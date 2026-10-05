@@ -1,0 +1,1086 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <title>Workiom Satış Playbook'u — Eğitim</title>
+    <script src="assets/vendor/gsap.min.js"></script>
+    <script src="assets/vendor/MotionPathPlugin.min.js"></script>
+    <style>
+      @font-face {
+  font-family: 'Fraunces';
+  font-style: italic;
+  font-weight: 400;
+  font-display: block;
+  src: url(assets/fonts/fraunces-6cc8f67d.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Fraunces';
+  font-style: italic;
+  font-weight: 400;
+  font-display: block;
+  src: url(assets/fonts/fraunces-feced23e.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Fraunces';
+  font-style: italic;
+  font-weight: 600;
+  font-display: block;
+  src: url(assets/fonts/fraunces-6cc8f67d.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Fraunces';
+  font-style: italic;
+  font-weight: 600;
+  font-display: block;
+  src: url(assets/fonts/fraunces-feced23e.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Fraunces';
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url(assets/fonts/fraunces-79671606.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Fraunces';
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url(assets/fonts/fraunces-39ce2001.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Fraunces';
+  font-style: normal;
+  font-weight: 600;
+  font-display: block;
+  src: url(assets/fonts/fraunces-79671606.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Fraunces';
+  font-style: normal;
+  font-weight: 600;
+  font-display: block;
+  src: url(assets/fonts/fraunces-39ce2001.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: block;
+  src: url(assets/fonts/jetbrainsmono-ba16536d.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: block;
+  src: url(assets/fonts/jetbrainsmono-480c0625.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 700;
+  font-display: block;
+  src: url(assets/fonts/jetbrainsmono-ba16536d.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 700;
+  font-display: block;
+  src: url(assets/fonts/jetbrainsmono-480c0625.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Rubik';
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url(assets/fonts/rubik-b7b482e1.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Rubik';
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url(assets/fonts/rubik-f673d854.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Rubik';
+  font-style: normal;
+  font-weight: 500;
+  font-display: block;
+  src: url(assets/fonts/rubik-b7b482e1.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Rubik';
+  font-style: normal;
+  font-weight: 500;
+  font-display: block;
+  src: url(assets/fonts/rubik-f673d854.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Rubik';
+  font-style: normal;
+  font-weight: 700;
+  font-display: block;
+  src: url(assets/fonts/rubik-b7b482e1.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Rubik';
+  font-style: normal;
+  font-weight: 700;
+  font-display: block;
+  src: url(assets/fonts/rubik-f673d854.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Rubik';
+  font-style: normal;
+  font-weight: 800;
+  font-display: block;
+  src: url(assets/fonts/rubik-b7b482e1.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Rubik';
+  font-style: normal;
+  font-weight: 800;
+  font-display: block;
+  src: url(assets/fonts/rubik-f673d854.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+      :root {
+        --paper: #f5efe4;
+        --paper2: #ece3d2;
+        --card: #fffdf8;
+        --ink: #221e52;
+        --ink2: #4a4577;
+        --pur: #7b2ff0;
+        --pur-soft: #e6dafd;
+        --pink: #e0186a;
+        --pink-soft: #ffd9e7;
+        --yel: #f6b71e;
+        --yel-soft: #fdebbd;
+        --line: #d6ccb8;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--paper); }
+      #root {
+        position: relative; width: 100%; height: 100%; overflow: hidden;
+        font-family: "Rubik", sans-serif; color: var(--ink); background: var(--paper);
+      }
+      .scene {
+        position: absolute; inset: 0; overflow: hidden; visibility: hidden; z-index: 1;
+        background-color: var(--paper);
+        background-image: radial-gradient(rgba(34, 30, 82, 0.09) 1.2px, transparent 1.6px);
+        background-size: 8px 8px;
+      }
+      #s1 { visibility: visible; }
+      .a { position: absolute; }
+      .serif { font-family: "Fraunces", serif; font-weight: 600; letter-spacing: -0.03em; }
+      .it { font-style: italic; font-weight: 400; color: var(--pink); }
+      .mono { font-family: "JetBrains Mono", monospace; font-weight: 500; letter-spacing: 0.08em; }
+      .chap { left: 120px; top: 70px; font: 700 24px "JetBrains Mono", monospace; letter-spacing: 0.14em; color: var(--pur); }
+      .chap b { color: var(--ink); }
+      .h1 { left: 120px; top: 118px; font: 600 92px/1.02 "Fraunces", serif; letter-spacing: -0.035em; white-space: nowrap; }
+      .token {
+        width: 64px; height: 64px; border-radius: 50%; background: var(--pur);
+        box-shadow: 5px 6px 0 var(--ink); display: flex; align-items: center; justify-content: center;
+      }
+      .token svg { width: 30px; height: 30px; }
+      .chip {
+        display: inline-block; padding: 6px 18px; border: 3px solid var(--ink); border-radius: 40px;
+        font: 500 30px "Rubik", sans-serif; background: var(--card); white-space: nowrap;
+      }
+      .card { background: var(--card); border: 4px solid var(--ink); border-radius: 20px; box-shadow: 8px 10px 0 var(--ink); }
+      svg.full { position: absolute; left: 0; top: 0; overflow: visible; }
+      .overlay { position: absolute; z-index: 100; pointer-events: none; }
+
+      /* S1 */
+      #s1-logo { left: 160px; top: 250px; width: 470px; height: auto; }
+      #s1-kick { left: 164px; top: 418px; font-size: 26px; color: var(--ink2); }
+      #s1-h { left: 150px; top: 470px; font-size: 150px; line-height: 1; white-space: nowrap; }
+      #s1-h span { display: inline-block; }
+      #s1-sub { left: 160px; top: 680px; font: 400 44px "Rubik", sans-serif; }
+      .stn { width: 36px; height: 36px; border-radius: 50%; border: 5px solid var(--ink); background: var(--card); }
+
+      /* S2 */
+      .src { width: 420px; height: 150px; border: 4px solid var(--ink); border-radius: 80px; text-align: center; padding-top: 26px; }
+      .src b { display: block; font: 800 46px "Rubik", sans-serif; }
+      .src span { display: block; font: 500 22px "JetBrains Mono", monospace; color: var(--ink2); margin-top: 6px; letter-spacing: 0.04em; }
+      #s2-tray { left: 690px; top: 690px; width: 540px; height: 240px; border: 4px solid var(--ink); border-radius: 28px; background: var(--paper2); }
+      #s2-tray .mono { position: absolute; left: 22px; top: 14px; font-size: 22px; font-weight: 700; color: var(--ink2); }
+      #s2-card { left: 760px; top: 760px; width: 400px; height: 140px; padding: 18px 22px; }
+      #s2-card .row1 { display: flex; align-items: center; gap: 16px; font: 800 40px "Rubik", sans-serif; }
+      #s2-card .token { width: 44px; height: 44px; box-shadow: 3px 4px 0 var(--ink); }
+      #s2-card .token svg { width: 22px; height: 22px; }
+      #s2-srcrow { position: absolute; left: 22px; top: 82px; display: flex; align-items: center; gap: 12px; font: 500 22px "JetBrains Mono", monospace; color: var(--ink2); }
+      #s2-chipbox { position: relative; width: 170px; height: 42px; perspective: 400px; }
+      #s2-chipbox .chip { position: absolute; left: 0; top: 0; font-size: 24px; padding: 3px 14px; border-width: 2px; color: var(--ink); }
+      #s2-chipA { background: var(--pur-soft); }
+      #s2-chipB { background: var(--pink-soft); }
+
+      /* S3 */
+      #s3-dial { left: 300px; top: 260px; width: 640px; height: 640px; }
+      #s3-token { left: 585px; top: 545px; width: 70px; height: 70px; }
+      #s3-count { left: 520px; top: 680px; width: 200px; text-align: center; font: 700 34px "JetBrains Mono", monospace; font-variant-numeric: tabular-nums; }
+      #s3-big { left: 1060px; top: 250px; font-size: 230px; line-height: 1; white-space: nowrap; }
+      #s3-sub { left: 1070px; top: 545px; font: 400 46px "Rubik", sans-serif; }
+      #s3-taze { left: 1066px; top: 625px; font-size: 62px; }
+      #s3-preplbl { left: 1070px; top: 790px; font-size: 24px; font-weight: 700; color: var(--ink2); }
+      #s3-chips { left: 1070px; top: 836px; display: flex; gap: 14px; }
+      #s3-phone { left: 860px; top: 250px; width: 120px; height: 120px; }
+
+      /* S4 */
+      .seg { top: 440px; height: 200px; border-left: 3px dashed var(--line); }
+      .seg i { position: absolute; bottom: 100px; width: 9px; border-radius: 5px; transform-origin: 50% 50%; }
+      .seglbl { top: 340px; font: 700 34px "Rubik", sans-serif; white-space: nowrap; }
+      .seglbl span { display: block; font: 500 24px "JetBrains Mono", monospace; color: var(--ink2); margin-top: 4px; letter-spacing: 0.04em; }
+      .segnote { top: 660px; font: 400 28px "Rubik", sans-serif; color: var(--ink2); white-space: nowrap; }
+      #s4-head { left: 160px; top: 405px; width: 4px; height: 270px; background: var(--ink); border-radius: 2px; }
+      #s4-q { left: 160px; top: 770px; font-size: 64px; }
+      .tchip { top: 760px; width: 220px; height: 100px; border: 4px solid var(--ink); border-radius: 22px; background: var(--card); display: flex; align-items: center; justify-content: center; gap: 10px; font: 700 46px "JetBrains Mono", monospace; }
+      #s4-no { left: 160px; top: 910px; font: 400 38px "Rubik", sans-serif; color: var(--ink2); white-space: nowrap; }
+      #s4-strike { left: 150px; top: 935px; width: 560px; height: 6px; background: var(--pink); border-radius: 3px; transform-origin: 0 50%; }
+      #s4-notag { left: 740px; top: 917px; font: 700 26px "JetBrains Mono", monospace; color: var(--pink); }
+
+      /* S5 */
+      #s5-world { left: 0; top: 0; width: 3700px; height: 1080px; }
+      .knot { width: 150px; height: 150px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font: 800 66px "Rubik", sans-serif; color: var(--card); box-shadow: 8px 10px 0 var(--ink); }
+      .klbl { top: 700px; width: 360px; text-align: center; }
+      .klbl b { display: block; font: 700 46px "Rubik", sans-serif; }
+      .klbl span { display: block; font: 500 24px "JetBrains Mono", monospace; color: var(--ink2); margin-top: 6px; letter-spacing: 0.1em; }
+      .bub { top: 345px; width: 220px; height: 92px; background: var(--card); border: 4px solid var(--ink); border-radius: 26px; text-align: center; padding-top: 10px; }
+      .bub b { display: block; font: 700 32px "Rubik", sans-serif; }
+      .bub span { display: block; font: 500 18px "JetBrains Mono", monospace; color: var(--ink2); letter-spacing: 0.08em; }
+      .bub::after { content: ""; position: absolute; left: 92px; bottom: -22px; width: 30px; height: 30px; background: var(--card); border-right: 4px solid var(--ink); border-bottom: 4px solid var(--ink); clip-path: polygon(100% 0, 100% 100%, 0 100%); }
+      #s5-end { left: 3160px; top: 470px; width: 440px; height: 250px; padding: 26px 30px; }
+      #s5-end .mono { font-size: 20px; color: var(--ink2); margin-bottom: 8px; }
+      #s5-end .chip { font-size: 30px; margin-bottom: 16px; }
+      #s5-cold { left: 3170px; top: 770px; font-size: 52px; white-space: nowrap; }
+      #s5-badge { left: 120px; top: 850px; display: flex; align-items: center; gap: 28px; }
+      #s5-badge .box { width: 76px; height: 76px; border: 5px solid var(--ink); border-radius: 14px; background: var(--card); position: relative; }
+      #s5-badge .t { font: 600 66px/1 "Fraunces", serif; letter-spacing: -0.03em; white-space: nowrap; }
+      #s5-badge .m { font: 500 24px "JetBrains Mono", monospace; color: var(--ink2); margin-top: 10px; letter-spacing: 0.04em; }
+
+      /* S6 */
+      #s6-title { left: 1180px; top: 130px; width: 680px; font-size: 84px; line-height: 1.02; }
+      .row { left: 1180px; display: flex; align-items: center; gap: 24px; }
+      .row .num { width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font: 800 34px "Rubik", sans-serif; border: 4px solid var(--ink); }
+      .row b { display: block; font: 700 42px "Rubik", sans-serif; }
+      .row span { display: block; font: 500 24px "JetBrains Mono", monospace; color: var(--ink2); letter-spacing: 0.04em; }
+      .node { height: 76px; padding: 0 30px; border: 4px solid var(--ink); border-radius: 40px; display: flex; align-items: center; justify-content: center; font: 700 36px "Rubik", sans-serif; white-space: nowrap; box-shadow: 5px 6px 0 var(--ink); }
+      #s6-stamp { left: 1190px; top: 790px; padding: 10px 26px; border: 6px solid var(--pink); border-radius: 12px; font: 800 44px "Rubik", sans-serif; color: var(--pink); letter-spacing: 0.04em; white-space: nowrap; }
+      #s6-quote { left: 1186px; top: 890px; width: 700px; font: italic 400 36px/1.25 "Fraunces", serif; }
+
+      /* S7 */
+      #s7-frame { left: 200px; top: 320px; width: 820px; height: 430px; border: 5px solid var(--ink); background: var(--card); border-radius: 120px; box-shadow: 10px 12px 0 var(--ink); overflow: hidden; }
+      #s7-tail { left: 300px; top: 735px; width: 70px; height: 70px; background: var(--card); border-left: 5px solid var(--ink); border-bottom: 5px solid var(--ink); clip-path: polygon(0 0, 0 100%, 100% 0); }
+      #s7-quote { left: 0; top: 0; width: 820px; height: 430px; display: flex; align-items: center; justify-content: center; font: italic 400 70px "Fraunces", serif; }
+      #s7-ui { left: 0; top: 0; width: 820px; height: 430px; }
+      #s7-ui .bar { position: absolute; left: 0; top: 0; width: 820px; height: 54px; border-bottom: 4px solid var(--ink); background: var(--paper2); }
+      #s7-ui .dot { position: absolute; top: 18px; width: 16px; height: 16px; border-radius: 50%; border: 3px solid var(--ink); }
+      #s7-ui .side { position: absolute; left: 0; top: 54px; width: 150px; height: 376px; border-right: 4px solid var(--ink); background: var(--paper); }
+      #s7-ui .sl { position: absolute; left: 22px; height: 12px; border-radius: 6px; background: var(--line); }
+      #s7-ui .col { position: absolute; top: 80px; width: 190px; height: 320px; }
+      #s7-ui .ch { height: 14px; width: 110px; border-radius: 7px; background: var(--ink2); margin-bottom: 16px; }
+      #s7-ui .kc { height: 66px; border: 3px solid var(--ink); border-radius: 12px; background: var(--paper); margin-bottom: 12px; }
+      #s7-ui .kc.on { background: var(--pur); }
+      #s7-yes { left: 205px; top: 800px; font-size: 56px; }
+      #s7-cond { left: 1160px; top: 330px; }
+      #s7-cond .mono { font-size: 26px; font-weight: 700; color: var(--pur); margin-bottom: 26px; }
+      .cond { display: flex; align-items: center; gap: 24px; margin-bottom: 30px; font: 500 40px "Rubik", sans-serif; white-space: nowrap; }
+      .cond .cb { width: 62px; height: 62px; border: 5px solid var(--ink); border-radius: 12px; background: var(--card); flex: none; }
+      #s7-deal { left: 1300px; top: 700px; width: 230px; height: 230px; border-radius: 50%; border: 8px solid var(--pink); display: flex; align-items: center; justify-content: center; font: 800 64px "Rubik", sans-serif; color: var(--pink); background: var(--card); }
+      #s7-dealt { left: 1570px; top: 790px; font-size: 26px; font-weight: 700; color: var(--ink2); white-space: nowrap; }
+
+      /* S8 */
+      .blk { top: 420px; height: 130px; border: 4px solid var(--ink); border-radius: 16px; transform-origin: 0 50%; display: flex; align-items: center; justify-content: center; font: 700 32px "JetBrains Mono", monospace; }
+      .blbl { top: 362px; font: 700 32px "Rubik", sans-serif; white-space: nowrap; text-align: center; }
+      #s8-heartchips { left: 1080px; top: 486px; display: flex; gap: 10px; }
+      #s8-heartchips .chip { font-size: 22px; padding: 4px 12px; border-width: 2px; }
+      #s8-ref { left: 1450px; top: 120px; width: 420px; }
+      #s8-ref .q { font: italic 400 40px/1.15 "Fraunces", serif; }
+      #s8-ref .mono { font-size: 20px; font-weight: 700; color: var(--pur); margin-top: 12px; }
+      #s8-poc { left: 560px; top: 660px; width: 604px; height: 240px; border: 5px dashed var(--pur); border-radius: 26px; background: var(--card); padding: 22px 28px; }
+      #s8-poc .t { font: 800 50px "Rubik", sans-serif; color: var(--pur); }
+      #s8-poc .t span { font: 500 22px "JetBrains Mono", monospace; color: var(--ink2); margin-left: 14px; letter-spacing: 0.06em; }
+      #s8-poc .chips { display: flex; gap: 12px; margin-top: 22px; }
+      #s8-poc .chip { font-size: 26px; padding: 5px 14px; }
+      #s8-tek { left: 1772px; top: 572px; font: 700 26px "JetBrains Mono", monospace; color: var(--pink); }
+
+      /* S9 */
+      #s9-paper { left: 220px; top: 300px; width: 560px; height: 660px; background: var(--card); border: 4px solid var(--ink); border-radius: 12px; box-shadow: 12px 14px 0 var(--ink); padding: 40px 44px; }
+      #s9-paper .mono { font-size: 26px; font-weight: 700; color: var(--pur); line-height: 1.2; }
+      #s9-paper .pt { font: italic 400 36px/1.2 "Fraunces", serif; margin: 26px 0 34px; }
+      #s9-paper .ln { position: relative; height: 16px; border-radius: 8px; background: var(--line); margin-bottom: 26px; }
+      #s9-mark { position: absolute; left: -6px; top: -8px; height: 32px; border-radius: 6px; background: rgba(246, 183, 30, 0.55); transform-origin: 0 50%; }
+      #s9-marklbl { left: 300px; top: 572px; font: 700 20px "JetBrains Mono", monospace; color: var(--ink2); }
+      #s9-stamp { left: 420px; top: 820px; padding: 10px 22px; border: 6px solid var(--pink); border-radius: 10px; font: 800 36px "Rubik", sans-serif; color: var(--pink); background: rgba(255, 253, 248, 0.85); white-space: nowrap; }
+      #s9-glass { left: 1080px; top: 270px; width: 340px; height: 500px; }
+      #s9-day { left: 1090px; top: 790px; font-size: 28px; font-weight: 700; color: var(--ink2); width: 320px; height: 40px; }
+      #s9-day span { position: absolute; left: 0; top: 0; white-space: nowrap; }
+      #s9-cool, #s9-warm { left: 1086px; top: 840px; font-size: 48px; white-space: nowrap; }
+      #s9-call { left: 1440px; top: 420px; width: 440px; padding: 22px 26px; }
+      #s9-call .mono { font-size: 20px; font-weight: 700; color: var(--ink2); }
+      #s9-call b { display: block; font: 700 42px "Rubik", sans-serif; margin-top: 6px; white-space: nowrap; }
+      #s9-q { left: 1086px; top: 950px; font: italic 400 40px "Fraunces", serif; white-space: nowrap; }
+
+      /* S10 */
+      #s10-world { left: 0; top: 0; width: 1920px; height: 1080px; }
+      .stamp { width: 330px; height: 330px; border-radius: 50%; border: 9px solid; background: var(--card); text-align: center; padding-top: 40px; }
+      .stamp b { display: block; font: 600 120px/1 "Fraunces", serif; letter-spacing: -0.03em; }
+      .stamp i { display: block; font: 700 36px "Rubik", sans-serif; font-style: normal; margin-top: 22px; }
+      .stamp span { display: block; font: 500 18px "JetBrains Mono", monospace; color: var(--ink2); margin-top: 6px; letter-spacing: 0.04em; }
+      #s10-crm { left: 0; top: 690px; width: 1920px; text-align: center; font-size: 64px; }
+      .mst { width: 130px; height: 130px; border-radius: 50%; border: 9px solid var(--ink); display: flex; align-items: center; justify-content: center; font: 800 56px "Rubik", sans-serif; color: var(--card); }
+      .mlbl { width: 520px; text-align: center; font: 700 56px "Rubik", sans-serif; white-space: nowrap; }
+      #s10-end { left: 0; top: 0; width: 1920px; height: 1080px; }
+      #s10-logo { left: 650px; top: 380px; width: 620px; height: auto; }
+      #s10-tag { left: 0; top: 560px; width: 1920px; text-align: center; font-size: 66px; }
+      #s10-url { left: 0; top: 680px; width: 1920px; text-align: center; font-size: 26px; font-weight: 700; color: var(--ink2); }
+
+      /* overlays */
+      #ov-wipe { left: -6%; top: 0; width: 112%; height: 1080px; background: var(--ink); transform-origin: 0 50%; clip-path: polygon(3% 0, 100% 0, 97% 100%, 0 100%); }
+      #ov-swap { left: 754px; top: 778px; width: 100px; height: 100px; border-radius: 50%; background: var(--pur); }
+      #ov-blinds { left: 0; top: 0; width: 1920px; height: 1080px; }
+      #ov-blinds i { position: absolute; left: 0; width: 1920px; height: 182px; background: var(--paper2); border-bottom: 4px solid var(--ink); transform-origin: 50% 0; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="150" data-width="1920" data-height="1080">
+
+      <!-- ============ S1 — AÇILIŞ ============ -->
+      <section id="s1" class="scene">
+        <img id="s1-logo" class="a" src="assets/workiom-logo.png" alt="Workiom" />
+        <div id="s1-kick" class="a mono">SATIŞ PLAYBOOK'U · SÜRÜM 2.0</div>
+        <h1 id="s1-h" class="a serif"><span>Lead’den</span> <span class="it">imzaya.</span></h1>
+        <div id="s1-sub" class="a">Full cycle: tek kişi, uçtan uca.</div>
+        <svg class="full" width="1920" height="1080">
+          <defs>
+            <mask id="s1-mask" maskUnits="userSpaceOnUse" x="0" y="0" width="1920" height="1080">
+              <path id="s1-mpath" d="M1180 220 C 1500 180, 1760 330, 1640 470 S 1260 620, 1380 760 S 1740 900, 1990 860" stroke="#fff" stroke-width="30" fill="none" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1" />
+            </mask>
+          </defs>
+          <path d="M1180 220 C 1500 180, 1760 330, 1640 470 S 1260 620, 1380 760 S 1740 900, 1990 860" stroke="#221e52" stroke-width="6" fill="none" stroke-linecap="round" stroke-dasharray="1 18" mask="url(#s1-mask)" />
+        </svg>
+        <div id="s1-st1" class="a stn" style="left:1162px;top:202px"></div>
+        <div id="s1-st2" class="a stn" style="left:1622px;top:452px"></div>
+        <div id="s1-st3" class="a stn" style="left:1362px;top:742px"></div>
+        <div id="s1-token" class="a token" style="left:0;top:0"><svg viewBox="0 0 24 24"><path d="M6 18 L18 6 M9 6 H18 V15" stroke="#fffdf8" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </section>
+
+      <!-- ============ S2 — KAYNAKLAR ============ -->
+      <section id="s2" class="scene">
+        <div class="a chap"><b>01</b> — LEAD KAYNAKLARI</div>
+        <div id="s2-h" class="a h1">Her şey bir <span class="it">lead</span> ile başlar.</div>
+        <svg class="full" width="1920" height="1080">
+          <path id="s2-p1" d="M420 452 C 420 590, 860 560, 860 690" stroke="#221e52" stroke-width="5" fill="none" stroke-linecap="round" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1" />
+          <path id="s2-p2" d="M960 452 C 960 540, 1000 600, 1000 690" stroke="#221e52" stroke-width="5" fill="none" stroke-linecap="round" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1" />
+          <path id="s2-p3" d="M1500 452 C 1500 540, 1640 540, 1640 600" stroke="#c99410" stroke-width="5" fill="none" stroke-linecap="round" stroke-dasharray="4 14" />
+          <rect id="s2-p3m" x="1480" y="440" width="190" height="180" fill="#f5efe4" />
+          <ellipse id="s2-circ" cx="1040" cy="864" rx="118" ry="38" stroke="#e0186a" stroke-width="5" fill="none" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1" transform="rotate(-4 1040 864)" />
+        </svg>
+        <div id="s2-c1" class="a src" style="left:210px;top:300px;background:#e6dafd"><b>Inbound</b><span>Reklam · Organik</span></div>
+        <div id="s2-c2" class="a src" style="left:750px;top:300px;background:#ffd9e7"><b>Outbound</b><span>Apollo · LinkedIn · Seel</span></div>
+        <div id="s2-c3" class="a src" style="left:1290px;top:300px;background:#fdebbd"><b>Network</b><span>Çevre · Referans</span></div>
+        <div id="s2-net" class="a mono" style="left:1560px;top:618px;font-size:24px;color:#4a4577">kendi ritminde</div>
+        <div id="s2-hot" class="a serif it" style="left:150px;top:780px;font-size:48px">Inbound: en sıcağı.</div>
+        <div id="s2-d1" class="a" style="left:0;top:0;width:22px;height:22px;border-radius:50%;background:#7b2ff0"></div>
+        <div id="s2-d2" class="a" style="left:0;top:0;width:22px;height:22px;border-radius:50%;background:#7b2ff0"></div>
+        <div id="s2-d3" class="a" style="left:0;top:0;width:22px;height:22px;border-radius:50%;background:#e0186a"></div>
+        <div id="s2-tray" class="a"><span class="mono">CRM</span></div>
+        <div id="s2-card" class="a card">
+          <div class="row1"><div class="token"><svg viewBox="0 0 24 24"><path d="M6 18 L18 6 M9 6 H18 V15" stroke="#fffdf8" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>LEAD</div>
+          <div id="s2-srcrow">Source:<div id="s2-chipbox"><div id="s2-chipA" class="chip">Inbound</div><div id="s2-chipB" class="chip">Outbound</div></div></div>
+        </div>
+        <svg id="s2-mail" class="a" style="left:1080px;top:470px" width="90" height="66" viewBox="0 0 90 66"><rect x="4" y="4" width="82" height="58" rx="8" fill="#fffdf8" stroke="#221e52" stroke-width="5"/><path d="M6 8 L45 38 L84 8" stroke="#221e52" stroke-width="5" fill="none" stroke-linejoin="round"/></svg>
+        <div id="s2-truth" class="a serif" style="left:1270px;top:800px;font-size:54px;white-space:nowrap">Source = <span class="it">gerçek kaynak.</span></div>
+      </section>
+
+      <!-- ============ S3 — 15 DK ============ -->
+      <section id="s3" class="scene">
+        <div class="a chap"><b>02</b> — SPEED-TO-LEAD</div>
+        <svg id="s3-dial" class="a" viewBox="0 0 640 640" width="640" height="640">
+          <circle id="s3-face" cx="320" cy="320" r="284" fill="#fffdf8" stroke="#221e52" stroke-width="8" />
+          <circle id="s3-wedge" cx="320" cy="320" r="130" fill="none" stroke="#7b2ff0" stroke-opacity="0.28" stroke-width="260" pathLength="1" stroke-dasharray="0 1" transform="rotate(-90 320 320)" />
+          <g id="s3-ticks"></g>
+          <line id="s3-hand" x1="320" y1="320" x2="320" y2="86" stroke="#221e52" stroke-width="10" stroke-linecap="round" />
+        </svg>
+        <div id="s3-token" class="a token"><svg viewBox="0 0 24 24"><path d="M6 18 L18 6 M9 6 H18 V15" stroke="#fffdf8" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div id="s3-count" class="a">00:00</div>
+        <svg id="s3-phone" class="a" viewBox="0 0 120 120" width="120" height="120">
+          <path d="M34 22 C 26 22 18 30 20 42 C 26 74 46 94 78 100 C 90 102 98 94 98 86 L 98 76 L 78 68 L 68 78 C 56 72 48 64 42 52 L 52 42 L 44 22 Z" fill="#e0186a" stroke="#221e52" stroke-width="5" stroke-linejoin="round" />
+          <path id="s3-r1" d="M70 20 Q 92 24 98 46" stroke="#221e52" stroke-width="5" fill="none" stroke-linecap="round" />
+          <path id="s3-r2" d="M72 4 Q 110 10 114 46" stroke="#221e52" stroke-width="5" fill="none" stroke-linecap="round" />
+        </svg>
+        <div id="s3-big" class="a serif">≤ 15 dk</div>
+        <div id="s3-sub" class="a">Lead düştü → ilk arama.</div>
+        <div id="s3-taze" class="a serif it">İhtiyaç henüz taze.</div>
+        <div id="s3-preplbl" class="a mono">1–2 DK HAZIRLIK, FAZLASI DEĞİL</div>
+        <div id="s3-chips" class="a"><span class="chip">şirket</span><span class="chip">sektör</span><span class="chip">kullanım amacı</span></div>
+      </section>
+
+      <!-- ============ S4 — İLK ARAMA ============ -->
+      <section id="s4" class="scene">
+        <div class="a chap"><b>03</b> — İLK ARAMA · 5–10 DK</div>
+        <div id="s4-h" class="a h1">Hedef: <span class="it">toplantı.</span></div>
+        <div id="s4-segs"></div>
+        <div id="s4-l1" class="a seglbl" style="left:180px">Açılış<span>30 sn</span></div>
+        <div id="s4-l2" class="a seglbl" style="left:420px">Dinle<span>2–3 dk</span></div>
+        <div id="s4-l3" class="a seglbl" style="left:940px">Çemberleri aç<span>2–3 dk</span></div>
+        <div id="s4-l4" class="a seglbl" style="left:1460px">Kapat<span>1 dk</span></div>
+        <div id="s4-n1" class="a segnote" style="left:180px">izin iste</div>
+        <div id="s4-n2" class="a segnote" style="left:420px">soru sor, not al</div>
+        <div id="s4-n3" class="a segnote" style="left:940px">demo değil, merak</div>
+        <div id="s4-n4" class="a segnote" style="left:1460px">iki seçenek sun</div>
+        <div id="s4-head" class="a"></div>
+        <div id="s4-q" class="a serif it">“Yarın 11:00 mı, 15:00 mü?”</div>
+        <div id="s4-c1" class="a tchip" style="left:1250px">11:00</div>
+        <div id="s4-c2" class="a tchip" style="left:1500px">15:00</div>
+        <div id="s4-no" class="a">“Müsait olunca haberleşelim.”</div>
+        <div id="s4-strike" class="a"></div>
+        <div id="s4-notag" class="a">BÖYLE BİTİRME</div>
+      </section>
+
+      <!-- ============ S5 — TAKİP KADANSI ============ -->
+      <section id="s5" class="scene">
+        <div id="s5-world" class="a">
+          <svg class="full" width="3700" height="1080">
+            <defs>
+              <mask id="s5-mask" maskUnits="userSpaceOnUse" x="0" y="0" width="3700" height="1080">
+                <path id="s5-mpath" d="" stroke="#fff" stroke-width="200" fill="none" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1" />
+              </mask>
+            </defs>
+            <path id="s5-rope" d="" stroke="#221e52" stroke-width="7" fill="none" stroke-linecap="round" stroke-dasharray="1 20" mask="url(#s5-mask)" />
+          </svg>
+          <div id="s5-b1" class="a bub" style="left:440px"><b>Mesaj 1</b><span>WHATSAPP</span></div>
+          <div id="s5-b2" class="a bub" style="left:1640px"><b>Mesaj 2</b><span>WHATSAPP</span></div>
+          <div id="s5-b3" class="a bub" style="left:2840px"><b>Mesaj 3</b><span>WHATSAPP</span></div>
+          <div id="s5-k1" class="a knot" style="left:475px;top:525px;background:#7b2ff0">1</div>
+          <div id="s5-k2" class="a knot" style="left:1075px;top:525px;background:#7b2ff0">2</div>
+          <div id="s5-k3" class="a knot" style="left:1675px;top:525px;background:#f6b71e;color:#221e52">3</div>
+          <div id="s5-k4" class="a knot" style="left:2275px;top:525px;background:#7b2ff0">4</div>
+          <div id="s5-k5" class="a knot" style="left:2875px;top:525px;background:#e0186a">5</div>
+          <svg id="s5-gear" class="a" style="left:1790px;top:500px" width="70" height="70" viewBox="0 0 70 70"><g id="s5-gearg"><path d="M35 6 L40 6 L42 15 L50 18 L57 12 L61 16 L55 24 L58 31 L67 33 L67 39 L58 41 L55 48 L61 56 L57 60 L49 54 L42 57 L40 66 L33 66 L31 57 L23 54 L16 60 L12 56 L18 48 L15 41 L6 39 L6 33 L15 31 L18 24 L12 16 L16 12 L23 18 L31 15 L33 6 Z" fill="#f6b71e" stroke="#221e52" stroke-width="4" stroke-linejoin="round"/><circle cx="36.5" cy="36" r="9" fill="#fffdf8" stroke="#221e52" stroke-width="4"/></g></svg>
+          <div id="s5-l1" class="a klbl" style="left:370px"><b>≤ 15 dk</b><span>İLK ARAMA</span></div>
+          <div id="s5-l2" class="a klbl" style="left:970px"><b>+2 saat</b><span>AYNI GÜN · MANUEL</span></div>
+          <div id="s5-l3" class="a klbl" style="left:1570px"><b>1 gün</b><span>OTOMATİK GÖREV</span></div>
+          <div id="s5-l4" class="a klbl" style="left:2170px"><b>ertesi gün</b><span>FARKLI SAAT DENE</span></div>
+          <div id="s5-l5" class="a klbl" style="left:2770px"><b>ertesi gün</b><span>SON DENEME</span></div>
+          <div id="s5-end" class="a card">
+            <div class="mono">STATÜ</div>
+            <span class="chip" style="background:#e0186a;color:#fffdf8;border-color:#221e52">Unqualified</span>
+            <div class="mono">NEDEN</div>
+            <span class="chip">Non-responding</span>
+          </div>
+          <div id="s5-cold" class="a serif it">Soğuk — ölü değil.</div>
+          <div id="s5-token" class="a token" style="left:0;top:0"><svg viewBox="0 0 24 24"><path d="M6 18 L18 6 M9 6 H18 V15" stroke="#fffdf8" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        </div>
+        <div class="a chap"><b>04</b> — TAKİP KADANSI</div>
+        <div id="s5-h" class="a h1">Beş deneme, <span class="it">sonra</span> karar.</div>
+        <div id="s5-badge" class="a">
+          <div class="box"><svg class="full" width="76" height="76" viewBox="0 0 76 76" style="left:-5px;top:-5px"><path id="s5-check" d="M16 40 L31 54 L60 22" stroke="#7b2ff0" stroke-width="9" fill="none" stroke-linecap="round" stroke-linejoin="round" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1"/></svg></div>
+          <div><div class="t">Hiçbir lead görevsiz kalmaz.</div><div class="m">Görüştün, toplantı yok, açık görev yok → sistem 2 gün sonraya arama görevi açar</div></div>
+        </div>
+      </section>
+
+      <!-- ============ S6 — ÜÇ ÇEMBER ============ -->
+      <section id="s6" class="scene">
+        <div class="a chap"><b>05</b> — İHTİYAÇ ÇEMBERLERİ</div>
+        <svg class="full" width="1920" height="1080">
+          <g id="s6-rings" fill="none" stroke-width="5" stroke-dasharray="14 12">
+            <circle id="s6-r1" cx="660" cy="600" r="170" stroke="#7b2ff0" />
+            <circle id="s6-r2" cx="660" cy="600" r="320" stroke="#e0186a" />
+            <circle id="s6-r3" cx="660" cy="600" r="470" stroke="#d99a00" />
+          </g>
+          <path id="s6-ground" d="M300 945 C 420 930, 520 955, 660 942 S 900 930, 1040 946" stroke="#221e52" stroke-width="6" fill="none" stroke-linecap="round" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1" />
+          <g fill="none" stroke="#221e52" stroke-width="9" stroke-linecap="round">
+            <path id="s6-stem" d="M660 940 C 646 850, 676 760, 660 640" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1" />
+            <path id="s6-bL" d="M660 720 C 600 700, 480 560, 430 500" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1" />
+            <path id="s6-bR" d="M662 700 C 720 680, 850 560, 890 500" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1" />
+            <path id="s6-b3a" d="M420 470 C 400 420, 340 360, 320 320" stroke-width="7" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1" />
+            <path id="s6-b3b" d="M900 470 C 920 420, 980 360, 1000 320" stroke-width="7" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1" />
+            <path id="s6-b3c" d="M660 560 C 666 440, 654 330, 660 230" stroke-width="7" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1" />
+          </g>
+          <g id="s6-leaves" fill="#e6dafd" stroke="#221e52" stroke-width="4">
+            <ellipse id="s6-lf1" cx="620" cy="830" rx="34" ry="16" transform="rotate(-30 620 830)" />
+            <ellipse id="s6-lf2" cx="700" cy="780" rx="34" ry="16" transform="rotate(25 700 780)" />
+            <ellipse id="s6-lf3" cx="540" cy="610" rx="30" ry="14" transform="rotate(-50 540 610)" />
+            <ellipse id="s6-lf4" cx="790" cy="600" rx="30" ry="14" transform="rotate(45 790 600)" />
+          </g>
+        </svg>
+        <div id="s6-seed" class="a token" style="left:628px;top:880px"><svg viewBox="0 0 24 24"><path d="M6 18 L18 6 M9 6 H18 V15" stroke="#fffdf8" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div id="s6-n1" class="a node" style="left:560px;top:562px;width:200px;background:#7b2ff0;color:#fffdf8">Görev</div>
+        <div id="s6-n2a" class="a node" style="left:320px;top:432px;width:200px;background:#e0186a;color:#fffdf8">Proje</div>
+        <div id="s6-n2b" class="a node" style="left:790px;top:432px;width:220px;background:#e0186a;color:#fffdf8">Müşteri</div>
+        <div id="s6-n3a" class="a node" style="left:210px;top:250px;width:220px;background:#f6b71e">Masraf</div>
+        <div id="s6-n3b" class="a node" style="left:890px;top:250px;width:220px;background:#f6b71e">Teklif</div>
+        <div id="s6-n3c" class="a node" style="left:540px;top:156px;width:240px;background:#f6b71e">Raporlama</div>
+        <div id="s6-title" class="a serif">Müşteri bir <span class="it">fidanla</span> gelir.</div>
+        <div id="s6-row1" class="a row" style="top:400px"><div class="num" style="background:#7b2ff0;color:#fffdf8">1</div><div><b>Geldiği ihtiyaç</b><span>önce burası tam kapanır</span></div></div>
+        <div id="s6-row2" class="a row" style="top:520px"><div class="num" style="background:#e0186a;color:#fffdf8">2</div><div><b>Bağlı süreçler</b><span>görev → proje → müşteri</span></div></div>
+        <div id="s6-row3" class="a row" style="top:640px"><div class="num" style="background:#f6b71e">3</div><div><b>Genişleme alanları</b><span>teklif · masraf · rapor</span></div></div>
+        <div id="s6-stamp" class="a">EKSTRA BÜTÇE YOK</div>
+        <div id="s6-quote" class="a">“Bunların hepsini ekstra bir bütçe ödemeden yapabilirsiniz.”</div>
+      </section>
+
+      <!-- ============ S7 — SÖZ'DEN KANIT'A ============ -->
+      <section id="s7" class="scene">
+        <div class="a chap"><b>06</b> — DEAL AŞAMASI</div>
+        <div id="s7-h" class="a h1">Söz’den <span class="it">kanıt’a.</span></div>
+        <div id="s7-tail" class="a"></div>
+        <div id="s7-frame" class="a">
+          <div id="s7-quote" class="a">“Bunu yapabilirsiniz.”</div>
+          <div id="s7-ui" class="a">
+            <div class="bar"><div class="dot" style="left:22px;background:#e0186a"></div><div class="dot" style="left:50px;background:#f6b71e"></div><div class="dot" style="left:78px;background:#7b2ff0"></div></div>
+            <div class="side"><div class="sl" style="top:30px;width:96px"></div><div class="sl" style="top:62px;width:76px"></div><div class="sl" style="top:94px;width:104px"></div><div class="sl" style="top:126px;width:66px"></div><div class="sl" style="top:158px;width:90px"></div></div>
+            <div class="col" style="left:176px"><div class="ch"></div><div class="kc s7k"></div><div class="kc s7k"></div><div class="kc s7k"></div></div>
+            <div class="col" style="left:390px"><div class="ch"></div><div class="kc s7k"></div><div class="kc on s7k" id="s7-on"></div></div>
+            <div class="col" style="left:604px"><div class="ch"></div><div class="kc s7k"></div></div>
+          </div>
+        </div>
+        <div id="s7-yes" class="a serif it">“Evet, işte böyle.”</div>
+        <div id="s7-cond" class="a">
+          <div class="mono">DEAL = ÜÇ KOŞUL</div>
+          <div class="cond" id="s7-c1"><div class="cb"><svg width="62" height="62" viewBox="0 0 62 62" style="margin:-5px"><path id="s7-k1" d="M14 33 L26 45 L50 18" stroke="#7b2ff0" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1"/></svg></div>Gerçek satış potansiyeli</div>
+          <div class="cond" id="s7-c2"><div class="cb"><svg width="62" height="62" viewBox="0 0 62 62" style="margin:-5px"><path id="s7-k2" d="M14 33 L26 45 L50 18" stroke="#7b2ff0" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1"/></svg></div>Platformu anladı</div>
+          <div class="cond" id="s7-c3"><div class="cb"><svg width="62" height="62" viewBox="0 0 62 62" style="margin:-5px"><path id="s7-k3" d="M14 33 L26 45 L50 18" stroke="#7b2ff0" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1"/></svg></div>Acil ihtiyaç: “şimdi lazım”</div>
+        </div>
+        <div id="s7-deal" class="a">DEAL</div>
+        <div id="s7-dealt" class="a mono">→ EN HIZLI KAPANIŞ</div>
+      </section>
+
+      <!-- ============ S8 — TOPLANTI + POC ============ -->
+      <section id="s8" class="scene">
+        <div class="a chap"><b>07</b> — TOPLANTI AKIŞI</div>
+        <div id="s8-h" class="a h1">Kalp: <span class="it">onların ihtiyacı.</span></div>
+        <div id="s8-b1" class="a blk" style="left:160px;width:154px;background:#ece3d2">5</div>
+        <div id="s8-b2" class="a blk" style="left:320px;width:394px;background:#e6dafd">10–15</div>
+        <div id="s8-b3" class="a blk" style="left:720px;width:154px;background:#ece3d2">5</div>
+        <div id="s8-b4" class="a blk" style="left:880px;width:714px;background:#7b2ff0;color:#fffdf8;justify-content:flex-start;padding:0 0 46px 24px">20–25 dk</div>
+        <div id="s8-b5" class="a blk" style="left:1600px;width:154px;background:#fdebbd">5</div>
+        <div id="s8-l1" class="a blbl" style="left:137px;width:200px">Kısaca anlat</div>
+        <div id="s8-l2" class="a blbl" style="left:417px;width:200px">Dinle</div>
+        <div id="s8-l3" class="a blbl" style="left:697px;width:200px">Süreçlerimiz</div>
+        <div id="s8-l4" class="a blbl" style="left:1037px;width:400px">İhtiyaç üzerinden</div>
+        <div id="s8-l5" class="a blbl" style="left:1577px;width:200px">Sonraki adım</div>
+        <div id="s8-heartchips" class="a"><span class="chip">“şu var” → “burada”</span><span class="chip">“şu var” → “burada”</span></div>
+        <svg class="full" width="1920" height="1080">
+          <path id="s8-refp" d="M1480 412 C 1490 350, 1500 300, 1520 268" stroke="#221e52" stroke-width="5" fill="none" stroke-linecap="round" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1" />
+          <path id="s8-pa" d="M1420 552 C 1420 680, 1300 770, 1164 770" stroke="#7b2ff0" stroke-width="6" fill="none" stroke-linecap="round" stroke-dasharray="3 14" />
+          <path id="s8-pb" d="M1164 840 C 1420 900, 1676 840, 1676 552" stroke="#7b2ff0" stroke-width="6" fill="none" stroke-linecap="round" stroke-dasharray="3 14" />
+          <path id="s8-arrow" d="M1764 485 L 1850 485 M 1826 462 L 1852 485 L 1826 508" stroke="#e0186a" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1" />
+        </svg>
+        <div id="s8-ref" class="a"><div class="q">“Benzer bir müşterimiz var…”</div><div class="mono">REFERANS = BİLEŞİK FAİZ</div></div>
+        <div id="s8-poc" class="a"><div class="t">POC<span>KANIT GEREKİRSE</span></div><div class="chips"><span class="chip">dar kapsam</span><span class="chip">1–2 senaryo</span><span class="chip">tarihli</span></div></div>
+        <div id="s8-tek" class="a">TEKLİF</div>
+        <div id="s8-token" class="a token" style="left:0;top:0"><svg viewBox="0 0 24 24"><path d="M6 18 L18 6 M9 6 H18 V15" stroke="#fffdf8" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </section>
+
+      <!-- ============ S9 — TEKLİF ============ -->
+      <section id="s9" class="scene">
+        <div class="a chap"><b>08</b> — TEKLİF VE KAPANIŞ</div>
+        <div id="s9-h" class="a h1">En hızlı şekilde <span class="it">kapat.</span></div>
+        <div id="s9-paper" class="a">
+          <div class="mono">TEKLİF</div>
+          <div class="pt">Sizin için kurduğumuz resim</div>
+          <div class="ln s9l" style="width:100%"></div>
+          <div class="ln s9l" style="width:86%"></div>
+          <div class="ln s9l" style="width:94%"><div id="s9-mark" style="width:106%"></div></div>
+          <div class="ln s9l" style="width:70%"></div>
+          <div class="ln s9l" style="width:90%"></div>
+          <div class="ln s9l" style="width:58%"></div>
+        </div>
+        <div id="s9-marklbl" class="a mono">← MÜŞTERİNİN KELİMELERİ</div>
+        <div id="s9-stamp" class="a">GEÇERLİLİK TARİHLİ</div>
+        <svg id="s9-glass" class="a" viewBox="0 0 340 500" width="340" height="500">
+          <g id="s9-steam" fill="none" stroke="#221e52" stroke-width="6" stroke-linecap="round">
+            <path id="s9-st1" d="M130 150 C 110 120, 150 100, 130 70 S 150 30, 135 10" />
+            <path id="s9-st2" d="M175 150 C 155 115, 195 95, 175 60 S 195 25, 178 0" />
+            <path id="s9-st3" d="M220 150 C 200 120, 240 100, 220 70 S 240 30, 222 10" />
+          </g>
+          <path d="M110 180 C 100 230, 130 260, 120 300 C 110 350, 120 400, 130 430 L 220 430 C 230 400, 240 350, 230 300 C 220 260, 250 230, 240 180 Z" fill="#fffdf8" stroke="#221e52" stroke-width="6" stroke-linejoin="round" />
+          <path id="s9-tea" d="M116 214 C 124 250, 128 270, 122 300 C 114 350, 124 400, 134 424 L 216 424 C 226 400, 236 350, 228 300 C 222 270, 226 250, 234 214 Z" fill="#c8641c" />
+          <path d="M110 180 C 100 230, 130 260, 120 300 C 110 350, 120 400, 130 430 L 220 430 C 230 400, 240 350, 230 300 C 220 260, 250 230, 240 180" fill="none" stroke="#221e52" stroke-width="6" stroke-linejoin="round" />
+          <ellipse cx="175" cy="450" rx="130" ry="26" fill="#ece3d2" stroke="#221e52" stroke-width="6" />
+        </svg>
+        <div id="s9-day" class="a mono"><span id="s9-d0">BUGÜN</span><span id="s9-d1">3 GÜN SONRA</span><span id="s9-d2">7 GÜN SONRA</span></div>
+        <div id="s9-cool" class="a serif it">Bekleyen teklif soğur.</div>
+        <div id="s9-warm" class="a serif">Takvime bağla, <span class="it">sıcak tut.</span></div>
+        <div id="s9-call" class="a card"><div class="mono">TEKLİF GÖRÜŞMESİ</div><b>Çarşamba · 15 dk</b></div>
+        <div id="s9-q" class="a">“Neyi netleştirirsek karar kolaylaşır?”</div>
+      </section>
+
+      <!-- ============ S10 — ALTIN KURALLAR + KAPANIŞ ============ -->
+      <section id="s10" class="scene">
+        <div id="s10-world" class="a">
+          <svg class="full" width="1920" height="1080">
+            <defs>
+              <mask id="s10-mask" maskUnits="userSpaceOnUse" x="-1200" y="-800" width="4400" height="2800">
+                <path id="s10-mpath" d="" stroke="#fff" stroke-width="60" fill="none" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1" />
+              </mask>
+            </defs>
+            <path id="s10-route" d="" stroke="#221e52" stroke-width="12" fill="none" stroke-linecap="round" stroke-dasharray="2 34" mask="url(#s10-mask)" />
+          </svg>
+          <div id="s10-map"></div>
+          <div id="s10-st1" class="a stamp" style="left:325px;top:300px;border-color:#7b2ff0"><b>15</b><i>dakika</i><span>ilk arama</span></div>
+          <div id="s10-st2" class="a stamp" style="left:795px;top:300px;border-color:#f6b71e"><b>5</b><i>temas</i><span>vazgeçmeden önce</span></div>
+          <div id="s10-st3" class="a stamp" style="left:1265px;top:300px;border-color:#e0186a"><b>0</b><i>görevsiz lead</i><span>hep bir sonraki adım</span></div>
+          <div id="s10-crm" class="a serif">CRM <span class="it">tek doğruluk kaynağı.</span></div>
+          <div id="s10-token" class="a token" style="left:0;top:0;width:110px;height:110px;box-shadow:8px 10px 0 #221e52"><svg viewBox="0 0 24 24" style="width:52px;height:52px"><path d="M6 18 L18 6 M9 6 H18 V15" stroke="#fffdf8" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        </div>
+        <div id="s10-chap" class="a chap"><b>09</b> — ALTIN KURALLAR</div>
+        <div id="s10-end" class="a">
+          <img id="s10-logo" class="a" src="assets/workiom-logo.png" alt="Workiom" />
+          <div id="s10-tag" class="a serif">Playbook’u <span class="it">masanda tut.</span></div>
+          <div id="s10-url" class="a mono">WORKIOM.COM/TR</div>
+        </div>
+      </section>
+
+      <!-- audio: score + tuned SFX (tools/make_audio.py) -->
+      <audio id="bgm" src="assets/audio/music.mp3" data-start="0" data-duration="150" data-track-index="10" data-volume="0.55"></audio>
+      <audio id="sfx" src="assets/audio/sfx.mp3" data-start="0" data-duration="150" data-track-index="11" data-volume="0.8"></audio>
+
+      <!-- overlays (transitions) -->
+      <div id="ov-wipe" class="overlay"></div>
+      <div id="ov-swap" class="overlay" style="opacity:0"></div>
+      <div id="ov-blinds" class="overlay"><i style="top:0"></i><i style="top:180px"></i><i style="top:360px"></i><i style="top:540px"></i><i style="top:720px"></i><i style="top:900px"></i></div>
+    </div>
+
+    <script>
+      gsap.registerPlugin(MotionPathPlugin);
+      const tl = gsap.timeline({ paused: true });
+      const T = [0, 10, 22.5, 35, 47.5, 67.5, 85, 97.5, 117.5, 132.5, 150];
+      const S = (n) => T[n - 1];
+      const $ = (s) => document.querySelector(s);
+      const $$ = (s) => Array.from(document.querySelectorAll(s));
+      const NS = "http://www.w3.org/2000/svg";
+
+      // --- helpers (all fromTo with explicit start states → seek-safe) ---
+      const pop = (sel, t, o = {}) =>
+        tl.fromTo(sel, { scale: o.from ?? 0.2, opacity: 0, rotation: o.rot ?? 0 },
+          { scale: 1, opacity: 1, rotation: o.rotTo ?? 0, duration: o.d ?? 0.55, ease: o.ease ?? "back.out(1.7)", stagger: o.st ?? 0 }, t);
+      const rise = (sel, t, o = {}) =>
+        tl.fromTo(sel, { y: o.y ?? 46, opacity: 0 },
+          { y: 0, opacity: 1, duration: o.d ?? 0.7, ease: o.ease ?? "power3.out", stagger: o.st ?? 0 }, t);
+      const slide = (sel, t, o = {}) =>
+        tl.fromTo(sel, { x: o.x ?? -60, opacity: 0 },
+          { x: 0, opacity: 1, duration: o.d ?? 0.7, ease: o.ease ?? "power3.out", stagger: o.st ?? 0 }, t);
+      const fade = (sel, t, d = 0.6) => tl.fromTo(sel, { opacity: 0 }, { opacity: 1, duration: d, ease: "sine.out" }, t);
+      const draw = (sel, t, d, ease = "power2.inOut", to = 0) =>
+        tl.fromTo(sel, { strokeDashoffset: 1 }, { strokeDashoffset: to, duration: d, ease }, t);
+      const show = (n, t) => tl.set("#s" + n, { visibility: "visible" }, t);
+      const hide = (n, t) => tl.set("#s" + n, { visibility: "hidden" }, t);
+      const chap = (n, t) => slide(`#s${n} .chap`, t, { x: -30, d: 0.6 });
+      const breathe = (sel, t, dur, props, cycle = 1.6) =>
+        tl.to(sel, { ...props, duration: cycle / 2, ease: "sine.inOut", yoyo: true, repeat: Math.max(0, Math.floor(dur / (cycle / 2)) - 1) }, t);
+
+      // ================= S1 — AÇILIŞ (0–10) =================
+      tl.fromTo("#s1-logo", { clipPath: "inset(0% 100% 0% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 1.0, ease: "power3.inOut" }, 0.3);
+      rise("#s1-kick", 1.0, { y: 20 });
+      tl.fromTo("#s1-h span", { yPercent: 70, opacity: 0, rotation: 4 }, { yPercent: 0, opacity: 1, rotation: 0, duration: 0.8, ease: "power4.out", stagger: 0.28 }, 1.5);
+      rise("#s1-sub", 2.7, { y: 24 });
+      draw("#s1-mpath", 3.2, 2.6, "power1.inOut");
+      pop(["#s1-st1", "#s1-st2", "#s1-st3"], 3.4, { st: 0.75, d: 0.45 });
+      gsap.set("#s1-token", { xPercent: -50, yPercent: -50 });
+      tl.fromTo("#s1-token", { x: 1180, y: -120, opacity: 1 }, { x: 1180, y: 220, duration: 0.7, ease: "power3.in" }, 5.6);
+      tl.fromTo("#s1-token", { scaleX: 1, scaleY: 1 }, { scaleX: 1.25, scaleY: 0.8, duration: 0.12, ease: "power1.out", yoyo: true, repeat: 1, immediateRender: false }, 6.3);
+      tl.to("#s1-token", { motionPath: { path: "M1180 220 C 1500 180, 1760 330, 1640 470 S 1260 620, 1380 760 S 1740 900, 2060 850", autoRotate: false }, duration: 2.9, ease: "power2.inOut" }, 7.0);
+
+      // ---- transition S1→S2: ink wipe ----
+      tl.fromTo("#ov-wipe", { scaleX: 0, transformOrigin: "0% 50%" }, { scaleX: 1, duration: 0.42, ease: "power3.in" }, 9.55);
+      hide(1, 9.97); show(2, 9.97);
+      tl.set("#ov-wipe", { transformOrigin: "100% 50%" }, 9.97);
+      tl.to("#ov-wipe", { scaleX: 0, duration: 0.5, ease: "power3.out" }, 9.98);
+
+      // ================= S2 — KAYNAKLAR (10–22.5) =================
+      {
+        const b = S(2);
+        chap(2, b + 0.3);
+        rise("#s2-h", b + 0.5);
+        pop(["#s2-c1", "#s2-c2", "#s2-c3"], b + 1.0, { st: 0.22, from: 0.6, ease: "back.out(1.4)" });
+        draw("#s2-p1", b + 1.9, 0.8); draw("#s2-p2", b + 2.05, 0.7);
+        tl.fromTo("#s2-p3m", { attr: { y: 440 } }, { attr: { y: 640 }, duration: 0.9, ease: "power2.inOut" }, b + 2.2);
+        fade("#s2-net", b + 3.0);
+        pop("#s2-tray", b + 2.4, { from: 0.85, ease: "power3.out", d: 0.5 });
+        gsap.set(["#s2-d1", "#s2-d2", "#s2-d3"], { xPercent: -50, yPercent: -50 });
+        tl.fromTo("#s2-d1", { opacity: 0 }, { opacity: 1, duration: 0.1 }, b + 3.0);
+        tl.fromTo("#s2-d1", { x: 420, y: 452 }, { motionPath: { path: "M420 452 C 420 590, 860 560, 860 690" }, duration: 1.0, ease: "power1.in" }, b + 3.0);
+        tl.to("#s2-d1", { opacity: 0, duration: 0.15 }, b + 4.0);
+        tl.fromTo("#s2-d2", { opacity: 0 }, { opacity: 1, duration: 0.1 }, b + 3.3);
+        tl.fromTo("#s2-d2", { x: 960, y: 452 }, { motionPath: { path: "M960 452 C 960 540, 1000 600, 1000 690" }, duration: 0.9, ease: "power1.in" }, b + 3.3);
+        tl.to("#s2-d2", { opacity: 0, duration: 0.15 }, b + 4.2);
+        tl.fromTo("#s2-card", { y: -260, opacity: 0, rotation: -6 }, { y: 0, opacity: 1, rotation: 0, duration: 0.6, ease: "power3.out" }, b + 4.1);
+        rise("#s2-hot", b + 4.9, { y: 24 });
+        gsap.set("#s2-chipB", { rotationX: -90, opacity: 0 });
+        // outbound mail travels → source correction
+        tl.fromTo("#s2-mail", { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.45, ease: "back.out(1.8)" }, b + 6.2);
+        gsap.set("#s2-d3", { opacity: 0 });
+        tl.fromTo("#s2-d3", { x: 1125, y: 540, opacity: 1 }, { x: 1040, y: 864, duration: 0.8, ease: "power2.in", immediateRender: false }, b + 6.8);
+        tl.to("#s2-d3", { opacity: 0, duration: 0.1 }, b + 7.6);
+        draw("#s2-circ", b + 7.4, 0.6, "power2.out");
+        tl.to("#s2-chipA", { rotationX: 90, opacity: 0, duration: 0.22, ease: "power2.in" }, b + 7.9);
+        tl.to("#s2-chipB", { rotationX: 0, opacity: 1, duration: 0.28, ease: "power2.out" }, b + 8.12);
+        rise("#s2-truth", b + 8.5, { y: 30 });
+        breathe("#s2-mail", b + 7.0, 4.5, { y: -8 }, 1.8);
+      }
+
+      // ---- transition S2→S3: scale-swap (lead token → dial centre) ----
+      tl.fromTo("#ov-swap", { opacity: 0, scale: 0.44 }, { opacity: 1, duration: 0.1 }, 22.0);
+      tl.to("#ov-swap", { scale: 46, duration: 0.45, ease: "power3.in" }, 22.02);
+      hide(2, 22.48); show(3, 22.48);
+      tl.to("#ov-swap", { scale: 0.7, x: 620 - 804, y: 580 - 828, duration: 0.6, ease: "power3.out" }, 22.5);
+      tl.to("#ov-swap", { opacity: 0, duration: 0.12 }, 23.1);
+
+      // ================= S3 — 15 DK (22.5–35) =================
+      {
+        const b = S(3);
+        // build ticks (deterministic)
+        const g = $("#s3-ticks");
+        for (let i = 0; i < 60; i++) {
+          const a = (i / 60) * Math.PI * 2, major = i % 5 === 0;
+          const r1 = major ? 236 : 252, r2 = 270;
+          const l = document.createElementNS(NS, "line");
+          l.setAttribute("x1", 320 + Math.sin(a) * r1); l.setAttribute("y1", 320 - Math.cos(a) * r1);
+          l.setAttribute("x2", 320 + Math.sin(a) * r2); l.setAttribute("y2", 320 - Math.cos(a) * r2);
+          l.setAttribute("stroke", i <= 15 ? "#7b2ff0" : "#221e52");
+          l.setAttribute("stroke-width", major ? 7 : 3); l.setAttribute("stroke-linecap", "round");
+          l.setAttribute("class", "s3t"); g.appendChild(l);
+        }
+        chap(3, b + 0.3);
+        tl.fromTo("#s3-face", { scale: 0.86, opacity: 0, svgOrigin: "320 320" }, { scale: 1, opacity: 1, duration: 0.6, ease: "power3.out" }, b + 0.15);
+        tl.fromTo("#s3-token", { scale: 1, opacity: 0 }, { opacity: 1, duration: 0.05 }, b + 0.6);
+        tl.fromTo(".s3t", { opacity: 0 }, { opacity: 1, duration: 0.25, stagger: 0.008 }, b + 0.5);
+        tl.fromTo("#s3-hand", { rotation: 0, svgOrigin: "320 320", opacity: 0 }, { opacity: 1, duration: 0.2 }, b + 0.9);
+        tl.to("#s3-hand", { rotation: 90, duration: 4.2, ease: "power1.inOut" }, b + 1.2);
+        tl.fromTo("#s3-wedge", { strokeDasharray: "0 1" }, { strokeDasharray: "0.25 1", duration: 4.2, ease: "power1.inOut" }, b + 1.2);
+        const cnt = { v: 0 };
+        tl.fromTo(cnt, { v: 0 }, { v: 15, duration: 4.2, ease: "power1.inOut",
+          onUpdate: () => { const m = Math.floor(cnt.v), s = Math.floor((cnt.v - m) * 60); $("#s3-count").textContent = String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0"); } }, b + 1.2);
+        fade("#s3-count", b + 1.0, 0.3);
+        tl.fromTo("#s3-big", { x: 80, opacity: 0 }, { x: 0, opacity: 1, duration: 0.8, ease: "expo.out" }, b + 1.1);
+        rise("#s3-sub", b + 2.4, { y: 30 });
+        rise("#s3-taze", b + 3.6, { y: 30 });
+        pop("#s3-phone", b + 5.3, { from: 0.4, ease: "back.out(2)" });
+        tl.fromTo("#s3-phone", { rotation: 0 }, { rotation: 10, duration: 0.07, yoyo: true, repeat: 13, ease: "sine.inOut", immediateRender: false }, b + 5.8);
+        tl.fromTo(["#s3-r1", "#s3-r2"], { opacity: 0 }, { opacity: 1, duration: 0.15, stagger: 0.12, yoyo: true, repeat: 5 }, b + 5.8);
+        tl.fromTo("#s3-token", { scale: 1 }, { scale: 1.18, duration: 0.25, yoyo: true, repeat: 1, ease: "power2.out", immediateRender: false }, b + 5.4);
+        rise("#s3-preplbl", b + 7.2, { y: 20 });
+        pop("#s3-chips .chip", b + 7.6, { st: 0.15, from: 0.5 });
+      }
+
+      // ---- transition S3→S4: whip pan (right → left) ----
+      show(4, 34.6);
+      tl.to("#s3", { x: -1920, filter: "blur(16px)", duration: 0.7, ease: "power4.inOut" }, 34.62);
+      tl.fromTo("#s4", { x: 1920, filter: "blur(16px)" }, { x: 0, filter: "blur(0px)", duration: 0.7, ease: "power4.inOut" }, 34.62);
+      hide(3, 35.35);
+      tl.set("#s4", { filter: "none" }, 35.35);
+
+      // ================= S4 — İLK ARAMA (35–47.5) =================
+      {
+        const b = S(4);
+        const segs = [
+          { x: 160, w: 240, c: "#221e52" }, { x: 400, w: 520, c: "#7b2ff0" },
+          { x: 920, w: 520, c: "#d99a00" }, { x: 1440, w: 320, c: "#e0186a" },
+        ];
+        const host = $("#s4-segs"), PX0 = 160, PX1 = 1760, H0 = b + 0.9, HD = 5.4;
+        segs.forEach((s, si) => {
+          const d = document.createElement("div");
+          d.className = "a seg"; d.style.left = s.x + "px"; d.style.width = s.w + "px"; d.id = "s4-seg" + si;
+          for (let x = 12; x < s.w - 6; x += 18) {
+            const gx = s.x + x, k = gx / 18;
+            const h = 26 + Math.round(120 * Math.abs(Math.sin(k * 0.71) * Math.cos(k * 0.23) + 0.35 * Math.sin(k * 1.9)));
+            const i = document.createElement("i");
+            i.style.left = x + "px"; i.style.height = Math.min(h, 170) + "px"; i.style.bottom = (100 - Math.min(h, 170) / 2) + "px"; i.style.background = s.c;
+            d.appendChild(i);
+            const tt = H0 + ((gx - PX0) / (PX1 - PX0)) * HD;
+            tl.fromTo(i, { scaleY: 0 }, { scaleY: 1, duration: 0.35, ease: "back.out(2)" }, tt);
+          }
+          host.appendChild(d);
+          const tt = H0 + ((s.x - PX0) / (PX1 - PX0)) * HD;
+          rise("#s4-l" + (si + 1), tt + 0.05, { y: 24, d: 0.5 });
+          fade("#s4-n" + (si + 1), tt + 0.4, 0.5);
+        });
+        chap(4, b - 0.35);
+        rise("#s4-h", b - 0.3, { d: 0.9 });
+        tl.fromTo("#s4-head", { x: 0, opacity: 0 }, { opacity: 1, duration: 0.2 }, H0 - 0.2);
+        tl.to("#s4-head", { x: PX1 - PX0, duration: HD, ease: "none" }, H0);
+        tl.to("#s4-head", { opacity: 0, duration: 0.3 }, H0 + HD);
+        rise("#s4-q", b + 6.9, { y: 30 });
+        pop("#s4-c1", b + 7.4, { from: 0.5 });
+        pop("#s4-c2", b + 7.6, { from: 0.5 });
+        tl.to("#s4-c1", { scale: 0.9, duration: 0.12, ease: "power2.in" }, b + 8.7);
+        tl.to("#s4-c1", { scale: 1, backgroundColor: "#7b2ff0", color: "#fffdf8", duration: 0.35, ease: "back.out(2)" }, b + 8.82);
+        tl.to("#s4-c2", { opacity: 0.35, duration: 0.4 }, b + 8.9);
+        fade("#s4-no", b + 9.6, 0.4);
+        tl.fromTo("#s4-strike", { scaleX: 0 }, { scaleX: 1, duration: 0.45, ease: "power3.inOut" }, b + 10.1);
+        slide("#s4-notag", b + 10.4, { x: -20, d: 0.4 });
+      }
+
+      // ---- transition S4→S5: focus pull ----
+      show(5, 47.05);
+      tl.to("#s4", { filter: "blur(22px)", opacity: 0, duration: 0.75, ease: "sine.inOut" }, 47.05);
+      tl.fromTo("#s5", { opacity: 0, filter: "blur(22px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.85, ease: "sine.inOut" }, 47.25);
+      hide(4, 47.85);
+      tl.set("#s5", { filter: "none" }, 48.12);
+
+      // ================= S5 — TAKİP KADANSI (47.5–67.5) =================
+      {
+        const b = S(5);
+        // rope path: Q/T wave through y=600 every 300px
+        let rope = "M250 600 Q 400 520 550 600";
+        for (let x = 850; x <= 3250; x += 300) rope += ` T ${x} 600`;
+        $("#s5-rope").setAttribute("d", rope); $("#s5-mpath").setAttribute("d", rope);
+        let walk = "M550 600 Q 700 680 850 600";
+        for (let x = 1150; x <= 2950; x += 300) walk += ` T ${x} 600`;
+
+        chap(5, b - 0.3);
+        rise("#s5-h", b - 0.25, { d: 0.9 });
+        gsap.set("#s5-world", { transformOrigin: "0px 0px" });
+        tl.fromTo("#s5-mpath", { strokeDashoffset: 1 }, { strokeDashoffset: 0.67, duration: 2.0, ease: "power1.inOut" }, b + 0.7);
+        pop("#s5-k1", b + 1.2); rise("#s5-l1", b + 1.45, { y: 24 });
+        tl.fromTo("#s5-b1", { y: 140, scale: 0.4, opacity: 0 }, { y: 0, scale: 1, opacity: 1, duration: 0.6, ease: "back.out(1.6)" }, b + 1.9);
+        pop("#s5-k2", b + 2.5); rise("#s5-l2", b + 2.75, { y: 24 });
+        tl.fromTo("#s5-world", { x: 0 }, { x: -900, duration: 1.3, ease: "power2.inOut" }, b + 3.6);
+        tl.to("#s5-mpath", { strokeDashoffset: 0.39, duration: 1.6, ease: "power1.inOut" }, b + 3.6);
+        pop("#s5-k3", b + 4.4, { ease: "back.out(2)" }); rise("#s5-l3", b + 4.65, { y: 24 });
+        pop("#s5-gear", b + 4.7, { from: 0 });
+        tl.fromTo("#s5-gearg", { rotation: 0, svgOrigin: "36.5 36" }, { rotation: 360, duration: 15, ease: "none" }, b + 4.7);
+        tl.fromTo("#s5-b2", { y: 140, scale: 0.4, opacity: 0 }, { y: 0, scale: 1, opacity: 1, duration: 0.6, ease: "back.out(1.6)" }, b + 5.2);
+        pop("#s5-k4", b + 5.7); rise("#s5-l4", b + 5.95, { y: 24 });
+        tl.to("#s5-world", { x: -1720, duration: 1.3, ease: "power2.inOut" }, b + 6.8);
+        tl.to("#s5-mpath", { strokeDashoffset: 0, duration: 1.8, ease: "power1.inOut" }, b + 6.8);
+        pop("#s5-k5", b + 7.7); rise("#s5-l5", b + 7.95, { y: 24 });
+        tl.fromTo("#s5-b3", { y: 140, scale: 0.4, opacity: 0 }, { y: 0, scale: 1, opacity: 1, duration: 0.6, ease: "back.out(1.6)" }, b + 8.3);
+        tl.fromTo("#s5-end", { x: 160, opacity: 0, rotation: 4 }, { x: 0, opacity: 1, rotation: 0, duration: 0.7, ease: "power3.out" }, b + 8.9);
+        rise("#s5-cold", b + 9.8, { y: 26 });
+        // zoom out to the whole rope
+        tl.to("#s5-world", { x: 22, y: 250, scale: 0.5, duration: 1.5, ease: "power3.inOut" }, b + 11.0);
+        // token walks the whole rope while zoomed out
+        gsap.set("#s5-token", { xPercent: -50, yPercent: -50 });
+        tl.fromTo("#s5-token", { x: 550, y: 600, opacity: 0, scale: 1.8 }, { opacity: 1, duration: 0.3 }, b + 12.4);
+        tl.to("#s5-token", { motionPath: { path: walk }, duration: 3.0, ease: "power1.inOut" }, b + 12.7);
+        tl.to("#s5-token", { x: 3380, y: 450, duration: 0.6, ease: "power2.inOut" }, b + 15.75);
+        [1, 2, 3, 4, 5].forEach((k, i) => tl.to("#s5-k" + k, { scale: 1.15, duration: 0.18, yoyo: true, repeat: 1, ease: "power2.out" }, b + 12.75 + i * 0.75));
+        // task badge
+        slide("#s5-badge", b + 13.0, { x: -40 });
+        draw("#s5-check", b + 13.6, 0.45, "power2.out");
+      }
+
+      // ---- transition S5→S6: radial iris from the seed ----
+      show(6, 66.95);
+      tl.fromTo("#s6", { clipPath: "circle(0px at 660px 940px)" }, { clipPath: "circle(2300px at 660px 940px)", duration: 1.0, ease: "power2.inOut" }, 66.95);
+      hide(5, 67.95);
+
+      // ================= S6 — ÜÇ ÇEMBER (67.5–85) =================
+      {
+        const b = S(6);
+        chap(6, b + 0.4);
+        draw("#s6-ground", b - 0.55, 0.8, "power2.out");
+        tl.fromTo("#s6-seed", { y: -320, opacity: 1, scale: 1 }, { y: 0, duration: 0.6, ease: "power3.in" }, b - 0.55);
+        tl.to("#s6-seed", { scale: 0, duration: 0.35, ease: "power2.in" }, b + 1.0);
+        rise("#s6-title", b + 0.8);
+        draw("#s6-stem", b + 1.25, 1.1, "power2.out");
+        pop(["#s6-lf1", "#s6-lf2"], b + 1.9, { st: 0.2, from: 0, d: 0.4 });
+        tl.fromTo("#s6-r1", { scale: 0, opacity: 0, svgOrigin: "660 600" }, { scale: 1, opacity: 1, duration: 0.8, ease: "power3.out" }, b + 2.3);
+        pop("#s6-n1", b + 2.4, { from: 0.3 });
+        slide("#s6-row1", b + 2.8, { x: -40 });
+        tl.fromTo("#s6-r2", { scale: 0.53, opacity: 0, svgOrigin: "660 600" }, { scale: 1, opacity: 1, duration: 0.9, ease: "power3.out" }, b + 4.6);
+        draw("#s6-bL", b + 4.8, 0.8, "power2.out"); draw("#s6-bR", b + 4.9, 0.8, "power2.out");
+        pop(["#s6-lf3", "#s6-lf4"], b + 5.4, { st: 0.2, from: 0, d: 0.4 });
+        pop("#s6-n2a", b + 5.6, { from: 0.3 }); pop("#s6-n2b", b + 5.8, { from: 0.3 });
+        slide("#s6-row2", b + 6.0, { x: -40 });
+        tl.fromTo("#s6-r3", { scale: 0.68, opacity: 0, svgOrigin: "660 600" }, { scale: 1, opacity: 1, duration: 0.9, ease: "power3.out" }, b + 7.8);
+        draw("#s6-b3a", b + 8.0, 0.7, "power2.out"); draw("#s6-b3b", b + 8.1, 0.7, "power2.out"); draw("#s6-b3c", b + 8.2, 0.8, "power2.out");
+        pop("#s6-n3a", b + 8.8, { from: 0.3 }); pop("#s6-n3b", b + 9.0, { from: 0.3 }); pop("#s6-n3c", b + 9.2, { from: 0.3 });
+        slide("#s6-row3", b + 9.3, { x: -40 });
+        tl.fromTo("#s6-stamp", { scale: 1.8, opacity: 0, rotation: 6 }, { scale: 1, opacity: 1, rotation: -4, duration: 0.32, ease: "power4.in" }, b + 11.0);
+        tl.fromTo("#s6-stamp", { y: 0 }, { y: 4, duration: 0.08, yoyo: true, repeat: 1, immediateRender: false }, b + 11.32);
+        rise("#s6-quote", b + 11.8, { y: 26 });
+        // ambient: rings drift, leaves sway
+        tl.fromTo("#s6-rings circle", { strokeDashoffset: 0 }, { strokeDashoffset: -260, duration: 15, ease: "none" }, b + 2.4);
+        breathe(["#s6-n1", "#s6-n2a", "#s6-n2b"], b + 9.6, 7.4, { y: -6 }, 2.2);
+      }
+
+      // ---- transition S6→S7: quote → speech bubble morph ----
+      show(7, 84.6);
+      tl.to("#s6", { scale: 0.94, opacity: 0, filter: "blur(8px)", duration: 0.6, ease: "power2.in" }, 84.6);
+      tl.fromTo("#s7-frame", { x: 930, y: 590, scale: 0.4 }, { x: 0, y: 0, scale: 1, duration: 0.8, ease: "power3.inOut" }, 84.65);
+      tl.fromTo("#s7-tail", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 85.3);
+      hide(6, 85.25);
+
+      // ================= S7 — SÖZ'DEN KANIT'A (85–97.5) =================
+      {
+        const b = S(7);
+        gsap.set("#s7-ui", { opacity: 0 });
+        chap(7, b + 0.3);
+        rise("#s7-h", b + 0.4);
+        // morph bubble → screen
+        tl.to("#s7-frame", { borderRadius: 18, duration: 0.8, ease: "power3.inOut" }, b + 1.7);
+        tl.to("#s7-tail", { opacity: 0, y: -20, duration: 0.35, ease: "power2.in" }, b + 1.7);
+        tl.to("#s7-quote", { opacity: 0, scale: 0.9, duration: 0.35, ease: "power2.in" }, b + 1.75);
+        tl.to("#s7-ui", { opacity: 1, duration: 0.3 }, b + 2.1);
+        tl.fromTo("#s7-ui .bar", { yPercent: -100 }, { yPercent: 0, duration: 0.4, ease: "power3.out" }, b + 2.1);
+        tl.fromTo("#s7-ui .side", { xPercent: -100 }, { xPercent: 0, duration: 0.45, ease: "power3.out" }, b + 2.2);
+        pop(".s7k", b + 2.4, { st: 0.08, from: 0.6, d: 0.4 });
+        tl.fromTo("#s7-on", { boxShadow: "0 0 0 0 rgba(123,47,240,0)" }, { boxShadow: "0 0 0 10px rgba(123,47,240,0.25)", duration: 0.5, yoyo: true, repeat: 3, immediateRender: false }, b + 3.0);
+        rise("#s7-yes", b + 3.3, { y: 30 });
+        rise("#s7-cond .mono", b + 3.9, { y: 20 });
+        slide(["#s7-c1", "#s7-c2", "#s7-c3"], b + 4.1, { x: 40, st: 0.2 });
+        draw("#s7-k1", b + 4.9, 0.35, "power2.out"); draw("#s7-k2", b + 5.6, 0.35, "power2.out"); draw("#s7-k3", b + 6.3, 0.35, "power2.out");
+        tl.fromTo("#s7-deal", { scale: 1.9, opacity: 0, rotation: 8 }, { scale: 1, opacity: 1, rotation: -10, duration: 0.3, ease: "power4.in" }, b + 7.2);
+        slide("#s7-dealt", b + 7.7, { x: -20 });
+      }
+
+      // ---- transition S7→S8: paper blinds ----
+      tl.fromTo("#ov-blinds i", { scaleY: 0, transformOrigin: "50% 0%" }, { scaleY: 1, duration: 0.32, ease: "power2.in", stagger: 0.05 }, 96.95);
+      hide(7, 97.5); show(8, 97.5);
+      tl.set("#ov-blinds i", { transformOrigin: "50% 100%" }, 97.5);
+      tl.to("#ov-blinds i", { scaleY: 0, duration: 0.34, ease: "power2.out", stagger: 0.05 }, 97.52);
+
+      // ================= S8 — TOPLANTI + POC (97.5–117.5) =================
+      {
+        const b = S(8);
+        chap(8, b + 0.4);
+        rise("#s8-h", b + 0.5);
+        const fills = [[1, 1.1, 0.45], [2, 1.6, 0.9], [3, 2.55, 0.45], [4, 3.05, 1.3], [5, 4.4, 0.45]];
+        fills.forEach(([k, t, d]) => {
+          tl.fromTo("#s8-b" + k, { scaleX: 0 }, { scaleX: 1, duration: d, ease: "power2.out" }, b + t);
+          rise("#s8-l" + k, b + t + 0.1, { y: 20, d: 0.5 });
+        });
+        tl.to("#s8-b4", { scale: 1.04, duration: 0.3, yoyo: true, repeat: 1, ease: "power2.out" }, b + 5.2);
+        pop("#s8-heartchips .chip", b + 5.6, { st: 0.25, from: 0.5 });
+        draw("#s8-refp", b + 7.6, 0.6, "power2.out");
+        rise("#s8-ref", b + 8.0, { y: 24 });
+        // POC detour
+        tl.fromTo("#s8-pa", { strokeDashoffset: 0, opacity: 0 }, { opacity: 1, duration: 0.5 }, b + 10.4);
+        pop("#s8-poc", b + 10.9, { from: 0.7, ease: "back.out(1.4)" });
+        pop("#s8-poc .chip", b + 11.4, { st: 0.18, from: 0.5 });
+        gsap.set("#s8-token", { xPercent: -50, yPercent: -50 });
+        tl.fromTo("#s8-token", { x: 1420, y: 552, opacity: 0 }, { opacity: 1, duration: 0.25 }, b + 12.3);
+        tl.to("#s8-token", { motionPath: { path: "M1420 552 C 1420 680, 1300 770, 1164 770" }, duration: 1.0, ease: "power2.inOut" }, b + 12.5);
+        tl.to("#s8-poc", { scale: 1.04, duration: 0.25, yoyo: true, repeat: 1, ease: "power2.out" }, b + 13.4);
+        tl.fromTo("#s8-pb", { opacity: 0 }, { opacity: 1, duration: 0.5 }, b + 13.8);
+        tl.to("#s8-token", { x: 1164, y: 840, duration: 0.5, ease: "power2.inOut" }, b + 13.9);
+        tl.to("#s8-token", { motionPath: { path: "M1164 840 C 1420 900, 1676 840, 1676 552" }, duration: 1.1, ease: "power2.inOut" }, b + 14.45);
+        draw("#s8-arrow", b + 15.7, 0.45, "power2.out");
+        slide("#s8-tek", b + 16.0, { x: -16 });
+        tl.fromTo(["#s8-pa", "#s8-pb"], { strokeDashoffset: 0 }, { strokeDashoffset: -170, duration: 9, ease: "none", immediateRender: false }, b + 11.0);
+      }
+
+      // ---- transition S8→S9: page turn ----
+      show(9, 117.0);
+      tl.set("#s8", { zIndex: 50 }, 117.0);
+      tl.to("#s8", { rotationY: -100, transformOrigin: "0% 50%", transformPerspective: 2600, duration: 0.85, ease: "power2.inOut" }, 117.0);
+      hide(8, 117.86);
+
+      // ================= S9 — TEKLİF (117.5–132.5) =================
+      {
+        const b = S(9);
+        chap(9, b + 0.4);
+        rise("#s9-h", b + 0.4);
+        tl.fromTo("#s9-paper", { y: 760, rotation: 7 }, { y: 0, rotation: -3, duration: 0.9, ease: "power3.out" }, b + 0.5);
+        tl.fromTo(".s9l", { scaleX: 0, transformOrigin: "0% 50%" }, { scaleX: 1, duration: 0.35, ease: "power2.out", stagger: 0.09 }, b + 1.3);
+        tl.fromTo("#s9-mark", { scaleX: 0 }, { scaleX: 1, duration: 0.45, ease: "power2.inOut" }, b + 2.0);
+        slide("#s9-marklbl", b + 2.3, { x: -16 });
+        tl.fromTo("#s9-stamp", { scale: 1.8, opacity: 0, rotation: 2 }, { scale: 1, opacity: 1, rotation: -8, duration: 0.3, ease: "power4.in" }, b + 2.8);
+        pop("#s9-glass", b + 3.2, { from: 0.8, ease: "power3.out", d: 0.6 });
+        // steam ambient (finite loop)
+        tl.fromTo("#s9-steam", { y: 0 }, { y: -14, duration: 0.9, ease: "sine.inOut", yoyo: true, repeat: 11 }, b + 3.2);
+        tl.fromTo("#s9-steam", { opacity: 0 }, { opacity: 0.75, duration: 0.6 }, b + 3.3);
+        gsap.set(["#s9-d1", "#s9-d2"], { opacity: 0 });
+        fade("#s9-d0", b + 3.6, 0.3);
+        rise("#s9-cool", b + 4.0, { y: 24 });
+        tl.to("#s9-d0", { opacity: 0, duration: 0.2 }, b + 5.2); tl.to("#s9-d1", { opacity: 1, duration: 0.2 }, b + 5.25);
+        tl.to("#s9-steam", { opacity: 0.3, duration: 1.2, ease: "sine.inOut" }, b + 5.2);
+        tl.to("#s9-d1", { opacity: 0, duration: 0.2 }, b + 6.6); tl.to("#s9-d2", { opacity: 1, duration: 0.2 }, b + 6.65);
+        tl.to("#s9-steam", { opacity: 0.0, duration: 1.2, ease: "sine.inOut" }, b + 6.6);
+        tl.to("#s9-tea", { fill: "#8a4a22", duration: 2.6, ease: "sine.inOut" }, b + 5.2);
+        // book the proposal call → warm again
+        tl.fromTo("#s9-call", { x: 120, opacity: 0, rotation: 3 }, { x: 0, opacity: 1, rotation: 0, duration: 0.6, ease: "back.out(1.5)" }, b + 8.6);
+        tl.to("#s9-steam", { opacity: 0.75, duration: 0.9, ease: "sine.out" }, b + 9.3);
+        tl.to("#s9-tea", { fill: "#c8641c", duration: 0.9, ease: "sine.out" }, b + 9.3);
+        tl.to(["#s9-d2", "#s9-cool"], { opacity: 0, duration: 0.3 }, b + 9.3);
+        rise("#s9-warm", b + 9.5, { y: 20 });
+        rise("#s9-q", b + 11.0, { y: 20 });
+      }
+
+      // ---- transition S9→S10: recede (zoom out) ----
+      show(10, 132.0);
+      tl.set("#s9", { zIndex: 50 }, 132.0);
+      tl.to("#s9", { scale: 0.22, rotation: -7, opacity: 0, duration: 0.85, ease: "power3.inOut" }, 132.0);
+      hide(9, 132.9);
+
+      // ================= S10 — ALTIN KURALLAR + KAPANIŞ (132.5–150) =================
+      {
+        const b = S(10);
+        // journey route on an ellipse around the rules
+        const cx = 960, cy = 540, rx = 1450, ry = 760, deg = Math.PI / 180;
+        const P = (a) => [cx + rx * Math.cos(a * deg), cy + ry * Math.sin(a * deg)];
+        const [sx, sy] = P(180), [ex, ey] = P(495);
+        const route = `M ${sx} ${sy} A ${rx} ${ry} 0 1 1 ${ex.toFixed(1)} ${ey.toFixed(1)}`;
+        $("#s10-route").setAttribute("d", route); $("#s10-mpath").setAttribute("d", route);
+        // arc-length fractions for each station (deterministic sampling)
+        const N = 3150, acc = [0];
+        for (let i = 1; i <= N; i++) { const [x0, y0] = P(180 + (i - 1) * 0.1), [x1, y1] = P(180 + i * 0.1); acc.push(acc[i - 1] + Math.hypot(x1 - x0, y1 - y0)); }
+        const L = acc[N];
+        const names = ["Kaynak", "15 dk", "İlk arama", "Kadans", "Çemberler", "Deal", "Toplantı · POC", "Teklif"];
+        const cols = ["#7b2ff0", "#7b2ff0", "#221e52", "#d99a00", "#e0186a", "#e0186a", "#7b2ff0", "#e0186a"];
+        const map = $("#s10-map");
+        const TRAVEL0 = b + 7.7, TRAVEL = 4.2;
+        names.forEach((nm, i) => {
+          const a = 180 + i * 45, [x, y] = P(a);
+          const st = document.createElement("div");
+          st.className = "a mst"; st.id = "s10-m" + i; st.style.left = (x - 65) + "px"; st.style.top = (y - 65) + "px"; st.style.background = cols[i];
+          st.textContent = String(i + 1); if (i === 3) st.style.color = "#221e52";
+          const lb = document.createElement("div");
+          lb.className = "a mlbl"; lb.id = "s10-ml" + i; lb.style.left = (x - 260) + "px"; lb.style.top = (y + 84) + "px"; lb.textContent = nm;
+          map.appendChild(st); map.appendChild(lb);
+          pop(st, b + 5.3 + i * 0.22, { from: 0.3, d: 0.45 });
+          fade(lb, b + 5.45 + i * 0.22, 0.4);
+          const frac = acc[Math.round((a - 180) * 10)] / L;
+          tl.to(st, { scale: 1.25, duration: 0.16, yoyo: true, repeat: 1, ease: "power2.out" }, TRAVEL0 + frac * TRAVEL);
+        });
+        chap(10, b + 0.2);
+        tl.fromTo(["#s10-st1", "#s10-st2", "#s10-st3"], { scale: 1.7, opacity: 0, rotation: (i) => [8, -6, 7][i] },
+          { scale: 1, opacity: 1, rotation: (i) => [-6, 4, -3][i], duration: 0.3, ease: "power4.in", stagger: 0.85 }, b + 0.5);
+        rise("#s10-crm", b + 3.0, { y: 30 });
+        // camera pulls back to reveal the whole journey
+        tl.fromTo("#s10-world", { scale: 1, transformOrigin: "960px 540px" }, { scale: 0.55, duration: 2.4, ease: "expo.inOut" }, b + 4.6);
+        tl.to("#s10-chap", { opacity: 0, duration: 0.5 }, b + 4.6);
+        tl.fromTo("#s10-mpath", { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 2.6, ease: "power2.inOut" }, b + 5.0);
+        gsap.set("#s10-token", { xPercent: -50, yPercent: -50 });
+        tl.fromTo("#s10-token", { x: sx, y: sy, opacity: 0 }, { opacity: 1, duration: 0.3 }, b + 7.3);
+        tl.to("#s10-token", { motionPath: { path: route }, duration: TRAVEL, ease: "none" }, TRAVEL0);
+        // closing lockup
+        tl.to("#s10-world", { opacity: 0.09, filter: "blur(4px)", duration: 0.9, ease: "sine.inOut" }, b + 12.3);
+        tl.fromTo("#s10-logo", { clipPath: "inset(0% 100% 0% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.9, ease: "power3.inOut" }, b + 12.7);
+        rise("#s10-tag", b + 13.4, { y: 30 });
+        fade("#s10-url", b + 14.1, 0.6);
+        tl.to("#s10-end", { opacity: 0, duration: 0.8, ease: "sine.in" }, b + 16.6);
+      }
+
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>
