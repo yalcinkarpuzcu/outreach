@@ -77,8 +77,9 @@ def tab(name, *groups, columns=1):
             "groups": [{"name": g[0], "fields": g[1], "col": g[2] if len(g) > 2 else 1} for g in groups]}
 
 
-# find_records operatörleri (Workiom API): 0 = eşittir, 1 = içerir — builder'ın "equals"→1, "contains"→3 eşlemesi hatalı
-EQ = 0
+# find_records operatörleri (Workiom API, çalışma anında doğrulandı): 1 = içerir, 2 = eşit değil, 3 = eşittir.
+# 0 filtreyi yok sayar. Not: koşullarda onay kutusu/sayı karşılaştırması tırnaksız yazılır ({{X}} = true / = 1).
+EQ = 3
 CONTAINS = 1
 
 PARA = (("TRY", BLUE), ("EUR", PURPLE), ("USD", GREEN))
@@ -785,6 +786,7 @@ SAPMALI_LOTLAR = {
         link("Tedarikçi", "Tedarikçiler"),
         link("Sevkiyat", "Sevkiyatlar"),
         lk("Sapma No", "Sapma Talebi", "Sapma No"),
+        lk("Sapma Konusu", "Sapma Talebi", "Sapma Konusu"),
         lk("Kalite Sorumlusu", "Sapma Talebi", "Kalite Sorumlusu"),
     ],
     "views": [{"name": "Tüm Sapmalı Lotlar", "type": V.GRID},
@@ -1085,7 +1087,7 @@ AUTOMATIONS = [
     # ── 3. Sevkiyat kalemi tedarikçi kopyalama ───────────────────────────────
     {"name": "03 Sevkiyat kalemi — tedarikçiyi sevkiyattan kopyala",
      "trigger": {"type": "record_created", "list": "Sevkiyat Kalemleri"},
-     "actions": [copy_tedarikci("Sevkiyat Kalemleri", "Sevkiyatlar", "ASN No", "ASN No")]},
+     "actions": [copy_tedarikci("Sevkiyat Kalemleri", "Sevkiyatlar", "İrsaliye No", "İrsaliye No")]},
     # ── 4–5. Sevkiyat durumu ─────────────────────────────────────────────────
     {"name": "04 Sevkiyat yola çıktı — Kırpart lojistiğe bildir",
      "trigger": {"type": "record_updated", "list": "Sevkiyatlar", "watch_field": "Durum"},
@@ -1124,7 +1126,7 @@ AUTOMATIONS = [
     # ── 7–11. 8D süreci ──────────────────────────────────────────────────────
     {"name": "07 Kalite vakası açıldı — 8D Kırpart onayı",
      "trigger": {"type": "record_created", "list": "Kalite Vakaları"},
-     "actions": [when("{{8D Gerekli}} = 'true'",
+     "actions": [when("{{8D Gerekli}} = true",
                       {"type": "update_record", "fields": {"8D Durumu": "Kırpart Onayında", "Revizyon No": "0"}},
                       {"type": "approval", "title": "8D Onayı",
                        "subtitle": "Kalite vakası {{Vaka No}} — {{Hata Tanımı}} için tedarikçiye 8D açılsın mı?",
@@ -1179,13 +1181,13 @@ AUTOMATIONS = [
                                         "{{Aksiyon Tanımı}} — termin {{Termin}}.")])]},
     {"name": "13b Aksiyon termini 3 gün kaldı — hatırlat",
      "trigger": {"type": "time_trigger", "list": "Aksiyonlar", "date_field": "Termin", "offset": 3},
-     "actions": [when("{{Açık (1/0)}} = '1'",
+     "actions": [when("{{Açık (1/0)}} = 1",
                       notify("Portal Kullanıcıları", "Hatırlatma: aksiyon {{Aksiyon No}} termini {{Termin}} "
                              "(3 gün kaldı) — {{Aksiyon Tanımı}}"),
                       notify("Sorumlu Kişi (Kırpart)", "Hatırlatma: aksiyon {{Aksiyon No}} termini {{Termin}}."))]},
     {"name": "14 Aksiyon termini geldi — gecikme uyarısı",
      "trigger": {"type": "time_trigger", "list": "Aksiyonlar", "date_field": "Termin", "offset": 0},
-     "actions": [when("{{Açık (1/0)}} = '1'",
+     "actions": [when("{{Açık (1/0)}} = 1",
                       notify("Portal Kullanıcıları", "Aksiyon {{Aksiyon No}} termini bugün doldu ve hâlâ açık."),
                       notify("Kalite Sorumlusu", "Geciken aksiyon: {{Aksiyon No}} — {{Tedarikçi}} — "
                              "{{Aksiyon Tanımı}}"))]},
@@ -1217,7 +1219,7 @@ AUTOMATIONS = [
                       notify("Denetçiler", "Denetim hatırlatması: {{Denetim No}} — {{Tedarikçi}}, {{Planlanan Tarih}}."))]},
     {"name": "18 Denetim bulgusu — aksiyon aç",
      "trigger": {"type": "record_updated", "list": "Denetim Cevapları", "watch_field": "Aksiyon Gerekli"},
-     "actions": [when("{{Aksiyon Gerekli}} = 'true'", {"type": "create_record", "list": "Aksiyonlar", "fields": {
+     "actions": [when("{{Aksiyon Gerekli}} = true", {"type": "create_record", "list": "Aksiyonlar", "fields": {
          "Aksiyon Başlığı": "trigger:Cevap", "Kaynak Tipi": "Denetim", "Denetim": "trigger:Denetim", "Tedarikçi": "trigger:Tedarikçi",
          "Aksiyon Tanımı": "trigger:Bulgu / Yorum", "Aksiyon Tipi": "Düzeltici", "Sorumlu Taraf": "Tedarikçi",
          "Durum": "Açık", "Termin": "formula:Today() + 30"}})]},
@@ -1305,7 +1307,7 @@ AUTOMATIONS = [
     # ── 25. Sapmalı lot ──────────────────────────────────────────────────────
     {"name": "25 Sapmalı lot girildi — tedarikçiyi kopyala, kaliteye bildir",
      "trigger": {"type": "record_created", "list": "Sapmalı Lotlar"},
-     "actions": [copy_tedarikci("Sapmalı Lotlar", "Sapma Talepleri", "Sapma No", "Sapma No"),
+     "actions": [copy_tedarikci("Sapmalı Lotlar", "Sapma Talepleri", "Sapma Konusu", "Sapma Konusu"),
                  notify("Kalite Sorumlusu", "Sapmalı lot sevk edildi: {{Lot No}} — {{Miktar}} adet "
                         "(sapma {{Sapma No}}).")]},
     # ── 26–27. Belgeler ──────────────────────────────────────────────────────
@@ -1387,7 +1389,7 @@ POST_AUTOMATIONS = [
                              "kalan ömür %{{Kalan Ömür %}}."))]},
     {"name": "32 Performans kartı yayınlandı — tedarikçiye bildir, puanı karta yaz",
      "trigger": {"type": "record_updated", "list": "Performans Kartları", "watch_field": "Yayınlandı"},
-     "actions": [when("{{Yayınlandı}} = 'true'",
+     "actions": [when("{{Yayınlandı}} = true",
                       notify("Portal Kullanıcıları", "Performans skor kartınız yayınlandı / scorecard published: "
                              "{{Dönem}} — toplam puan {{Toplam Puan}}, sınıf {{Sınıf}}."),
                       {"type": "find_records", "list": "Tedarikçiler", "max": 1,
