@@ -77,6 +77,10 @@ def tab(name, *groups, columns=1):
             "groups": [{"name": g[0], "fields": g[1], "col": g[2] if len(g) > 2 else 1} for g in groups]}
 
 
+# find_records "eşittir" operatörü (1 = "içerir"; metin/sayı/onay kutusu alanlarında 0 kullanılmalı)
+EQ = 0
+LINK_EQ = "equals"
+
 PARA = (("TRY", BLUE), ("EUR", PURPLE), ("USD", GREEN))
 
 # Tedarikçi kartından taşınan bildirim alıcıları (lookup) — otomasyonlar bunları kullanır
@@ -851,7 +855,7 @@ BELGELER = {
         user("Kırpart Sorumlusu"),
         link("Tedarikçiler", "Tedarikçiler", multiple=True),
         link("Malzemeler", "Malzemeler", multiple=True),
-        lk("Portal Kullanıcıları", "Tedarikçiler", "Tedarikçi Portal Kullanıcıları"),
+        {"name": "Portal Kullanıcıları", "type": F.MULTIUSER},  # çoklu tedarikçi bağlantısında lookup desteklenmiyor
     ],
     "views": [
         {"name": "Tüm Belgeler", "type": V.GRID},
@@ -1027,7 +1031,7 @@ def copy_tedarikci(trigger_list, parent_list, key_child, key_parent, parent_ted=
     """Kayıt açılınca Tedarikçi'yi üst kayıttan kopyala (portal veri güvenliği)."""
     return {
         "type": "find_records", "list": parent_list, "max": 1,
-        "where": {"field": key_parent, "op": "equals", "value": f"trigger:{key_child}"},
+        "where": {"field": key_parent, "op": EQ, "value": f"trigger:{key_child}"},
         "actions": [{"type": "update_record", "target": "trigger",
                      "fields": {"Tedarikçi": f"loop:{parent_ted}"}}],
     }
@@ -1038,7 +1042,7 @@ PPAP_AUTOS = [{
     "trigger": {"type": "record_created", "list": "PPAP Talepleri"},
     "actions": [when(f"{{{{PPAP Seviyesi}}}} = '{s}'", {
         "type": "find_records", "list": "PPAP Belge Tipleri", "max": 50, "sort_by": "Sıra ASC",
-        "where": {"field": f"{s} Zorunlu", "op": "equals", "value": True},
+        "where": {"field": f"{s} Zorunlu", "op": EQ, "value": True},
         "actions": [{"type": "create_record", "list": "PPAP Dokümanları", "fields": {
             "Doküman": "loop:Belge Tipi", "PPAP Talebi": "trigger:_id", "Belge Tipi": "loop:_id", "Tedarikçi": "trigger:Tedarikçi",
             "Durum": "Bekliyor", "Versiyon": "0", "Onaylı (1/0)": "0"}}],
@@ -1094,7 +1098,7 @@ AUTOMATIONS = [
     {"name": "05b Kabul miktarı girildi — sipariş kalemine son irsaliyeyi yaz",
      "trigger": {"type": "record_updated", "list": "Sevkiyat Kalemleri", "watch_field": "Kabul Edilen Miktar"},
      "actions": [{"type": "find_records", "list": "Sipariş Kalemleri", "max": 1,
-                  "where": {"field": "Kalem Kodu", "op": "equals", "value": "trigger:Sipariş Kalem Kodu"},
+                  "where": {"field": "Kalem Kodu", "op": EQ, "value": "trigger:Sipariş Kalem Kodu"},
                   "actions": [{"type": "update_record", "fields": {
                       "Son Teslim Alınan İrsaliye No": "trigger:İrsaliye No",
                       "Son Teslim Alma Tarihi": "formula:Today()"}}]}]},
@@ -1197,7 +1201,7 @@ AUTOMATIONS = [
     {"name": "16 Denetim açıldı — soru listesinden cevap kayıtlarını oluştur",
      "trigger": {"type": "record_created", "list": "Denetimler"},
      "actions": [{"type": "find_records", "list": "Denetim Soruları", "max": 200, "sort_by": "Sıra ASC",
-                  "where": {"field": "Denetim Tipi", "op": "equals", "value": "trigger:Denetim Tipi"},
+                  "where": {"field": "Denetim Tipi", "op": LINK_EQ, "value": "trigger:Denetim Tipi"},
                   "actions": [when("{{Aktif}} = 'true'", {"type": "create_record", "list": "Denetim Cevapları",
                                                          "fields": {"Cevap": "loop:Soru Kodu", "Denetim": "trigger:_id",
                                                                     "Denetim Sorusu": "loop:_id",
@@ -1218,7 +1222,7 @@ AUTOMATIONS = [
      "trigger": {"type": "record_updated", "list": "Denetimler", "watch_field": "Durum"},
      "actions": [when("{{Durum}} = 'Yapıldı'", {
          "type": "find_records", "list": "Tedarikçiler", "max": 1,
-         "where": {"field": "Tedarikçi Kodu", "op": "equals", "value": "trigger:Tedarikçi Kodu"},
+         "where": {"field": "Tedarikçi Kodu", "op": EQ, "value": "trigger:Tedarikçi Kodu"},
          "actions": [{"type": "update_record", "fields": {"Son Denetim Tarihi": "trigger:Gerçekleşen Tarih"}}]})]},
     {"name": "19b Bir yıldır denetlenmeyen tedarikçi — Kırpart kaliteye uyar",
      "trigger": {"type": "time_trigger", "list": "Tedarikçiler", "date_field": "Son Denetim Tarihi", "offset": 365},
@@ -1323,7 +1327,7 @@ AUTOMATIONS = [
     {"name": "29 Bakım/baskı kaydı — tedarikçiyi kopyala, varlığı güncelle",
      "trigger": {"type": "record_created", "list": "Bakım & Baskı Kayıtları"},
      "actions": [{"type": "find_records", "list": "Varlıklar (Kalıp / Ekipman)", "max": 1,
-                  "where": {"field": "Demirbaş No", "op": "equals", "value": "trigger:Demirbaş No"},
+                  "where": {"field": "Demirbaş No", "op": EQ, "value": "trigger:Demirbaş No"},
                   "actions": [
                       {"type": "update_record", "target": "trigger",
                        "fields": {"Tedarikçi": "loop:Tedarikçi (Bulunduğu Yer)"}},
@@ -1332,7 +1336,7 @@ AUTOMATIONS = [
                   ]},
                  when("{{Kayıt Tipi}} = 'Periyodik Bakım'", {
                      "type": "find_records", "list": "Varlıklar (Kalıp / Ekipman)", "max": 1,
-                     "where": {"field": "Demirbaş No", "op": "equals", "value": "trigger:Demirbaş No"},
+                     "where": {"field": "Demirbaş No", "op": EQ, "value": "trigger:Demirbaş No"},
                      "actions": [{"type": "update_record", "fields": {"Son Bakım Tarihi": "trigger:Tarih"}}]}),
                  when("{{Kayıt Tipi}} = 'Arıza'",
                       notify("Satınalma Sorumlusu", "Varlık arıza bildirimi: {{Demirbaş No}} — {{Yapılan İşlem}}"))]},
@@ -1385,7 +1389,7 @@ POST_AUTOMATIONS = [
                       notify("Portal Kullanıcıları", "Performans skor kartınız yayınlandı / scorecard published: "
                              "{{Dönem}} — toplam puan {{Toplam Puan}}, sınıf {{Sınıf}}."),
                       {"type": "find_records", "list": "Tedarikçiler", "max": 1,
-                       "where": {"field": "Tedarikçi Kodu", "op": "equals", "value": "trigger:Tedarikçi Kodu"},
+                       "where": {"field": "Tedarikçi Kodu", "op": EQ, "value": "trigger:Tedarikçi Kodu"},
                        "actions": [{"type": "update_record", "fields": {
                            "Güncel Performans Puanı": "trigger:Toplam Puan"}}]})]},
 ]
