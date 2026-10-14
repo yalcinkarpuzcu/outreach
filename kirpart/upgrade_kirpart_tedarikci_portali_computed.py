@@ -101,6 +101,9 @@ def rollup(parent: str, name: str, child: str, bl_id: int | None, value_field: s
     if not bl_id:
         print(f"  ✗ {parent} / {name}: back-link yok")
         return None
+    if value_field and value_field not in live_fields(child):
+        print(f"  ✗ {parent} / {name}: '{value_field}' alanı {child} listesinde yok")
+        return None
     if kind == COUNT:
         return create(parent, {"name": name, "dataType": 12, "countLocalLinkedFieldId": bl_id})
     return create(parent, {
@@ -149,7 +152,7 @@ formula("Varlıklar (Kalıp / Ekipman)", "Kalan Ömür %",
 formula("Varlıklar (Kalıp / Ekipman)", "Ömür Durumu",
         "If([[Kalan Ömür %]] <= 0, 'Ömrü Doldu', If([[Kalan Ömür %]] <= 20, 'Revizyon Yaklaşıyor', 'Normal'))", TEXT)
 formula("Varlıklar (Kalıp / Ekipman)", "Sonraki Bakım Tarihi",
-        "DateAdd([[Son Bakım Tarihi]], [[Bakım Periyodu (gün)]], 'day')", DATE)
+        "[[Son Bakım Tarihi]] + [[Bakım Periyodu (gün)]]", DATE)
 formula("Varlıklar (Kalıp / Ekipman)", "Bakım Durumu",
         "If(IsBlank([[Son Bakım Tarihi]]), 'Bakım Kaydı Yok', If(SubtractDate([[Sonraki Bakım Tarihi]], Today()) < 0, "
         "'Gecikti', 'Zamanında'))", TEXT)
@@ -192,17 +195,21 @@ bl = backlink("Siparişler", "Sipariş Kalemleri (liste)", SK, "Sipariş")
 rollup("Siparişler", "Kalem Sayısı", SK, bl, None, COUNT)
 rollup("Siparişler", "Teyit Bekleyen Kalem", SK, bl, "Teyit Bekliyor (1/0)", SUM)
 rollup("Siparişler", "Toplam Bakiye", SK, bl, "Bakiye", SUM)
-rollup("Siparişler", "Son Teslim Alma Tarihi", SK, bl, "Son Teslim Alma Tarihi", MAX)
+# Not: Workiom rollup yalnızca sayı/para alanlarını toplar — tarih MAX/MIN rollup'ı desteklenmiyor.
+# Son teslim alma tarihi kalem seviyesinde (05b otomasyonu) tutulur.
 
 bl = backlink("Sevkiyatlar", "Sevkiyat Kalemleri (liste)", "Sevkiyat Kalemleri", "Sevkiyat")
 rollup("Sevkiyatlar", "Toplam Kutu", "Sevkiyat Kalemleri", bl, "Kutu Adedi", SUM)
-rollup("Sevkiyatlar", "En Erken İstenen Tarih", "Sevkiyat Kalemleri", bl, "İstenen Teslim Tarihi", MIN)
-formula("Sevkiyatlar", "Gecikme (gün)",
-        f"If(Or(IsBlank([[Teslim Alma Tarihi]]), IsBlank([[En Erken İstenen Tarih]])), 0, "
-        f"{z('SubtractDate([[Teslim Alma Tarihi]], [[En Erken İstenen Tarih]])')})")
-formula("Sevkiyatlar", "Zamanında (1/0)",
-        "If(Or(IsBlank([[Teslim Alma Tarihi]]), IsBlank([[En Erken İstenen Tarih]])), 0, "
-        "If(SubtractDate([[Teslim Alma Tarihi]], [[En Erken İstenen Tarih]]) <= 0, 1, 0))")
+# Tarih rollup'ı desteklenmediği için gecikme kalem seviyesinde hesaplanır, sevkiyata MAX/MIN ile taşınır
+SVK = "Sevkiyat Kalemleri"
+formula(SVK, "Gecikme (gün)",
+        f"If(IsBlank([[Teslim Alma Tarihi]]) or IsBlank([[İstenen Teslim Tarihi]]), 0, "
+        f"{z('SubtractDate([[Teslim Alma Tarihi]], [[İstenen Teslim Tarihi]])')})")
+formula(SVK, "Zamanında (1/0)",
+        "If(IsBlank([[Teslim Alma Tarihi]]) or IsBlank([[İstenen Teslim Tarihi]]), 0, "
+        "If(SubtractDate([[Teslim Alma Tarihi]], [[İstenen Teslim Tarihi]]) <= 0, 1, 0))")
+rollup("Sevkiyatlar", "Gecikme (gün)", SVK, bl, "Gecikme (gün)", MAX)
+rollup("Sevkiyatlar", "Zamanında (1/0)", SVK, bl, "Zamanında (1/0)", MIN)
 
 bl = backlink("Malzemeler", "Tedarikçi Kartları", "Tedarikçi–Malzeme Kartları", "Malzeme")
 rollup("Malzemeler", "Tedarikçi Sayısı", "Tedarikçi–Malzeme Kartları", bl, None, COUNT)
@@ -217,7 +224,7 @@ rollup(D, "Maksimum Puan", "Denetim Cevapları", bl, "Ağırlıklı Maks. Puan",
 formula(D, "Başarı %", "If([[Maksimum Puan]] = 0, 0, Round([[Toplam Puan]] / [[Maksimum Puan]] * 100, 1))")
 formula(D, "Sonuç", "If([[Başarı %]] >= [[A Sınıfı Alt Sınırı %]], 'A', "
                     "If([[Başarı %]] >= [[B Sınıfı Alt Sınırı %]], 'B', 'C'))", TEXT)
-formula(D, "Sonraki Denetim Tarihi", "DateAdd([[Gerçekleşen Tarih]], [[Periyot (gün)]], 'day')", DATE)
+formula(D, "Sonraki Denetim Tarihi", "[[Gerçekleşen Tarih]] + [[Periyot (gün)]]", DATE)
 
 PT = "PPAP Talepleri"
 bl = backlink(PT, "PPAP Dokümanları (liste)", "PPAP Dokümanları", "PPAP Talebi")
@@ -237,6 +244,52 @@ for parent, fk in [("Kalite Vakaları", "Kalite Vakası"), ("Denetimler", "Denet
     if parent == "Ziyaret & Toplantılar":
         rollup(parent, "Aksiyon Sayısı", "Aksiyonlar", bl, None, COUNT)
 
+# ─── 2b. Rollup ikiz bağlantı senkronu ───────────────────────────────────────
+# Workiom back-link oluştururken alt listede AYRI bir ikiz bağlantı alanı açar; rollup/COUNT
+# yalnızca bu ikizi okur. İleri bağlantı (ör. "PPAP Talebi") değiştikçe ikizi otomasyonla doldururuz.
+phase("2b — Rollup ikiz bağlantı senkronu")
+PAIRS = [  # (alt liste, ileri bağlantı, üst liste, back-link adı)
+    ("Sevkiyat Kalemleri", "Sipariş Kalemi", "Sipariş Kalemleri", "Sevkiyat Kalemleri (İrsaliye Tarihçesi)"),
+    ("Sevkiyat Kalemleri", "Sevkiyat", "Sevkiyatlar", "Sevkiyat Kalemleri (liste)"),
+    ("Sipariş Kalemleri", "Sipariş", "Siparişler", "Sipariş Kalemleri (liste)"),
+    ("Tedarikçi–Malzeme Kartları", "Malzeme", "Malzemeler", "Tedarikçi Kartları"),
+    ("Denetim Soruları", "Denetim Tipi", "Denetim Tipleri", "Sorular"),
+    ("Denetim Cevapları", "Denetim", "Denetimler", "Denetim Cevapları (liste)"),
+    ("PPAP Dokümanları", "PPAP Talebi", "PPAP Talepleri", "PPAP Dokümanları (liste)"),
+    ("Sapmalı Lotlar", "Sapma Talebi", "Sapma Talepleri", "Sapmalı Lotlar (liste)"),
+    ("Aksiyonlar", "Kalite Vakası", "Kalite Vakaları", "Aksiyonlar (liste)"),
+    ("Aksiyonlar", "Denetim", "Denetimler", "Aksiyonlar (liste)"),
+    ("Aksiyonlar", "Sapma Talebi", "Sapma Talepleri", "Aksiyonlar (liste)"),
+    ("Aksiyonlar", "Ziyaret / Toplantı", "Ziyaret & Toplantılar", "Aksiyonlar (liste)"),
+]
+SYNC_AUTOS: list[dict] = []
+_created: dict[str, dict] = {}
+for child, fk, parent, bl_name in PAIRS:
+    bl_id = live_fields(parent).get(bl_name)
+    raw = client.get_all_fields(state.get_list_id(child))
+    twin = next((f for f in raw if f.get("dataType") == 5 and f.get("linkedFieldId") == bl_id), None)
+    if not bl_id or not twin:
+        print(f"  ✗ {child} / {fk}: ikiz alan bulunamadı")
+        continue
+    state.set_field_id(child, twin["name"], twin["id"])
+    _created.setdefault(child, {})[twin["name"]] = f"trigger:{fk}"
+    SYNC_AUTOS.append({"name": f"SYS {child} — {fk} rollup senkronu (değişiklik)",
+                       "trigger": {"type": "record_updated", "list": child, "watch_field": fk},
+                       "actions": [{"type": "update_record", "fields": {twin["name"]: f"trigger:{fk}"}}]})
+    # Mevcut kayıtlar için bir kerelik yama
+    fk_id, n = str(fid(child, fk)), 0
+    for rec in client.get_all_records(state.get_list_id(child)):
+        val = rec.get(fk_id)
+        if val and not rec.get(str(twin["id"])):
+            client.update_record(state.get_list_id(child), rec["_id"],
+                                 {str(twin["id"]): [{"_id": v["_id"]} for v in val]})
+            n += 1
+    print(f"  ✅ {child} / {fk} → {twin['name']} ({n} kayıt yamandı)")
+for child, fields in _created.items():
+    SYNC_AUTOS.append({"name": f"SYS {child} — rollup senkronu (oluşturma)",
+                       "trigger": {"type": "record_created", "list": child},
+                       "actions": [{"type": "update_record", "fields": fields}]})
+
 # ─── 3. Bağımlı otomasyon ve raporlar ────────────────────────────────────────
 phase("3 — Hesaplanan alanlara bağlı otomasyon ve raporlar")
 spec_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "kirpart_tedarikci_portali.py")
@@ -249,7 +302,7 @@ from workiom.automation_builder import AutomationBuilder
 from workiom.builder import Builder
 from workiom.resolver import Resolver
 
-AutomationBuilder(client, state).build_all(state.app_id, SPEC.get("post_automations", []))
+AutomationBuilder(client, state).build_all(state.app_id, SPEC["automations"] + SPEC.get("post_automations", []) + SYNC_AUTOS)
 b = Builder(client, state, Resolver(client))
 for r in SPEC.get("post_reports", []):
     b._ensure_report(state.app_id, r)

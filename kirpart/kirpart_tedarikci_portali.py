@@ -77,9 +77,9 @@ def tab(name, *groups, columns=1):
             "groups": [{"name": g[0], "fields": g[1], "col": g[2] if len(g) > 2 else 1} for g in groups]}
 
 
-# find_records "eşittir" operatörü (1 = "içerir"; metin/sayı/onay kutusu alanlarında 0 kullanılmalı)
+# find_records operatörleri (Workiom API): 0 = eşittir, 1 = içerir — builder'ın "equals"→1, "contains"→3 eşlemesi hatalı
 EQ = 0
-LINK_EQ = "equals"
+CONTAINS = 1
 
 PARA = (("TRY", BLUE), ("EUR", PURPLE), ("USD", GREEN))
 
@@ -576,6 +576,7 @@ DENETIM_SORULARI = {
         num("Sıra"),
         boolf("Aktif"),
         link("Denetim Tipi", "Denetim Tipleri"),
+        lk("Denetim Tipi Adı", "Denetim Tipi", "Denetim Tipi"),
     ],
     "views": [
         {"name": "Tüm Sorular", "type": V.GRID},
@@ -598,6 +599,7 @@ DENETIMLER = {
         link("Tedarikçi", "Tedarikçiler"),
         link("Denetim Tipi", "Denetim Tipleri"),
         link("Tedarikçi Katılımcıları", "Kontaklar & Portal Kullanıcıları", multiple=True),
+        lk("Denetim Tipi Adı", "Denetim Tipi", "Denetim Tipi"),
         lk("Periyot (gün)", "Denetim Tipi", "Periyot (gün)"),
         lk("A Sınıfı Alt Sınırı %", "Denetim Tipi", "A Sınıfı Alt Sınırı %"),
         lk("B Sınıfı Alt Sınırı %", "Denetim Tipi", "B Sınıfı Alt Sınırı %"),
@@ -653,6 +655,7 @@ PPAP_BELGE_TIPLERI = {
         pk("Belge Tipi"),
         txt("Belge Tipi (EN)"),
         *[boolf(f"Seviye {i} Zorunlu") for i in range(1, 6)],
+        txt("Zorunlu Seviyeler (kod)"),  # örn. "S2 S3 S4 S5" — PPAP otomasyonu bu koda göre doküman açar
         ml("Açıklama"),
         filef("Şablon Dosya"),
         boolf("PLM'e Aktarılsın"),
@@ -1042,7 +1045,7 @@ PPAP_AUTOS = [{
     "trigger": {"type": "record_created", "list": "PPAP Talepleri"},
     "actions": [when(f"{{{{PPAP Seviyesi}}}} = '{s}'", {
         "type": "find_records", "list": "PPAP Belge Tipleri", "max": 50, "sort_by": "Sıra ASC",
-        "where": {"field": f"{s} Zorunlu", "op": EQ, "value": True},
+        "where": {"field": "Zorunlu Seviyeler (kod)", "op": CONTAINS, "value": "S" + s[-1]},
         "actions": [{"type": "create_record", "list": "PPAP Dokümanları", "fields": {
             "Doküman": "loop:Belge Tipi", "PPAP Talebi": "trigger:_id", "Belge Tipi": "loop:_id", "Tedarikçi": "trigger:Tedarikçi",
             "Durum": "Bekliyor", "Versiyon": "0", "Onaylı (1/0)": "0"}}],
@@ -1200,12 +1203,12 @@ AUTOMATIONS = [
     # ── 16–19. Denetimler ────────────────────────────────────────────────────
     {"name": "16 Denetim açıldı — soru listesinden cevap kayıtlarını oluştur",
      "trigger": {"type": "record_created", "list": "Denetimler"},
-     "actions": [{"type": "find_records", "list": "Denetim Soruları", "max": 200, "sort_by": "Sıra ASC",
-                  "where": {"field": "Denetim Tipi", "op": LINK_EQ, "value": "trigger:Denetim Tipi"},
-                  "actions": [when("{{Aktif}} = 'true'", {"type": "create_record", "list": "Denetim Cevapları",
-                                                         "fields": {"Cevap": "loop:Soru Kodu", "Denetim": "trigger:_id",
-                                                                    "Denetim Sorusu": "loop:_id",
-                                                                    "Tedarikçi": "trigger:Tedarikçi"}})]}]},
+     "actions": [{"type": "find_records", "list": "Denetim Soruları", "view": "Aktif Sorular", "max": 200,
+                  "sort_by": "Sıra ASC",
+                  "where": {"field": "Denetim Tipi Adı", "op": EQ, "value": "trigger:Denetim Tipi Adı"},
+                  "actions": [{"type": "create_record", "list": "Denetim Cevapları",
+                               "fields": {"Cevap": "loop:Soru Kodu", "Denetim": "trigger:_id",
+                                          "Denetim Sorusu": "loop:_id", "Tedarikçi": "trigger:Tedarikçi"}}]}]},
     {"name": "17 Planlı denetime 14 gün kaldı — hatırlat",
      "trigger": {"type": "time_trigger", "list": "Denetimler", "date_field": "Planlanan Tarih", "offset": 14},
      "actions": [when("{{Durum}} = 'Planlandı'",
@@ -1217,7 +1220,7 @@ AUTOMATIONS = [
      "actions": [when("{{Aksiyon Gerekli}} = 'true'", {"type": "create_record", "list": "Aksiyonlar", "fields": {
          "Aksiyon Başlığı": "trigger:Cevap", "Kaynak Tipi": "Denetim", "Denetim": "trigger:Denetim", "Tedarikçi": "trigger:Tedarikçi",
          "Aksiyon Tanımı": "trigger:Bulgu / Yorum", "Aksiyon Tipi": "Düzeltici", "Sorumlu Taraf": "Tedarikçi",
-         "Durum": "Açık", "Termin": "formula:DateAdd(Today(), 30, 'day')"}})]},
+         "Durum": "Açık", "Termin": "formula:Today() + 30"}})]},
     {"name": "19a Denetim yapıldı — tedarikçinin son denetim tarihini güncelle",
      "trigger": {"type": "record_updated", "list": "Denetimler", "watch_field": "Durum"},
      "actions": [when("{{Durum}} = 'Yapıldı'", {
@@ -1359,10 +1362,9 @@ AUTOMATIONS = [
      "actions": [{"type": "loop", "list": "Tedarikçiler", "view": "Aktif Tedarikçiler", "max_records": 500,
                   "actions": [{"type": "create_record", "list": "Performans Kartları", "fields": {
                       "Tedarikçi": "loop:_id",
-                      "Dönem Başlangıcı": "formula:DateAdd(Today(), -1, 'month')",
-                      "Dönem Bitişi": "formula:DateAdd(Today(), -1, 'day')",
-                      "Dönem": "formula:Concat(Year(DateAdd(Today(), -1, 'day')), '-', "
-                               "Month(DateAdd(Today(), -1, 'day')))",
+                      "Dönem Başlangıcı": "formula:Today() - 1 - Day(Today() - 1) + 1",
+                      "Dönem Bitişi": "formula:Today() - 1",
+                      "Dönem": "formula:Concat(Year(Today() - 1), '-', Month(Today() - 1))",
                       "Yayınlandı": "false"}}]}]},
 ]
 
@@ -1532,7 +1534,8 @@ SEED = {
     ],
     "PPAP Belge Tipleri": [
         {"Name": n, "Belge Tipi (EN)": en, "Sıra": i + 1, "PLM'e Aktarılsın": True,
-         **{f"Seviye {s} Zorunlu": s in lv for s in range(1, 6)}}
+         **{f"Seviye {s} Zorunlu": s in lv for s in range(1, 6)},
+         "Zorunlu Seviyeler (kod)": " ".join(f"S{s}" for s in sorted(lv))}
         for i, (n, en, lv) in enumerate(PPAP_BELGELER)
     ],
     "Denetim Soruları": [
