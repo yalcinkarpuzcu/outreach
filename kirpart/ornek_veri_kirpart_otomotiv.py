@@ -37,6 +37,18 @@ CACHE: dict[str, dict[str, str]] = {}
 STATS = {"create": 0, "update": 0, "error": 0}
 
 
+def retry(fn, *a):
+    """Geçici ağ hatalarında (curl) tekrar dene."""
+    for i in range(6):
+        try:
+            return fn(*a)
+        except WorkiomAPIError as e:
+            if "curl" not in e.message or i == 5:
+                raise
+            print(f"  … ağ hatası, tekrar deneniyor ({i + 1})", flush=True)
+            time.sleep(5 * (i + 1))
+
+
 def meta(lst):
     if lst not in META:
         META[lst] = {f["name"]: f for f in c.get_all_fields(st.get_list_id(lst))}
@@ -70,7 +82,7 @@ def payload(lst, data):
 
 def create(lst, key, data):
     try:
-        rid = c.create_record(st.get_list_id(lst), payload(lst, data))
+        rid = retry(c.create_record, st.get_list_id(lst), payload(lst, data))
         CACHE.setdefault(lst, {})[key] = rid
         STATS["create"] += 1
         return rid
@@ -81,7 +93,7 @@ def create(lst, key, data):
 
 def update(lst, key, data):
     try:
-        c.update_record(st.get_list_id(lst), CACHE[lst][key], payload(lst, data))
+        retry(c.update_record, st.get_list_id(lst), CACHE[lst][key], payload(lst, data))
         STATS["update"] += 1
     except (WorkiomAPIError, KeyError) as e:
         STATS["error"] += 1
