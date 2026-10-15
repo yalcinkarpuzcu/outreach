@@ -29,9 +29,9 @@ const F = {
          teslim: 6022189, tasiyici: 6022190, plaka: 6022191, kabulNotu: 6022196, ted: 6022197, portal: 6022453,
          toplamKutu: 6022549, gecikme: 6022595 },
   SVK: { lot: 6021965, sevk: 6022199, kabul: 6022200, kutu: 6022201, sevkiyat: 6022202, kalem: 6022203,
-         ted: 6022204, kalemKodu: 6022458, portal: 6022951 },
+         ted: 6022204, kalemKodu: 6022458 },   // "Portal Kullanıcıları" tedarikçi rolünde gizli, istenmez
   ENV: { ozet: 6021972, tarih: 6022207, ted: 6022209, malzeme: 6022210, no: 6022205, miktar: 6022206,
-         not: 6022208, tip: 6022460, portal: 6023233 }
+         not: 6022208, tip: 6022460, portal: 6023233, olusturma: 6021975 }
 };
 
 const OPT = {
@@ -78,7 +78,6 @@ const I18N = {
     unsaved: "Kaydedilmemiş değişiklikler var. Kapatılsın mı?", lose: "Girdiğiniz bilgiler kaybolacak. Kapatılsın mı?",
     noAccessTitle: "Bu portal tedarikçiler içindir",
     noAccessMsg: "Hesabınız hiçbir tedarikçinin portal kullanıcısı olarak tanımlı değil. Erişim için Kırpart satınalma ile iletişime geçin.",
-    permNote: "Bazı listelere erişiminiz yok ({l}). Bu bölümler boş görünebilir; Kırpart yöneticinizden yetki isteyin.",
     sessionGone: "Oturumunuzun süresi doldu — giriş sayfasına yönlendiriliyorsunuz…",
     sessionGoneDirty: "Oturumunuzun süresi doldu — kaydedilmemiş değişiklikleriniz kaybolacak. Giriş sayfasına yönlendiriliyorsunuz…",
     status: "Durum", updated: "Son güncelleme {t}", updating: "Güncelleniyor…", select: "Seçiniz…", capNo: "Kapasite yetersiz",
@@ -120,7 +119,6 @@ const I18N = {
     unsaved: "You have unsaved changes. Close anyway?", lose: "What you entered will be lost. Close anyway?",
     noAccessTitle: "This portal is for suppliers",
     noAccessMsg: "Your account is not set up as a portal user of any supplier. Please contact Kırpart purchasing for access.",
-    permNote: "You don't have access to some lists ({l}). Those sections may look empty; ask your Kırpart administrator for access.",
     sessionGone: "Your session has expired — taking you to the sign-in page…",
     sessionGoneDirty: "Your session has expired — unsaved changes will be lost. Taking you to the sign-in page…",
     status: "Status", updated: "Updated {t}", updating: "Updating…", select: "Select…", capNo: "Capacity insufficient",
@@ -248,10 +246,14 @@ async function api(method, path, payload) {
   return json.result;
 }
 
-async function readAll(listId) {
+/* Workiom arayüzü gibi yalnızca gereken alanları ister (projectedFields). Alan kısıtlı
+   kullanıcılarda (tedarikçi rolü) alan listesi verilmezse istek reddedilebiliyor. */
+const fieldIds = obj => Object.values(obj).flat().filter(x => typeof x === "number");
+async function readAll(listId, fields) {
   const out = [];
   for (let skip = 0; skip < 5000; skip += 200) {
-    const r = await api("POST", "/api/services/app/Data/All", { listId, maxResultCount: 200, skipCount: skip });
+    const r = await api("POST", "/api/services/app/Data/All",
+      { listId, maxResultCount: 200, skipCount: skip, projectedFields: fields, filter: [], quickSearch: "", sorting: "" });
     const items = r?.items || [];
     out.push(...items);
     if (items.length < 200 || out.length >= (r?.totalCount ?? 0)) break;
@@ -370,7 +372,8 @@ function isMine(rec, portalFid) {
 /* Kayıt kullanıcının şirketine mi ait ve kullanıcı o kaydın portal kullanıcısı mı?
    (Workiom zaten yalnızca kullanıcının yetkili olduğu kayıtları döndürür; bu ikinci süzgeçtir.) */
 function ofSelected(rec, key) {
-  return isMine(rec, F[key].portal) && S.suppliers.some(s => s.id === linkId(v(rec, F[key].ted)));
+  const company = S.suppliers.some(s => s.id === linkId(v(rec, F[key].ted)));
+  return F[key].portal ? company && isMine(rec, F[key].portal) : company;
 }
 
 /* ════════════════════════ Yükleme ════════════════════════ */
@@ -384,11 +387,12 @@ async function loadAll({ quiet = false } = {}) {
       S.me = info?.user?.id != null ? String(info.user.id) : null;
       S.meName = [info?.user?.name, info?.user?.surname].filter(Boolean).join(" ");
     }
-    S.kontak = await readAll(KON_LIST).catch(e => { if (e instanceof SessionExpired) throw e; return []; });
+    S.kontak = await readAll(KON_LIST, fieldIds(KON)).catch(e => { if (e instanceof SessionExpired) throw e; return []; });
     const keys = Object.keys(L);
     const denied = [];
-    const results = await Promise.all(keys.map(k => readAll(L[k]).catch(e => {
+    const results = await Promise.all(keys.map(k => readAll(L[k], fieldIds(F[k])).catch(e => {
       if (e instanceof SessionExpired) throw e;
+      console.warn("[Tedarikçi Portalı] " + k + " okunamadı:", e.message);
       denied.push(k);
       return [];
     })));
@@ -429,7 +433,7 @@ function computeSuppliers() {
   if (!map.size) {
     for (const key of Object.keys(L)) {
       for (const r of S.data[key]) {
-        if (!isMine(r, F[key].portal)) continue;
+        if (!F[key].portal || !isMine(r, F[key].portal)) continue;
         const link = v(r, F[key].ted), id = linkId(link);
         if (id && !map.has(id)) map.set(id, lbl(link));
       }
@@ -489,7 +493,7 @@ function envanterRows() {
     malzeme: lbl(v(r, F.ENV.malzeme)),
     tip: lbl(v(r, F.ENV.tip)),
     miktar: num(v(r, F.ENV.miktar)),
-    tarih: v(r, F.ENV.tarih) || v(r, 6021975),
+    tarih: v(r, F.ENV.tarih) || v(r, F.ENV.olusturma),
     not: lbl(v(r, F.ENV.not))
   })).sort((a, b) => (toDate(b.tarih)?.getTime() ?? 0) - (toDate(a.tarih)?.getTime() ?? 0));
 }
@@ -548,10 +552,7 @@ function renderWho() {
 }
 
 function renderPermNote() {
-  const box = $("#perm-note");
-  if (S.loading || !S.denied.length) { box.hidden = true; return; }
-  box.textContent = t("permNote", { l: S.denied.map(k => t("lists")[k]).join(", ") });
-  box.hidden = false;
+  $("#perm-note").hidden = true;   // erişilemeyen listeler kullanıcıya gösterilmez, yalnızca konsola yazılır
 }
 
 function renderChips(container, items, current, onPick) {
