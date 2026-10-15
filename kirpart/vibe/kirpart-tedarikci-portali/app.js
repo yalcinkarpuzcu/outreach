@@ -14,6 +14,8 @@ const L = {
   SVK: "3b8f3100-04f9-41ac-856e-12eaafaf107a",   // Sevkiyat Kalemleri
   ENV: "df726636-61a9-49d2-b113-d416ce61c2e6"    // Envanter Bildirimleri
 };
+const KON_LIST = "cda09a7f-534e-4ac3-884e-267ba6f4dc21";   // Kontaklar & Portal Kullanıcıları
+const KON = { ad: 6021923, kullanici: 6022138, ted: 6022140, aktif: 6022139 };
 
 const F = {
   SIP: { no: 6021944, yayin: 6022162, tarih: 6022163, durum: 6022164, not: 6022165, ted: 6022166, portal: 6022445,
@@ -67,7 +69,7 @@ const I18N = {
     fTasiyici: "Taşıyıcı firma", fPlaka: "Araç plakası", asnLines: "Sevk edilecek kalemler", lnKalem: "Sipariş kalemi", lnLot: "Lot No",
     lnMiktar: "Miktar", lnKutu: "Kutu", addLine: "+ Kalem ekle", removeLine: "Satırı kaldır", asnSave: "ASN oluştur",
     asnSent: "ASN oluşturuldu — Kırpart lojistiğe bildirim gidiyor", noOpenLines: "Sevk edilebilecek teyitli açık kalem yok.",
-    lineNeed: "En az bir kalem ekleyin.", lineFields: "Her satırda kalem, lot ve miktar dolu olmalı.", openQty: "açık {n}",
+    lineNeed: "En az bir kalem ekleyin.", oneSupplier: "Bir ASN'deki tüm kalemler aynı şirkete ait olmalı.", lineFields: "Her satırda kalem, lot ve miktar dolu olmalı.", openQty: "açık {n}",
     colPlan: "Planlandı", colYolda: "Yolda", colTeslim: "Teslim Alındı", colKismi: "Kısmi Kabul", empty: "Kayıt yok",
     shipOn: "Sevk", arrive: "Varış", delivered: "Teslim", lateShort: "gecikti", qtyLines: "{a} adet · {k} kalem",
     btnOnWay: "Yola çıktı", onWayDone: "{i} yola çıktı olarak işaretlendi", shipment: "Sevkiyat / ASN",
@@ -109,7 +111,7 @@ const I18N = {
     fTasiyici: "Carrier", fPlaka: "Vehicle plate", asnLines: "Lines to ship", lnKalem: "Order line", lnLot: "Lot no.",
     lnMiktar: "Qty", lnKutu: "Boxes", addLine: "+ Add line", removeLine: "Remove line", asnSave: "Create ASN",
     asnSent: "ASN created — Kırpart logistics is notified", noOpenLines: "No confirmed open lines to ship.",
-    lineNeed: "Add at least one line.", lineFields: "Each line needs an order line, lot and quantity.", openQty: "open {n}",
+    lineNeed: "Add at least one line.", oneSupplier: "All lines in one ASN must belong to the same company.", lineFields: "Each line needs an order line, lot and quantity.", openQty: "open {n}",
     colPlan: "Planned", colYolda: "In transit", colTeslim: "Received", colKismi: "Partially accepted", empty: "Nothing here",
     shipOn: "Ships", arrive: "Arrives", delivered: "Received", lateShort: "late", qtyLines: "{a} pcs · {k} lines",
     btnOnWay: "Dispatched", onWayDone: "{i} marked as dispatched", shipment: "Shipment / ASN",
@@ -350,8 +352,9 @@ const S = {
   me: null,                       // giriş yapan kullanıcının id'si (string)
   data: { SIP: [], KAL: [], SEV: [], SVK: [], ENV: [] },
   denied: [],                     // okunamayan listeler
-  suppliers: [],                  // [{id, label}] — kullanıcının portal kullanıcısı olduğu tedarikçiler
-  ted: null,                      // seçili tedarikçi id
+  meName: "",                     // giriş yapan kullanıcının adı
+  kontak: [],                     // Kontaklar kayıtları (okunabiliyorsa)
+  suppliers: [],                  // [{id, label}] — kullanıcının bağlı olduğu şirket(ler)
   tab: "siparis",
   filter: { siparis: "teyit", sevkiyat: "aktif" },
   search: { siparis: "", sevkiyat: "" },
@@ -364,8 +367,10 @@ function isMine(rec, portalFid) {
   const users = v(rec, portalFid);
   return Array.isArray(users) && users.some(u => String(u?.id ?? u) === S.me);
 }
+/* Kayıt kullanıcının şirketine mi ait ve kullanıcı o kaydın portal kullanıcısı mı?
+   (Workiom zaten yalnızca kullanıcının yetkili olduğu kayıtları döndürür; bu ikinci süzgeçtir.) */
 function ofSelected(rec, key) {
-  return isMine(rec, F[key].portal) && linkId(v(rec, F[key].ted)) === S.ted;
+  return isMine(rec, F[key].portal) && S.suppliers.some(s => s.id === linkId(v(rec, F[key].ted)));
 }
 
 /* ════════════════════════ Yükleme ════════════════════════ */
@@ -377,7 +382,9 @@ async function loadAll({ quiet = false } = {}) {
     if (!S.me) {
       const info = await api("GET", "/api/services/app/Session/GetCurrentLoginInformations");
       S.me = info?.user?.id != null ? String(info.user.id) : null;
+      S.meName = [info?.user?.name, info?.user?.surname].filter(Boolean).join(" ");
     }
+    S.kontak = await readAll(KON_LIST).catch(e => { if (e instanceof SessionExpired) throw e; return []; });
     const keys = Object.keys(L);
     const denied = [];
     const results = await Promise.all(keys.map(k => readAll(L[k]).catch(e => {
@@ -411,16 +418,24 @@ function reloadAfterWrite() {
 
 function computeSuppliers() {
   const map = new Map();
-  for (const key of Object.keys(L)) {
-    for (const r of S.data[key]) {
-      if (!isMine(r, F[key].portal)) continue;
-      const link = v(r, F[key].ted);
-      const id = linkId(link);
-      if (id && !map.has(id)) map.set(id, lbl(link));
+  // 1) Kullanıcının kontak kaydı varsa şirketi oradan al (Kontaklar → Workiom Kullanıcısı = ben)
+  for (const r of S.kontak) {
+    const u = v(r, KON.kullanici);
+    if (String(u?.id ?? "") !== S.me || v(r, KON.aktif) === false) continue;
+    const link = v(r, KON.ted), id = linkId(link);
+    if (id) map.set(id, lbl(link));
+  }
+  // 2) Yoksa kullanıcının portal kullanıcısı olarak göründüğü kayıtların tedarikçisinden çıkar
+  if (!map.size) {
+    for (const key of Object.keys(L)) {
+      for (const r of S.data[key]) {
+        if (!isMine(r, F[key].portal)) continue;
+        const link = v(r, F[key].ted), id = linkId(link);
+        if (id && !map.has(id)) map.set(id, lbl(link));
+      }
     }
   }
   S.suppliers = [...map].map(([id, label]) => ({ id, label })).sort((a, b) => a.label.localeCompare(b.label, "tr"));
-  if (!S.suppliers.some(s => s.id === S.ted)) S.ted = S.suppliers[0]?.id ?? null;
 }
 
 /* ════════════════════════ Türetilmiş veriler ════════════════════════ */
@@ -428,6 +443,8 @@ function kalemRows() {
   return S.data.KAL.filter(r => ofSelected(r, "KAL")).map(r => ({
     r, id: r._id,
     kod: lbl(v(r, F.KAL.kod)) || "—",
+    tedId: linkId(v(r, F.KAL.ted)),
+    tedLabel: lbl(v(r, F.KAL.ted)),
     sipId: linkId(v(r, F.KAL.siparis)),
     sipNo: lbl(v(r, F.KAL.siparisNo)) || lbl(v(r, F.KAL.siparis)),
     malId: linkId(v(r, F.KAL.malzeme)),
@@ -478,10 +495,10 @@ function envanterRows() {
 }
 
 /* Tedarikçinin malzemeleri: kendi sipariş kalemleri ve önceki bildirimlerinden */
-function malzemeOptions() {
+function malzemeOptions(tedId) {
   const map = new Map();
-  for (const k of kalemRows()) if (k.malId && !map.has(k.malId)) map.set(k.malId, k.malzeme + (k.malzemeAdi ? " · " + k.malzemeAdi : ""));
-  for (const r of S.data.ENV.filter(x => ofSelected(x, "ENV"))) {
+  for (const k of kalemRows()) if (k.malId && k.tedId === tedId && !map.has(k.malId)) map.set(k.malId, k.malzeme + (k.malzemeAdi ? " · " + k.malzemeAdi : ""));
+  for (const r of S.data.ENV.filter(x => ofSelected(x, "ENV") && linkId(v(x, F.ENV.ted)) === tedId)) {
     const id = linkId(v(r, F.ENV.malzeme));
     if (id && !map.has(id)) map.set(id, lbl(v(r, F.ENV.malzeme)));
   }
@@ -503,7 +520,7 @@ function renderAll() {
   renderSiparis();
   renderEnvanter();
   renderSevkiyat();
-  if (!S.loading && S.ted) {
+  if (!S.loading && S.suppliers.length) {
     $("#tc-siparis").textContent = String(kalemRows().filter(k => k.teyit === "Bekliyor").length);
     $("#tc-envanter").textContent = String(envanterRows().length);
     $("#tc-sevkiyat").textContent = String(sevkiyatRows().filter(isActiveSev).length);
@@ -522,14 +539,9 @@ function renderWho() {
   const box = $("#who");
   box.textContent = "";
   if (S.loading || !S.suppliers.length) return;
-  if (S.suppliers.length === 1) {
-    box.append(h("span", { class: "who-label", text: t("supplier") + ":" }), h("span", { class: "who-name", text: S.suppliers[0].label }));
-    return;
-  }
-  const sel = h("select", { id: "who-select", "aria-label": t("supplier") });
-  for (const s of S.suppliers) sel.append(h("option", { value: s.id, text: s.label, selected: s.id === S.ted }));
-  sel.addEventListener("change", () => { S.ted = sel.value; renderAll(); });
-  box.append(h("label", { class: "who-label", for: "who-select", text: t("supplier") + ":" }), sel);
+  box.append(h("span", { class: "who-label", text: t("supplier") + ":" }),
+    h("span", { class: "who-name", text: S.suppliers.map(x => x.label).join(", ") }),
+    S.meName ? h("span", { class: "who-label", text: "· " + S.meName }) : null);
 }
 
 function renderPermNote() {
@@ -562,7 +574,7 @@ function switchTab(tab) {
 function renderKpis() {
   const box = $("#kpis");
   box.textContent = "";
-  if (S.loading || !S.ted) {
+  if (S.loading || !S.suppliers.length) {
     for (let i = 0; i < 4; i++) box.append(h("div", { class: "kpi skeleton" }, h("div", { class: "kpi-label", text: " " }), h("div", { class: "kpi-value", text: "00" })));
     return;
   }
@@ -598,7 +610,7 @@ function renderSiparis() {
   const box = $("#orders");
   box.textContent = "";
   if (S.loading) { box.append(h("div", { class: "state" }, h("div", { class: "loader" }))); return; }
-  if (!S.ted) return;
+  if (!S.suppliers.length) return;
   const all = kalemRows();
   renderChips("#chips-siparis", SIP_FILTERS.map(f => ({ key: f.key, label: f.label(), n: all.filter(f.test).length })),
     S.filter.siparis, k => { S.filter.siparis = k; renderSiparis(); });
@@ -733,7 +745,7 @@ function renderEnvanter() {
   const box = $("#inv-grid");
   box.textContent = "";
   if (S.loading) { box.append(h("div", { class: "state" }, h("div", { class: "loader" }))); return; }
-  if (!S.ted) return;
+  if (!S.suppliers.length) return;
   const rows = envanterRows();
   if (!rows.length) {
     box.append(h("div", { class: "card state", style: "grid-column:1/-1" }, h("div", { class: "big", text: t("invEmpty") }), h("div", { text: t("invEmptySub") })));
@@ -751,15 +763,23 @@ function renderEnvanter() {
 }
 
 function newEnvanter() {
-  const opts = malzemeOptions();
+  // Kullanıcı tek şirkete bağlıysa (normal durum) şirket sabittir; birden fazlaysa formda sorulur
+  const multi = S.suppliers.length > 1;
+  const ted = selectEl(S.suppliers, { id: nid("env-ted"), value: multi ? "" : S.suppliers[0].id });
+  let opts = malzemeOptions(ted.value);
   const mal = selectEl(opts, { id: nid("env-mal") });
+  ted.addEventListener("change", () => {
+    opts = malzemeOptions(ted.value);
+    mal.replaceChildren(...selectEl(opts).childNodes);
+  });
   const miktar = h("input", { type: "number", min: "0", step: "any", id: nid("env-mik") });
   const tarih = h("input", { type: "date", id: nid("env-tar"), value: todayIso() });
   const notu = h("textarea", { id: nid("env-not") });
   const err = h("div", { class: "alert alert-danger form-error", role: "alert", hidden: true });
   const body = h("div", null, reqNote(),
-    opts.length ? null : h("div", { class: "alert alert-info", text: t("noMaterials") }),
+    opts.length || multi ? null : h("div", { class: "alert alert-info", text: t("noMaterials") }),
     h("div", { class: "form-grid" },
+      multi ? fieldEl(t("supplier"), ted, { required: true, full: true }) : null,
       fieldEl(t("fMalzeme"), mal, { required: true, full: true }),
       fieldEl(t("fMiktar"), miktar, { required: true }), fieldEl(t("fTarih"), tarih, { required: true }),
       fieldEl(t("fNot"), notu, { full: true })), err);
@@ -768,15 +788,16 @@ function newEnvanter() {
     saveBtn(async () => {
       clearInvalid(body);
       const miss = [];
+      if (isEmptyValue(ted.value)) miss.push([t("supplier"), ted]);
       if (isEmptyValue(mal.value)) miss.push([t("fMalzeme"), mal]);
       if (num(miktar.value) == null || num(miktar.value) < 0) miss.push([t("fMiktar"), miktar]);
       if (isEmptyValue(tarih.value)) miss.push([t("fTarih"), tarih]);
       if (miss.length) { showErr(err, miss.map(m => m[0]), miss[0][1], miss.map(m => m[1])); return false; }
       const malLabel = (opts.find(o => o.id === mal.value)?.label || "").split(" · ")[0];
-      const tedLabel = S.suppliers.find(s => s.id === S.ted)?.label || "";
+      const tedLabel = S.suppliers.find(x => x.id === ted.value)?.label || "";
       const p = {
         [F.ENV.ozet]: tedLabel.split(" ")[0] + " – " + malLabel + " stok bildirimi",
-        [F.ENV.ted]: [S.ted], [F.ENV.malzeme]: [mal.value],
+        [F.ENV.ted]: [ted.value], [F.ENV.malzeme]: [mal.value],
         [F.ENV.miktar]: num(miktar.value), [F.ENV.tarih]: tarih.value
       };
       if (notu.value.trim()) p[F.ENV.not] = notu.value.trim();
@@ -802,7 +823,7 @@ function renderSevkiyat() {
   const board = $("#board-sevkiyat");
   board.textContent = "";
   if (S.loading) { board.append(h("div", { class: "state" }, h("div", { class: "loader" }))); return; }
-  if (!S.ted) return;
+  if (!S.suppliers.length) return;
   const all = sevkiyatRows();
   renderChips("#chips-sevkiyat", SEV_FILTERS.map(f => ({ key: f.key, label: f.label(), n: all.filter(s => f.cols.includes(s.durum)).length })),
     S.filter.sevkiyat, k => { S.filter.sevkiyat = k; renderSevkiyat(); });
@@ -907,7 +928,8 @@ function newAsn() {
     h("div", { class: "lines-head" }, h("span", { text: t("lnKalem") + " *" }), h("span", { text: t("lnLot") + " *" }),
       h("span", { text: t("lnMiktar") + " *" }), h("span", { text: t("lnKutu") }), h("span")));
   const rows = [];
-  const kalemOpts = open.map(k => ({ id: k.id, label: k.kod + " · " + k.malzeme + " (" + t("openQty", { n: fmtN(openQty(k)) }) + ")" }));
+  const multi = S.suppliers.length > 1;
+  const kalemOpts = open.map(k => ({ id: k.id, label: (multi ? k.tedLabel.split(" ")[0] + " · " : "") + k.kod + " · " + k.malzeme + " (" + t("openQty", { n: fmtN(openQty(k)) }) + ")" }));
   const addLine = () => {
     const kal = selectEl(kalemOpts, { placeholder: t("select") }); kal.setAttribute("aria-label", t("lnKalem")); kal.setAttribute("aria-required", "true");
     const lot = h("input", { type: "text", "aria-label": t("lnLot"), "aria-required": "true" });
@@ -943,7 +965,11 @@ function newAsn() {
         for (const r of bad) for (const el of [r.kal, r.lot, r.mik]) if (!el.value || (el === r.mik && !(num(el.value) > 0))) el.setAttribute("aria-invalid", "true");
         return false;
       }
-      const p = { [F.SEV.irsaliye]: irs.value.trim(), [F.SEV.durum]: "Planlandı", [F.SEV.ted]: [S.ted] };
+      // Sevkiyatın tedarikçisi, seçilen kalemlerin tedarikçisidir; bir ASN tek şirkete ait olmalı
+      const tedIds = [...new Set(filled.map(r => open.find(k => k.id === r.kal.value)?.tedId).filter(Boolean))];
+      if (tedIds.length !== 1) { err.textContent = t("oneSupplier"); err.hidden = false; return false; }
+      const tedId = tedIds[0];
+      const p = { [F.SEV.irsaliye]: irs.value.trim(), [F.SEV.durum]: "Planlandı", [F.SEV.ted]: [tedId] };
       if (plan.value) p[F.SEV.plan] = plan.value;
       if (varis.value) p[F.SEV.varis] = varis.value;
       if (tas.value.trim()) p[F.SEV.tasiyici] = tas.value.trim();
@@ -952,7 +978,7 @@ function newAsn() {
       if (!sevId) throw new Error("ASN ID?");
       for (const r of filled) {
         const kp = { [F.SVK.lot]: r.lot.value.trim(), [F.SVK.sevkiyat]: [sevId], [F.SVK.kalem]: [r.kal.value],
-                     [F.SVK.ted]: [S.ted], [F.SVK.sevk]: num(r.mik.value) };
+                     [F.SVK.ted]: [tedId], [F.SVK.sevk]: num(r.mik.value) };
         if (num(r.kutu.value) != null) kp[F.SVK.kutu] = num(r.kutu.value);
         await createRec(L.SVK, kp);
       }
@@ -1102,8 +1128,8 @@ function init() {
   for (const b of document.querySelectorAll(".tab")) b.addEventListener("click", () => switchTab(b.dataset.tab));
   for (const b of document.querySelectorAll(".lang button")) b.addEventListener("click", () => { LANG = b.dataset.lang; renderAll(); });
   $("#btn-refresh").addEventListener("click", () => loadAll());
-  $("#btn-new-env").addEventListener("click", () => { if (!S.loading && S.ted) newEnvanter(); });
-  $("#btn-new-asn").addEventListener("click", () => { if (!S.loading && S.ted) newAsn(); });
+  $("#btn-new-env").addEventListener("click", () => { if (!S.loading && S.suppliers.length) newEnvanter(); });
+  $("#btn-new-asn").addEventListener("click", () => { if (!S.loading && S.suppliers.length) newAsn(); });
   $("#drawer-close").addEventListener("click", closeDrawer);
   $("#scrim").addEventListener("click", closeDrawer);
   $("#modal-close").addEventListener("click", closeModalAsk);
