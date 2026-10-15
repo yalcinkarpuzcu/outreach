@@ -70,7 +70,7 @@ GOREVLER = [
     (34, "F6", "BE/BY Komisyon Onayı",                                 270, [32],          RUH, False, False, True),
     (35, "F6", "KUB/KT Komisyon Onayı",                                180, [33],          RUH, False, False, True),
     (36, "F6", "Raf Ömrü Onayı",                                       270, [32],          RUH, False, False, True),
-    (37, "F6", "Ruhsat Alımı",                                         0,   [33, 34, 35, 36], RUH, True, False, True),
+    (37, "F6", "Ruhsatın Alınması",                                         0,   [33, 34, 35, 36], RUH, True, False, True),
     (38, "F6", "Geri Ödeme Alımı Başvurusu",                           30,  [37],          RUH, False, False, True),
 ]
 
