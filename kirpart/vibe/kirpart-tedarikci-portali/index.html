@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kırpart · Tedarikçi Portalı</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <img src="logo.png" alt="Kırpart" class="logo">
+        <div class="brand-text">
+          <span class="brand-title" data-i18n="title">Tedarikçi Portalı</span>
+          <span class="brand-sub" id="today-label"></span>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <div class="who" id="who"></div>
+        <div class="lang" role="group" aria-label="Dil / Language">
+          <button type="button" data-lang="tr" class="is-active">TR</button>
+          <button type="button" data-lang="en">EN</button>
+        </div>
+        <button class="btn btn-ghost" id="btn-refresh" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span data-i18n="refresh">Yenile</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="page">
+    <div id="global-error" class="alert alert-danger" role="alert" hidden></div>
+    <div id="perm-note" class="alert alert-info" hidden></div>
+
+    <section class="kpis kpis-4" id="kpis" aria-label="Özet"></section>
+
+    <nav class="tabs" role="tablist">
+      <button class="tab is-active" role="tab" data-tab="siparis" aria-selected="true" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10l3 4v12H4V8l3-4zM4 8h16M9 12h6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+        <span data-i18n="tabOrders">Siparişlerim</span> <span class="tab-count" id="tc-siparis"></span>
+      </button>
+      <button class="tab" role="tab" data-tab="envanter" aria-selected="false" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7l8-4 8 4v10l-8 4-8-4zM4 7l8 4 8-4M12 11v10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+        <span data-i18n="tabInv">Envanter Bildirimleri</span> <span class="tab-count" id="tc-envanter"></span>
+      </button>
+      <button class="tab" role="tab" data-tab="sevkiyat" aria-selected="false" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7M7 19a2 2 0 1 0 0-.01M17 19a2 2 0 1 0 0-.01" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+        <span data-i18n="tabShip">Sevkiyatlarım</span> <span class="tab-count" id="tc-sevkiyat"></span>
+      </button>
+    </nav>
+
+    <section class="panel" id="panel-siparis" role="tabpanel">
+      <div class="toolbar">
+        <div class="chips" id="chips-siparis"></div>
+        <div class="toolbar-right">
+          <input class="search" id="search-siparis" type="search" data-i18n-ph="searchOrders" placeholder="Sipariş, kalem, malzeme ara…">
+        </div>
+      </div>
+      <div class="orders" id="orders"></div>
+    </section>
+
+    <section class="panel" id="panel-envanter" role="tabpanel" hidden>
+      <div class="toolbar">
+        <p class="hint" data-i18n="invHint" style="margin:0">Kırpart'a sevke hazır stok miktarlarınızı bildirin. Her bildirim tarihli olarak saklanır.</p>
+        <div class="toolbar-right">
+          <button class="btn btn-primary" id="btn-new-env" type="button" data-i18n="newInv">+ Yeni Envanter Bildirimi</button>
+        </div>
+      </div>
+      <div class="inv-grid" id="inv-grid"></div>
+    </section>
+
+    <section class="panel" id="panel-sevkiyat" role="tabpanel" hidden>
+      <div class="toolbar">
+        <div class="chips" id="chips-sevkiyat"></div>
+        <div class="toolbar-right">
+          <input class="search" id="search-sevkiyat" type="search" data-i18n-ph="searchShip" placeholder="İrsaliye, lot ara…">
+          <button class="btn btn-primary" id="btn-new-asn" type="button" data-i18n="newAsn">+ Yeni ASN</button>
+        </div>
+      </div>
+      <div class="board" id="board-sevkiyat"></div>
+    </section>
+  </main>
+
+  <div class="scrim" id="scrim" hidden></div>
+  <aside class="drawer" id="drawer" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="drawer-title">
+    <div class="drawer-head">
+      <div>
+        <div class="drawer-kicker" id="drawer-kicker"></div>
+        <h3 id="drawer-title"></h3>
+      </div>
+      <button class="icon-btn" id="drawer-close" type="button" aria-label="Kapat">✕</button>
+    </div>
+    <div class="drawer-body" id="drawer-body"></div>
+    <div class="drawer-foot" id="drawer-foot"></div>
+  </aside>
+
+  <div class="modal" id="modal" hidden role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3 id="modal-title"></h3>
+        <button class="icon-btn" id="modal-close" type="button" aria-label="Kapat">✕</button>
+      </div>
+      <div class="modal-body" id="modal-body"></div>
+      <div class="modal-foot" id="modal-foot"></div>
+    </div>
+  </div>
+
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+
+  <div class="notice" id="noaccess" hidden>
+    <div class="card notice-card">
+      <img src="logo.png" alt="Kırpart" class="logo">
+      <h2 id="noaccess-title">Bu portal tedarikçiler içindir</h2>
+      <p id="noaccess-msg" class="hint"></p>
+    </div>
+  </div>
+
+  <div class="loggedout" id="loggedout" hidden>
+    <div class="card loggedout-card">
+      <img src="logo.png" alt="Kırpart" class="logo">
+      <p id="loggedout-msg">Oturumunuz bulunamadı — giriş sayfasına yönlendiriliyorsunuz…</p>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

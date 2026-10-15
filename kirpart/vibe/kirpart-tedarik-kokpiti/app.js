@@ -997,7 +997,8 @@ function newSiparis() {
       if (ted.value) p[F.SIP.ted] = [ted.value];
       if (durum.value) p[F.SIP.durum] = durum.value;
       if (notu.value.trim()) p[F.SIP.not] = notu.value.trim();
-      const sipId = (await createRec(L.SIP, p))?.id;
+      const sipRes = await createRec(L.SIP, p);
+      const sipId = sipRes?._id ?? sipRes?.id;
       if (!sipId) throw new Error("Sipariş oluşturuldu ama kimliği alınamadı.");
       for (const r of filled) {
         const kp = { [F.KAL.siparis]: [sipId], [F.KAL.malzeme]: [r.mal.value], [F.KAL.miktar]: num(r.mik.value) };
@@ -1083,7 +1084,8 @@ function newSevkiyat() {
       if (varis.value) p[F.SEV.varis] = varis.value;
       if (tas.value.trim()) p[F.SEV.tasiyici] = tas.value.trim();
       if (plk.value.trim()) p[F.SEV.plaka] = plk.value.trim();
-      const sevId = (await createRec(L.SEV, p))?.id;
+      const sevRes = await createRec(L.SEV, p);
+      const sevId = sevRes?._id ?? sevRes?.id;
       if (!sevId) throw new Error("Sevkiyat oluşturuldu ama kimliği alınamadı.");
       for (const r of filled) {
         const kp = { [F.SVK.lot]: r.lot.value.trim(), [F.SVK.sevkiyat]: [sevId], [F.SVK.kalem]: [r.kal.value], [F.SVK.sevk]: num(r.mik.value) };
