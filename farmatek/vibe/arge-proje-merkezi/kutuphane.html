@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Görev Kütüphanesi · Ar-Ge Proje Merkezi</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="topbar"></header>
+<main>
+  <div class="page-head">
+    <div>
+      <h1>Görev Kütüphanesi</h1>
+      <p>Proje şablonları: fazlar, görevler, öncül bağları ve göreli süreler. Yeni proje açıldığında plan buradan kurulur.</p>
+    </div>
+    <div class="toolbar">
+      <label for="sel-sab" class="sr">Şablon</label>
+      <select class="input" id="sel-sab" style="width:auto"></select>
+      <div class="seg" id="zoom" role="group" aria-label="Ölçek">
+        <button type="button" data-z="ay" aria-pressed="true">Ay</button>
+        <button type="button" data-z="ceyrek" aria-pressed="false">Çeyrek</button>
+        <button type="button" data-z="yil" aria-pressed="false">Yıl</button>
+      </div>
+    </div>
+  </div>
+  <section class="kpis" id="kpis" aria-label="Şablon özeti"></section>
+  <div class="legend">
+    <span><i style="background:var(--summary)"></i>Faz</span>
+    <span><i style="background:var(--accent)"></i>Görev</span>
+    <span>◆ Kilometre taşı</span>
+    <span><i style="background:transparent;box-shadow:0 0 0 1.5px var(--critical)"></i>Kritik yol</span>
+    <span style="color:var(--text-muted)">Tarihler "Gün N" = proje başlangıcından itibaren gün</span>
+  </div>
+  <div class="card gantt-wrap" id="gantt"></div>
+</main>
+<script src="schema.js"></script>
+<script src="app.js"></script>
+<script src="gantt.js"></script>
+<script src="kutuphane.js"></script>
+</body>
+</html>

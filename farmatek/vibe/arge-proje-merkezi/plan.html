@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Proje Planı · Ar-Ge Proje Merkezi</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="topbar"></header>
+<main>
+  <div class="page-head">
+    <div>
+      <div class="meta" style="font-size:12.5px;color:var(--text-muted)"><a href="index.html">← Portföy</a></div>
+      <h1 id="p-title">Proje planı</h1>
+      <p id="p-sub"></p>
+    </div>
+    <div class="toolbar">
+      <div class="seg" id="zoom" role="group" aria-label="Ölçek">
+        <button type="button" data-z="hafta" aria-pressed="false">Hafta</button>
+        <button type="button" data-z="ay" aria-pressed="true">Ay</button>
+        <button type="button" data-z="ceyrek" aria-pressed="false">Çeyrek</button>
+        <button type="button" data-z="yil" aria-pressed="false">Yıl</button>
+      </div>
+      <button class="btn" type="button" id="btn-today">Bugün</button>
+      <button class="btn" type="button" id="btn-fold">Fazları daralt</button>
+      <label class="btn" style="cursor:pointer"><input type="checkbox" id="chk-base" checked> Baseline</label>
+      <button class="btn" type="button" id="btn-csv">⤓ Excel</button>
+      <button class="btn primary" type="button" id="btn-baseline" hidden>📌 Baseline al</button>
+    </div>
+  </div>
+  <section class="kpis" id="kpis" aria-label="Proje göstergeleri"></section>
+  <div class="legend">
+    <span><i style="background:#8fa6bd"></i>Başlamadı</span>
+    <span><i style="background:var(--accent)"></i>Başlayabilir</span>
+    <span><i style="background:#d18f00"></i>Devam ediyor</span>
+    <span><i style="background:var(--violet)"></i>Onay bekliyor</span>
+    <span><i style="background:var(--serious)"></i>Revizyon</span>
+    <span><i style="background:var(--good)"></i>Tamamlandı</span>
+    <span><i style="background:var(--baseline);height:4px"></i>Baseline</span>
+    <span><i style="background:transparent;box-shadow:0 0 0 1.5px var(--critical)"></i>Kritik yol</span>
+  </div>
+  <div class="card gantt-wrap" id="gantt"></div>
+</main>
+<script src="schema.js"></script>
+<script src="app.js"></script>
+<script src="gantt.js"></script>
+<script src="plan.js"></script>
+</body>
+</html>

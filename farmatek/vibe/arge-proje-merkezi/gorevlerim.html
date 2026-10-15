@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Görevlerim · Ar-Ge Proje Merkezi</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="topbar"></header>
+<main style="max-width:1080px">
+  <div class="page-head">
+    <div>
+      <h1>Görevlerim</h1>
+      <p>Size atanan görevleri güncelleyin; onayınızı bekleyen işleri karara bağlayın.</p>
+    </div>
+    <div class="toolbar">
+      <label class="btn" style="cursor:pointer"><input type="checkbox" id="chk-closed"> Kapananları göster</label>
+      <button class="btn" type="button" id="btn-refresh">↻ Yenile</button>
+    </div>
+  </div>
+  <div class="tabs" role="tablist">
+    <button type="button" role="tab" id="tab-mine" aria-selected="true" aria-controls="panel">Bana atananlar <span class="badge" id="c-mine" hidden></span></button>
+    <button type="button" role="tab" id="tab-onay" aria-selected="false" aria-controls="panel">Onayımı bekleyenler <span class="badge" id="c-onay" hidden></span></button>
+  </div>
+  <section id="panel" role="tabpanel" aria-live="polite"></section>
+</main>
+<script src="schema.js"></script>
+<script src="app.js"></script>
+<script src="gorevler.js"></script>
+</body>
+</html>
