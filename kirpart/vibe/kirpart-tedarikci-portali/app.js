@@ -219,6 +219,7 @@ function apiBase() {
 }
 
 class SessionExpired extends Error {}
+class Forbidden extends Error {}
 
 async function api(method, path, payload) {
   const headers = workiomHeaders();
@@ -229,9 +230,14 @@ async function api(method, path, payload) {
   });
   const json = await res.json().catch(() => null);
 
-  if (res.status === 401 || json?.unAuthorizedRequest) {
+  if (res.status === 401) {
     redirectToLogin();                     // session expired — see the auth rules
     throw new SessionExpired();
+  }
+  // 403: oturum geçerli ama bu listeye yetki yok. ABP burada da unAuthorizedRequest=true
+  // döndürür; girişe yönlendirmek kullanıcıyı döngüye sokar, yetki hatası olarak bildir.
+  if (res.status === 403 || json?.unAuthorizedRequest) {
+    throw new Forbidden(json?.error?.message || "Bu işlem için yetkiniz yok.");
   }
 
   if (!res.ok || !json || json.success === false) {
