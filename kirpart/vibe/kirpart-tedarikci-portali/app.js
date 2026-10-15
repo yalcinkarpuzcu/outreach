@@ -46,7 +46,7 @@ const I18N = {
     title: "Tedarikçi Portalı", refresh: "Yenile", tabOrders: "Siparişlerim", tabInv: "Envanter Bildirimleri", tabShip: "Sevkiyatlarım",
     searchOrders: "Sipariş, kalem, malzeme ara…", searchShip: "İrsaliye, lot ara…",
     invHint: "Kırpart'a sevke hazır stok miktarlarınızı bildirin. Her bildirim tarihli olarak saklanır.",
-    newInv: "+ Yeni Envanter Bildirimi", newAsn: "+ Yeni ASN", supplier: "Tedarikçi",
+    newInv: "+ Yeni Envanter Bildirimi", newAsn: "+ Yeni ASN", supplier: "Tedarikçi", nSuppliers: "{n} şirket",
     kTeyit: "Teyit Bekleyen Kalem", kTeyitSub: "yanıtınızı bekliyor", kBakiye: "Açık Sipariş Bakiyesi", kBakiyeSub: "adet, {n} kalem",
     kHafta: "7 Gün İçinde Teslim", kHaftaSub: "{n} kalem gecikmiş", kHaftaOk: "gecikme yok", kYolda: "Yoldaki Sevkiyat", kYoldaSub: "{n} planlı ASN",
     fTeyit: "Teyit bekleyen", fAcik: "Açık", fTum: "Tümü", fAktif: "Aktif",
@@ -88,7 +88,7 @@ const I18N = {
     title: "Supplier Portal", refresh: "Refresh", tabOrders: "My Orders", tabInv: "Inventory Reports", tabShip: "My Shipments",
     searchOrders: "Search order, line, material…", searchShip: "Search delivery note, lot…",
     invHint: "Report stock that is ready to ship to Kırpart. Every report is kept with its date.",
-    newInv: "+ New Inventory Report", newAsn: "+ New ASN", supplier: "Supplier",
+    newInv: "+ New Inventory Report", newAsn: "+ New ASN", supplier: "Supplier", nSuppliers: "{n} companies",
     kTeyit: "Lines Awaiting Confirmation", kTeyitSub: "waiting for your answer", kBakiye: "Open Order Balance", kBakiyeSub: "pcs, {n} lines",
     kHafta: "Due in 7 Days", kHaftaSub: "{n} lines overdue", kHaftaOk: "nothing overdue", kYolda: "Shipments in Transit", kYoldaSub: "{n} planned ASNs",
     fTeyit: "Awaiting confirmation", fAcik: "Open", fTum: "All", fAktif: "Active",
@@ -539,8 +539,11 @@ function renderWho() {
   const box = $("#who");
   box.textContent = "";
   if (S.loading || !S.suppliers.length) return;
+  // Tek şirket: adını yaz. Birden fazla (ör. Kırpart yöneticisi): sadece sayıyı göster, adlar ipucunda
+  const multi = S.suppliers.length > 1;
   box.append(h("span", { class: "who-label", text: t("supplier") + ":" }),
-    h("span", { class: "who-name", text: S.suppliers.map(x => x.label).join(", ") }),
+    h("span", { class: "who-name", title: S.suppliers.map(x => x.label).join("\n"),
+      text: multi ? t("nSuppliers", { n: S.suppliers.length }) : S.suppliers[0].label }),
     S.meName ? h("span", { class: "who-label", text: "· " + S.meName }) : null);
 }
 

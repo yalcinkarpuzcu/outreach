@@ -379,3 +379,12 @@ svg { width: 18px; height: 18px; flex: none; }
   .topbar-actions { display: contents; }
   #btn-refresh span { display: none; }
 }
+/* Üst bar: dil seçici ve butonlar asla sıkışmasın, şirket adı gerekirse kısalsın */
+.brand { flex: none; }
+.brand-text { white-space: nowrap; }
+.topbar-actions { min-width: 0; }
+.who { min-width: 0; }
+.who-label { white-space: nowrap; }
+.who-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lang, #btn-refresh { flex: none; }
+.lang button { min-width: 36px; }
