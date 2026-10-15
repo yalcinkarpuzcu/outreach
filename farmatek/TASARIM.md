@@ -277,7 +277,7 @@ Eski "Yalçın 2" app'ine dokunulmaz.
 
 ## 11. Kurulum sonrası notlar (as-built, 16.10.2026)
 
-**Kurulu:** app `Ar-Ge Proje Yönetimi` (7 liste, 2 klasör), 9 otomasyon, 13 rapor, 3 rol, kütüphane (6 faz + 38 kalem, 2 şablon), 2 demo proje. Vibe app: `Ar-Ge Proje Merkezi`.
+**Kurulu:** app `Ar-Ge Proje Yönetimi` (7 liste, 2 klasör), 7 otomasyon (A1, A2, A3–A6, A6b, A7–A8, A8b, A9), 12 rapor, 3 rol, kütüphane (6 faz + 38 kalem, 2 şablon), 2 demo proje. Vibe app: `Ar-Ge Proje Merkezi`.
 
 Tasarımdan sapmalar ve canlı testte bulunanlar:
 
