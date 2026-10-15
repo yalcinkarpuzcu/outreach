@@ -306,7 +306,7 @@ for no, yay, tar, ted, durum, notu, kalemler in SIP:
     create("Siparişler", no, d)
     for satir, mlz, ist, mik in kalemler:
         create("Sipariş Kalemleri", f"{no}/{satir}", {
-            "Kalem Kodu": f"{no}/{satir}", "Sipariş": no, "Satır No": satir, "Tedarikçi": T[ted], "Malzeme": mlz,
+            "Sipariş": no,  # Kalem Kodu formülle "Sipariş No/Satır No" olarak hesaplanır "Satır No": satir, "Tedarikçi": T[ted], "Malzeme": mlz,
             "İstenen Teslim Tarihi": ist, "Sipariş Miktarı": mik})
 
 time.sleep(5)

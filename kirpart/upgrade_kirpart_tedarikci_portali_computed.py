@@ -272,7 +272,7 @@ for child, fk, parent, bl_name in PAIRS:
         print(f"  ✗ {child} / {fk}: ikiz alan bulunamadı")
         continue
     state.set_field_id(child, twin["name"], twin["id"])
-    _created.setdefault(child, {})[twin["name"]] = f"trigger:{fk}"
+    _created.setdefault(child, []).append((fk, parent, bl_name, twin["name"]))
     SYNC_AUTOS.append({"name": f"SYS {child} — {fk} rollup senkronu (değişiklik)",
                        "trigger": {"type": "record_updated", "list": child, "watch_field": fk},
                        "actions": [{"type": "update_record", "fields": {twin["name"]: f"trigger:{fk}"}}]})
@@ -285,10 +285,51 @@ for child, fk, parent, bl_name in PAIRS:
                                  {str(twin["id"]): [{"_id": v["_id"]} for v in val]})
             n += 1
     print(f"  ✅ {child} / {fk} → {twin['name']} ({n} kayıt yamandı)")
-for child, fields in _created.items():
-    SYNC_AUTOS.append({"name": f"SYS {child} — rollup senkronu (oluşturma)",
-                       "trigger": {"type": "record_created", "list": child},
-                       "actions": [{"type": "update_record", "fields": fields}]})
+# Oluşturma senkronu iki yönlü:
+#  • kayıt alt listeden açıldıysa (ileri bağlantı dolu)  → ikizi doldur
+#  • kayıt üst kaydın içinden eklendiyse (yalnız ikiz dolu) → üst kaydı back-link'ten bul,
+#    ileri bağlantıyı ve (varsa) Tedarikçi'yi üst kayıttan doldur
+HAS_TED = {"Siparişler", "Sevkiyatlar", "Denetimler", "PPAP Talepleri", "Sapma Talepleri", "Kalite Vakaları",
+           "Ziyaret & Toplantılar"}
+EQ, CONTAINS = 3, 1
+for child, pairs in _created.items():
+    child_has_ted = "Tedarikçi" in live_fields(child)
+    acts = []
+    for fk, parent, bl_name, twin_name in pairs:
+        fill = {fk: "loop:_id"}
+        if child_has_ted and parent in HAS_TED:
+            fill["Tedarikçi"] = "loop:Tedarikçi"
+        acts.append({"type": "condition", "if": f"isNotBlank({{{{{fk}}}}})",
+                     "then": [{"type": "update_record", "fields": {twin_name: f"trigger:{fk}"}}],
+                     "else": [{"type": "find_records", "list": parent, "max": 1,
+                               "where": {"field": bl_name, "op": CONTAINS, "value": "trigger:_id"},
+                               "actions": [{"type": "update_record", "target": "trigger", "fields": fill}]}]})
+    if child == "Sipariş Kalemleri":  # kalem listeden açıldıysa tedarikçiyi siparişten getir
+        acts.append({"type": "condition", "if": "isBlank({{Tedarikçi}}) and isNotBlank({{Sipariş No}})",
+                     "then": [{"type": "find_records", "list": "Siparişler", "max": 1,
+                               "where": {"field": "Sipariş No", "op": EQ, "value": "trigger:Sipariş No"},
+                               "actions": [{"type": "update_record", "target": "trigger",
+                                            "fields": {"Tedarikçi": "loop:Tedarikçi"}}]}]})
+    SYNC_AUTOS.append({"name": f"SYS {child} — bağlantı senkronu (oluşturma, iki yönlü)",
+                       "trigger": {"type": "record_created", "list": child}, "actions": acts})
+# Eski tek yönlü oluşturma senkronlarını kaldır (üst kayıttan eklenen bağlantıyı silebiliyordu)
+for a in client.get_all_automations(state.app_id):
+    if a["name"].startswith("SYS ") and a["name"].endswith("rollup senkronu (oluşturma)"):
+        client.delete_automation(a["id"])
+        state.data["automations"].pop(a["name"], None)
+        print(f"  · eski senkron silindi: {a['name']}")
+state.save()
+
+# Sipariş kaleminin başlığı (Kalem Kodu) formül: "Sipariş No/Satır No" — siparişin içinden kalem
+# eklerken kullanıcıdan kod istenmez. Workiom başlık alanını zorunlu tuttuğu için varsayılan değer şart.
+_kk = next(f for f in client.get_all_fields(state.get_list_id("Sipariş Kalemleri")) if f["name"] == "Kalem Kodu")
+if not _kk.get("isComputed"):
+    _b = {k: v for k, v in _kk.items() if v is not None}
+    _b.update({"isComputed": True, "defaultValue": "-",
+               "expression": f"Concat(_F_{fid('Sipariş Kalemleri', 'Sipariş No')}, '/', "
+                             f"_F_{fid('Sipariş Kalemleri', 'Satır No')})"})
+    client.update_field(state.get_list_id("Sipariş Kalemleri"), _kk["id"], _b)
+    print("  ✅ Sipariş Kalemleri / Kalem Kodu → formül (Sipariş No/Satır No)")
 
 # ─── 3. Bağımlı otomasyon ve raporlar ────────────────────────────────────────
 phase("3 — Hesaplanan alanlara bağlı otomasyon ve raporlar")
