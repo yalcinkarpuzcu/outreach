@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kırpart · Tedarik Zinciri Kokpiti</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <img src="logo.png" alt="Kırpart" class="logo">
+        <div class="brand-text">
+          <span class="brand-title">Tedarik Zinciri Kokpiti</span>
+          <span class="brand-sub" id="today-label"></span>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <span class="sync" id="sync-label" aria-live="polite"></span>
+        <button class="btn btn-ghost" id="btn-refresh" type="button" title="Verileri yenile">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span>Yenile</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="page">
+    <div id="global-error" class="alert alert-danger" role="alert" hidden></div>
+
+    <section class="kpis" id="kpis" aria-label="Özet göstergeler"></section>
+
+    <nav class="tabs" role="tablist" aria-label="Modüller">
+      <button class="tab is-active" role="tab" data-tab="siparis" aria-selected="true" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10l3 4v12H4V8l3-4zM4 8h16M9 12h6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+        Siparişler <span class="tab-count" id="tc-siparis"></span>
+      </button>
+      <button class="tab" role="tab" data-tab="sevkiyat" aria-selected="false" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7M7 19a2 2 0 1 0 0-.01M17 19a2 2 0 1 0 0-.01" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+        Sevkiyatlar <span class="tab-count" id="tc-sevkiyat"></span>
+      </button>
+      <button class="tab" role="tab" data-tab="aksiyon" aria-selected="false" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11l3 3 8-8M20 12v7a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Aksiyonlar &amp; 8D <span class="tab-count" id="tc-aksiyon"></span>
+      </button>
+    </nav>
+
+    <!-- SİPARİŞLER -->
+    <section class="panel" id="panel-siparis" role="tabpanel">
+      <div class="toolbar">
+        <div class="chips" id="chips-siparis"></div>
+        <div class="toolbar-right">
+          <input class="search" id="search-siparis" type="search" placeholder="Kalem, malzeme, tedarikçi ara…" aria-label="Siparişlerde ara">
+          <button class="btn btn-primary" id="btn-new-siparis" type="button">+ Yeni Sipariş</button>
+        </div>
+      </div>
+      <div class="card table-card">
+        <div class="table-wrap">
+          <table class="table" id="table-siparis">
+            <thead>
+              <tr>
+                <th>Kalem</th><th>Tedarikçi</th><th>Malzeme</th><th>İstenen Teslim</th>
+                <th class="num">Sipariş</th><th>Teyit</th><th class="num">Teyit Edilen</th>
+                <th class="num">Yolda</th><th class="num">Bakiye</th><th>Son İrsaliye</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="state" id="state-siparis"></div>
+      </div>
+    </section>
+
+    <!-- SEVKİYATLAR -->
+    <section class="panel" id="panel-sevkiyat" role="tabpanel" hidden>
+      <div class="toolbar">
+        <div class="chips" id="chips-sevkiyat"></div>
+        <div class="toolbar-right">
+          <input class="search" id="search-sevkiyat" type="search" placeholder="İrsaliye, tedarikçi, lot ara…" aria-label="Sevkiyatlarda ara">
+          <button class="btn btn-primary" id="btn-new-sevkiyat" type="button">+ Yeni ASN</button>
+        </div>
+      </div>
+      <div class="board" id="board-sevkiyat"></div>
+    </section>
+
+    <!-- AKSİYONLAR & 8D -->
+    <section class="panel" id="panel-aksiyon" role="tabpanel" hidden>
+      <div class="split">
+        <div class="split-main">
+          <div class="toolbar">
+            <h2 class="section-title">Aksiyonlar</h2>
+            <div class="toolbar-right">
+              <input class="search" id="search-aksiyon" type="search" placeholder="Aksiyon, tedarikçi ara…" aria-label="Aksiyonlarda ara">
+              <button class="btn btn-primary" id="btn-new-aksiyon" type="button">+ Yeni Aksiyon</button>
+            </div>
+          </div>
+          <div class="chips" id="chips-aksiyon"></div>
+          <div class="board" id="board-aksiyon"></div>
+        </div>
+        <aside class="split-side">
+          <div class="toolbar">
+            <h2 class="section-title">8D / Kalite Vakaları</h2>
+            <button class="btn btn-outline btn-sm" id="btn-new-vaka" type="button">+ Yeni Vaka</button>
+          </div>
+          <div class="chips" id="chips-vaka"></div>
+          <div class="vaka-list" id="vaka-list"></div>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <!-- Sağ panel (detay / düzenleme) -->
+  <div class="scrim" id="scrim" hidden></div>
+  <aside class="drawer" id="drawer" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="drawer-title">
+    <div class="drawer-head">
+      <div>
+        <div class="drawer-kicker" id="drawer-kicker"></div>
+        <h3 id="drawer-title"></h3>
+      </div>
+      <button class="icon-btn" id="drawer-close" type="button" aria-label="Kapat">✕</button>
+    </div>
+    <div class="drawer-body" id="drawer-body"></div>
+    <div class="drawer-foot" id="drawer-foot"></div>
+  </aside>
+
+  <!-- Modal (yeni kayıt) -->
+  <div class="modal" id="modal" hidden role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3 id="modal-title"></h3>
+        <button class="icon-btn" id="modal-close" type="button" aria-label="Kapat">✕</button>
+      </div>
+      <div class="modal-body" id="modal-body"></div>
+      <div class="modal-foot" id="modal-foot"></div>
+    </div>
+  </div>
+
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+
+  <div class="loggedout" id="loggedout" hidden>
+    <div class="card loggedout-card">
+      <img src="logo.png" alt="Kırpart" class="logo">
+      <p id="loggedout-msg">Oturumunuz bulunamadı — giriş sayfasına yönlendiriliyorsunuz…</p>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
