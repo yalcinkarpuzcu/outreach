@@ -272,3 +272,26 @@ Eski "Yalçın 2" app'ine dokunulmaz.
 2. 27–38 varsayımları demo için yeterli mi?
 3. Onay gerekli görev listesi (3, 5, 18, 19, 22, 23, 27, 31) uygun mu?
 4. Kullanıcı/rol testleri için farmatek tenant'ında hangi kullanıcılar kullanılabilir (PM, ekip üyesi, onaylayıcı)?
+
+---
+
+## 11. Kurulum sonrası notlar (as-built, 16.10.2026)
+
+**Kurulu:** app `Ar-Ge Proje Yönetimi` (7 liste, 2 klasör), 9 otomasyon, 13 rapor, 3 rol, kütüphane (6 faz + 38 kalem, 2 şablon), 2 demo proje. Vibe app: `Ar-Ge Proje Merkezi`.
+
+Tasarımdan sapmalar ve canlı testte bulunanlar:
+
+| Konu | Sonuç |
+|---|---|
+| Otomasyon filtre operatörleri | `1 = Contains` (çoklu link/bağımlılık), `3 = Is` (tekil). Çoklu linkte `Is` yalnızca tek değerli kayıtları buluyor. |
+| Tarih formülü | `DateAdd` otomasyon eşlemesinde boş dönüyor; `tarih + gün` çalışıyor. |
+| Hiyerarşi | Sistem "Üst Görev" alanı otomasyonla yazılamıyor → üst kaydın "Alt Görevler" alanına append ile kuruluyor. Lookup alanı find filtresinde kaynak olarak çalışmıyor → kütüphanenin "Alt Öğeler" alanı kullanılıyor. |
+| Ardılı açma | Rollup, aynı otomasyon içinde henüz güncellenmemiş olabiliyor → **A6b** eklendi: ardıl, kendi "Kapanan Öncül" rollup'ı değişince kendini "Başlayabilir"e alıyor (testte ~8 sn). |
+| Gecikme | Zaman tetikleyicisi yerine günlük (06:00) zamanlanmış kontrol: geciken bayrağı + 3 gün kala hatırlatma. |
+| "Yalnızca kendi görevini güncelle" | Workiom arayüzü koşullu yetki grubunu (permissionGroups) göndermiyor → rolde alan bazında kısıt var (ekip: yalnızca Durum, %, Notlar, Dokümanlar, gerçekleşen tarihler düzenlenebilir; ekleme/silme/görünüm oluşturma kapalı); "yalnızca bana atanan" kuralı vibe app'te uygulanıyor. Native arayüzde ekip üyesi başkasının görevinin durumunu değiştirebilir — Workiom ekibiyle teyit/yol haritası konusu. |
+| WBS 37 adı | Faz "Ruhsat Alımı" ile çakıştığı için kalem adı "Ruhsatın Alınması". |
+| Onay | Vibe app onay/redi doğrudan yapıyor (`AutomationApprovalRequest/Approve|Reject`); Workiom bildirimi üzerinden de yapılabiliyor. |
+
+**Uçtan uca test (canlı, `akis_testi.py`):** proje oluşturma → 44 kayıt + hiyerarşi + 37 öncül bağı (proje dışına sızan bağ: 0) · öncülü açık görevi başlatma → geri alındı · tamamla → ardıllar Başlayabilir · onaylı görevi doğrudan tamamla → Onay Bekliyor · red (gerekçeli) → Revizyon · tekrar onay → Tamamlandı + Onay Geçmişi'nde 2 satır · baseline → 44 görevde baseline + 44 arşiv satırı · bitiş +30 gün → sapma +29.
+
+**Rol atamaları yapılmadı** — roller kullanıcısız oluşturuldu; demo kullanıcıları Workiom > Ayarlar > Ekipler'den atanmalı.
