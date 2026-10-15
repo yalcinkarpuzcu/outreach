@@ -10,12 +10,12 @@
 
   const TXT = {
     tr: { title: "Bildirimler", unread: "Okunmamış", all: "Tümü", markAll: "Tümünü okundu say",
-          empty: "Okunmamış bildiriminiz yok.", emptyAll: "Henüz bildirim yok.", open: "Kaydı aç ↗",
+          empty: "Okunmamış bildiriminiz yok.", emptyAll: "Henüz bildirim yok.", open: "Kaydı aç", workiom: "Workiom'da aç ↗", notHere: "Bu kayıt burada görüntülenemiyor; Workiom'da açabilirsiniz.",
           approve: "Onayla / Reddet ↗", error: "Hata", approval: "Onay bekliyor", loadErr: "Bildirimler yüklenemedi",
           more: "Daha fazla yükle", fresh: n => n === 1 ? "1 yeni bildirim" : n + " yeni bildirim", now: "şimdi",
           min: n => n + " dk önce", hour: n => n + " sa önce", day: n => n + " gün önce", bell: "Bildirimler" },
     en: { title: "Notifications", unread: "Unread", all: "All", markAll: "Mark all as read",
-          empty: "No unread notifications.", emptyAll: "No notifications yet.", open: "Open record ↗",
+          empty: "No unread notifications.", emptyAll: "No notifications yet.", open: "Open record", workiom: "Open in Workiom ↗", notHere: "This record can't be shown here; you can open it in Workiom.",
           approve: "Approve / Reject ↗", error: "Error", approval: "Approval pending", loadErr: "Could not load notifications",
           more: "Load more", fresh: n => n === 1 ? "1 new notification" : n + " new notifications", now: "now",
           min: n => n + " min ago", hour: n => n + " h ago", day: n => n + " d ago", bell: "Notifications" }
@@ -94,6 +94,19 @@
     }
   }
 
+  /* Kayıt bu uygulamanın listelerinden birindeyse uygulama içinde açılır (app.js: openFromNotification). */
+  function canOpenHere(listId) {
+    return typeof openFromNotification === "function" && typeof L === "object" && Object.values(L).includes(listId);
+  }
+
+  async function openInApp(listId, recordId) {
+    toggle(false);
+    if (openFromNotification(listId, recordId)) return;
+    // Kayıt yeni olabilir: verileri sessizce yenileyip bir kez daha dene.
+    if (typeof loadAll === "function") { try { await loadAll({ quiet: true }); } catch (_) { /* yükleme hatasını app.js gösterir */ } }
+    if (!openFromNotification(listId, recordId) && typeof toast === "function") toast(tx("notHere"));
+  }
+
   function item(un) {
     const n = un.notification || {};
     const p = n.data?.properties || {};
@@ -103,6 +116,8 @@
     const isApproval = kind === "App.AutomationApprovalRequest";
     const head = p.title || p.listName || p.automationName || p.appName || "Workiom";
     const url = p.recordUrl || null;
+    const listId = n.listId || p.listId;
+    const inApp = !isApproval && n.recordId && canOpenHere(listId);
 
     const row = h("li", { class: "nt-item" + (un.state === 0 ? " is-unread" : "") + (isFail ? " is-fail" : "") },
       h("div", { class: "nt-top" },
@@ -113,8 +128,11 @@
       ),
       p.recordTitle && p.recordTitle !== head ? h("div", { class: "nt-rec", text: p.recordTitle }) : null,
       h("div", { class: "nt-msg", text: msg }),
-      url ? h("a", { class: "nt-link", href: url, target: "_blank", rel: "noopener", text: isApproval ? tx("approve") : tx("open"),
-                     onclick: e => { e.stopPropagation(); markRead(un); } }) : null
+      inApp || url ? h("div", { class: "nt-actions" },
+        inApp ? h("button", { class: "nt-open", type: "button", text: tx("open"),
+                              onclick: e => { e.stopPropagation(); markRead(un); openInApp(listId, n.recordId); } }) : null,
+        url ? h("a", { class: "nt-link", href: url, target: "_blank", rel: "noopener", text: isApproval ? tx("approve") : tx("workiom"),
+                       onclick: e => { e.stopPropagation(); markRead(un); } }) : null) : null
     );
     row.addEventListener("click", () => markRead(un));
     return row;

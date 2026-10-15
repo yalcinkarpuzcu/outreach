@@ -1124,6 +1124,27 @@ function toast(msg, tone) {
   setTimeout(() => el.remove(), 5000);
 }
 
+/* ════════════════════════ Bildirimden kayda git ════════════════════════ */
+/* notify.js çağırır: kayıt portalda bu kullanıcıya görünüyorsa ilgili sekmeyi ve formu açar, true döner. */
+function openFromNotification(listId, recordId) {
+  if (S.loading || !recordId || !S.suppliers.length) return false;
+  if (listId === L.KAL && kalemRows().some(x => x.id === recordId)) { switchTab("siparis"); renderSiparis(); openTeyit(recordId); return true; }
+  if (listId === L.SIP) {
+    const sip = S.data.SIP.find(x => x._id === recordId && ofSelected(x, "SIP"));
+    if (sip) {
+      const no = lbl(v(sip, F.SIP.no));
+      S.filter.siparis = "tum"; S.search.siparis = no; $("#search-siparis").value = no;
+      switchTab("siparis"); renderSiparis();
+      return true;
+    }
+  }
+  let sid = listId === L.SEV ? recordId : null;
+  if (listId === L.SVK) sid = linkId(v(S.data.SVK.find(x => x._id === recordId), F.SVK.sevkiyat));
+  if (sid && sevkiyatRows().some(x => x.id === sid)) { switchTab("sevkiyat"); renderSevkiyat(); openSevkiyat(sid); return true; }
+  if (listId === L.ENV && S.data.ENV.some(x => x._id === recordId && ofSelected(x, "ENV"))) { switchTab("envanter"); return true; }
+  return false;
+}
+
 /* ════════════════════════ Başlat ════════════════════════ */
 function init() {
   applyStaticText();

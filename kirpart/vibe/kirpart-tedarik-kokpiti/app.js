@@ -1337,6 +1337,27 @@ function toast(msg, tone) {
   setTimeout(() => t.remove(), 5000);
 }
 
+/* ════════════════════════ Bildirimden kayda git ════════════════════════ */
+/* notify.js çağırır: kayıt bu uygulamada gösterilebiliyorsa ilgili sekmeyi ve detayı açar, true döner. */
+function openFromNotification(listId, recordId) {
+  if (S.loading || !recordId) return false;
+  const has = (key, id) => S.data[key].some(x => x._id === id);
+  const showOrder = no => {
+    S.filter.siparis = "tum"; S.search.siparis = no; $("#search-siparis").value = no;
+    switchTab("siparis");
+  };
+  if (listId === L.KAL && has("KAL", recordId)) { switchTab("siparis"); openKalem(recordId); return true; }
+  if (listId === L.SIP && has("SIP", recordId)) { showOrder(lbl(v(S.data.SIP.find(x => x._id === recordId), F.SIP.no))); return true; }
+  if (listId === L.SEV && has("SEV", recordId)) { switchTab("sevkiyat"); openSevkiyat(recordId); return true; }
+  if (listId === L.SVK) {
+    const sid = linkId(v(S.data.SVK.find(x => x._id === recordId), F.SVK.sevkiyat));
+    if (sid && has("SEV", sid)) { switchTab("sevkiyat"); openSevkiyat(sid); return true; }
+  }
+  if (listId === L.AKS && has("AKS", recordId)) { switchTab("aksiyon"); openAksiyon(recordId); return true; }
+  if (listId === L.VAK && has("VAK", recordId)) { switchTab("aksiyon"); openVaka(recordId); return true; }
+  return false;
+}
+
 /* ════════════════════════ Başlat ════════════════════════ */
 function init() {
   $("#today-label").textContent = new Date().toLocaleDateString("tr-TR", { weekday: "long", day: "numeric", month: "long", year: "numeric" });

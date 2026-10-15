@@ -368,6 +368,10 @@ svg { width: 18px; height: 18px; flex: none; }
 .nt-link:hover { text-decoration: underline; }
 .nt-state { padding: 28px 16px; text-align: center; color: var(--muted); font-size: 13px; list-style: none; }
 .nt-err { color: #b42318; }
+.nt-actions { display: flex; align-items: center; gap: 14px; margin-top: 7px; flex-wrap: wrap; }
+.nt-actions .nt-link { margin-top: 0; font-weight: 500; color: var(--muted); }
+.nt-open { border: 1px solid var(--navy); background: #fff; color: var(--navy); border-radius: 7px; padding: 4px 11px; font-size: 12.5px; font-weight: 700; cursor: pointer; }
+.nt-open:hover { background: var(--navy); color: #fff; }
 @media (max-width: 640px) {
   .nt-panel { position: fixed; left: 8px; right: 8px; top: 64px; width: auto; max-height: calc(100vh - 80px); }
 }
