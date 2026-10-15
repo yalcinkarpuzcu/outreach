@@ -427,19 +427,24 @@ def otomasyon():
     ensure_automation("A1 · Proje oluşturulunca şablondan görevleri üret", t_created(P), a1)
 
     # A2 — hiyerarşi + öncülleri proje içinde (Proje + Şablon Öğesi ile) bağla
-    T, X, S2, Y = new_uuid(), new_uuid(), new_uuid(), new_uuid()
+    # Not: lookup alanı (Şablon Üst Öğe) find filtresinde kaynak olarak çalışmıyor → üst öğe,
+    # kütüphanedeki "Alt Öğeler" alanı üzerinden bulunur ve üst kaydın "Alt Görevler"ine eklenir. Öncül ve üst öğe ayrı döngülerde
+    # (biri boş dönerse diğerini etkilemesin).
+    T, S2, Y, T2, L, X = (new_uuid() for _ in range(6))
     proje_filtre = lambda: flt(G, "Proje", src_id())  # noqa: E731
     a2 = [cond(is_(P, "Plan Durumu", "Görevler Oluşturuldu"), then=[
+        # öncüller: kütüphanede T'nin şablonunu öncül tutan kalemler (S2) → projedeki karşılıkları (Y)
         find(G, [proje_filtre()], id=T, actions=[
-            # üst öğe
-            find(G, [proje_filtre(), flt(G, "Şablon Öğesi", src(G, "Şablon Üst Öğe", T))], id=X, count=1,
-                 actions=[update([m(G, "Üst Görev", src_id(X))], aid=T)]),
-            # ardılları: kütüphanede T'nin şablonunu öncül olarak tutan kalemler → projedeki karşılıkları
-            find(K, [flt(K, "Öncüller", src(G, "Şablon Öğesi", T), op=1)], id=S2, actions=[
+            find(K, [flt(K, "Öncüller", src(G, "Şablon Öğesi", T), op=1)], id=S2, count=20, actions=[
                 find(G, [proje_filtre(), flt(G, "Şablon Öğesi", src_id(S2))], id=Y, count=1, actions=[
-                    update([m(G, "Öncüller", src_id(T), append=True),
-                            m(G, "Öncül Kayıtları", src_id(T), append=True)], aid=Y)])]),
-        ]),
+                    update([m(G, "Öncüller", src_id(T), append=True)], aid=Y),
+                    update([m(G, "Öncül Kayıtları", src_id(T), append=True)], aid=Y)])])]),
+        # hiyerarşi: T'nin şablonunu alt öğe tutan kütüphane kalemi (L) → projedeki karşılığı (X)
+        find(G, [proje_filtre()], id=T2, actions=[
+            find(K, [flt(K, "Alt Öğeler", src(G, "Şablon Öğesi", T2), op=1)], id=L, count=1, actions=[
+                find(G, [proje_filtre(), flt(G, "Şablon Öğesi", src_id(L))], id=X, count=1, actions=[
+                    # sistem "Üst Görev" alanı otomasyonla yazılamıyor; üst kaydın Alt Görevler'ine eklenir
+                    update([m(G, "Alt Görevler", src_id(T2), append=True)], aid=X)])])]),
         update([m(P, "Plan Durumu", val(opt(P, "Plan Durumu", "Hazır")))]),
         notify_field(P, "Proje Yöneticisi",
                      f"Proje planı hazır: {ref(P, 'Proje Adı')}. Görevler, hiyerarşi ve öncüller oluşturuldu."),
@@ -505,6 +510,14 @@ def otomasyon():
     ])]
     ensure_automation("A3-A6 · Görev durum akışı (öncül kilidi, onay, kapanış)", t_updated(G, "Durum"), a3)
 
+    # A6b — ardıl kendi kararını verir: öncül rollup'ı değişince (A6 içindeki kontrol rollup
+    # henüz güncellenmeden çalışabildiği için) "Başlamadı" + açık öncül 0 → "Başlayabilir"
+    ensure_automation("A6b · Öncülleri kapanan görevi Başlayabilir yap", t_updated(G, "Kapanan Öncül"), [
+        cond(f"{is_(G, 'Durum', 'Başlamadı')} and {ref(G, 'Açık Öncül Sayısı')} = 0 and {ref(G, 'Öncül Sayısı')} > 0", then=[
+            update([m(G, "Durum", val(opt(G, "Durum", "Başlayabilir")))]),
+            notify_field(G, "Sorumlu", f"▶️ {ref(G, 'Görev Adı')} başlayabilir: tüm öncülleri tamamlandı."),
+        ])])
+
     # A7/A8 — her sabah: geciken görevleri işaretle, 3 gün kalanlara hatırlatma
     Z = new_uuid()
     a7 = [find(G, [flt(G, "Kapalı", val(0), op=3)], id=Z, count=1000, actions=[
@@ -548,5 +561,58 @@ def otomasyon():
     ensure_automation("A9 · Baseline al", t_updated(P, "Durum"), a9)
 
 
+# ───────────────────────────────────────────────────────────── roller
+# Alan izni: 0=Gizli, 1=Salt okunur, 2=Düzenleyebilir · listAccess: 0=Yok, 1=Özel, 2=Tam
+# Not: Workiom arayüzü koşullu yetki gruplarını (permissionGroups, ör. "Sorumlu = ben") göndermiyor;
+# bu yüzden "yalnızca kendi görevini güncelleme" vibe app'te uygulanır, burada alan bazında kısıt var.
+EKIP_DUZENLER = ["Durum", "% Tamamlanma", "Notlar", "Dokümanlar", "Gerçekleşen Başlangıç", "Gerçekleşen Bitiş"]
+
+
+def _liste_izni(list_name, *, erisim=1, olustur=False, sil=False, export=True, duzenlenebilir=(), gizli=()):
+    lp = {"listId": list_id(list_name), "listAccess": erisim, "createRecords": olustur, "deleteRecords": sil,
+          "bulkUpdateRecords": False, "export": export, "import": False, "preventViewCreation": True,
+          "filters": [], "filtersCache": [], "permissionGroups": []}
+    if erisim == 1:
+        lp["fieldsPermissions"] = {str(f["id"]): (2 if f["name"] in duzenlenebilir else 0 if f["name"] in gizli else 1)
+                                   for f in fields(list_name) if not f.get("systemFieldType")}
+    return lp
+
+
+def _rol(ad, app_izni):
+    roller = c.get(f"{API}/Role/GetRoles", {})
+    roller = roller["items"] if isinstance(roller, dict) else roller
+    mevcut = next((r for r in roller if r.get("displayName") == ad), None)
+    body = {"role": {"displayName": ad, **({"id": mevcut["id"]} if mevcut else {})},
+            "teamUsersChanged": False, "roleUserIds": [], "teamPermissionTreeChanged": True,
+            "permissionTree": {"inviteMembers": False, "createApp": False, "createDashbaord": False,
+                               "createInterface": False, "useAIMila": True, "apps": [app_izni],
+                               "dashboards": [], "interfaces": [], "adminUserIds": []},
+            "teamAdminUserIdsChanged": False, "adminUserIds": []}
+    c.post(f"{API}/Role/CreateOrUpdateRole", body)
+    print(f"  ✅ rol: {ad} ({'güncellendi' if mevcut else 'oluşturuldu'})")
+
+
+def yetki():
+    ref_listeler = ("Departmanlar", "Proje Şablonları")
+    _rol("Ar-Ge · Proje Yöneticisi", {
+        "appId": APP_ID, "accessLevel": 1, "reportsAccess": 1, "formsAccess": 1,
+        "listsPermissions": [
+            _liste_izni(P, erisim=2), _liste_izni(G, erisim=2),
+            _liste_izni("Onay Geçmişi"), _liste_izni("Baseline Arşivi"),
+            _liste_izni(K), *[_liste_izni(x) for x in ref_listeler]],
+        "listWithPreventViewCreationAccess": []})
+    _rol("Ar-Ge · Ekip Üyesi", {
+        "appId": APP_ID, "accessLevel": 1, "reportsAccess": 1, "formsAccess": 0,
+        "listsPermissions": [
+            _liste_izni(P), _liste_izni(G, duzenlenebilir=EKIP_DUZENLER),
+            _liste_izni("Onay Geçmişi"), _liste_izni("Baseline Arşivi"),
+            *[_liste_izni(x) for x in ref_listeler]],  # kütüphane listelenmez → erişim yok
+        "listWithPreventViewCreationAccess": []})
+    _rol("Ar-Ge · Yönetim (İzleyici)", {
+        "appId": APP_ID, "accessLevel": 2, "reportsAccess": 1, "formsAccess": 0,
+        "listsPermissions": [], "listWithPreventViewCreationAccess": []})
+
+
 if __name__ == "__main__":
-    {"yapi": yapi, "gorunum": gorunum, "raporlar": raporlar, "otomasyon": otomasyon}[sys.argv[1]]()
+    {"yapi": yapi, "gorunum": gorunum, "raporlar": raporlar, "otomasyon": otomasyon,
+     "yetki": yetki}[sys.argv[1]]()
