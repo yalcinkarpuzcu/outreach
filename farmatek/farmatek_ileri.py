@@ -439,17 +439,22 @@ def otomasyon():
                 find(G, [proje_filtre(), flt(G, "Şablon Öğesi", src_id(S2))], id=Y, count=1, actions=[
                     update([m(G, "Öncüller", src_id(T), append=True)], aid=Y),
                     update([m(G, "Öncül Kayıtları", src_id(T), append=True)], aid=Y)])])]),
+        update([m(P, "Plan Durumu", val(opt(P, "Plan Durumu", "Hazır")))]),
+    ])]
+    ensure_automation("A2 · Öncülleri bağla", t_updated(P, "Plan Durumu"), a2)
+
+    # A2b — hiyerarşi ayrı otomasyonda: A2 ile aynı çalıştırmada kalınca (adım limiti) hiç çalışmadı
+    a2b = [cond(is_(P, "Plan Durumu", "Hazır"), then=[
         # hiyerarşi: T'nin şablonunu alt öğe tutan kütüphane kalemi (L) → projedeki karşılığı (X)
         find(G, [proje_filtre()], id=T2, actions=[
             find(K, [flt(K, "Alt Öğeler", src(G, "Şablon Öğesi", T2), op=1)], id=L, count=1, actions=[
                 find(G, [proje_filtre(), flt(G, "Şablon Öğesi", src_id(L))], id=X, count=1, actions=[
                     # sistem "Üst Görev" alanı otomasyonla yazılamıyor; üst kaydın Alt Görevler'ine eklenir
                     update([m(G, "Alt Görevler", src_id(T2), append=True)], aid=X)])])]),
-        update([m(P, "Plan Durumu", val(opt(P, "Plan Durumu", "Hazır")))]),
         notify_field(P, "Proje Yöneticisi",
-                     f"Proje planı hazır: {ref(P, 'Proje Adı')}. Görevler, hiyerarşi ve öncüller oluşturuldu."),
+                     f"Proje planı hazır: {ref(P, 'Proje Adı')}. Görevler, öncüller ve hiyerarşi oluşturuldu."),
     ])]
-    ensure_automation("A2 · Görev hiyerarşisini ve öncülleri bağla", t_updated(P, "Plan Durumu"), a2)
+    ensure_automation("A2b · Görev hiyerarşisini kur", t_updated(P, "Plan Durumu"), a2b)
 
     # A3–A6 — görev durum akışı (öncül kilidi, onay, kapanış, ardılları açma)
     ONAY = "Onay Geçmişi"

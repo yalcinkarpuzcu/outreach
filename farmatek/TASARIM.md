@@ -277,7 +277,7 @@ Eski "Yalçın 2" app'ine dokunulmaz.
 
 ## 11. Kurulum sonrası notlar (as-built, 16.10.2026)
 
-**Kurulu:** app `Ar-Ge Proje Yönetimi` (7 liste, 2 klasör), 7 otomasyon (A1, A2, A3–A6, A6b, A7–A8, A8b, A9), 12 rapor, 3 rol, kütüphane (6 faz + 38 kalem, 2 şablon), 2 demo proje. Vibe app: `Ar-Ge Proje Merkezi`.
+**Kurulu:** app `Ar-Ge Proje Yönetimi` (7 liste, 2 klasör), 8 otomasyon (A1, A2, A2b, A3–A6, A6b, A7–A8, A8b, A9), 12 rapor, 3 rol, kütüphane (6 faz + 38 kalem, 2 şablon), 2 demo proje. Vibe app: `Ar-Ge Proje Merkezi`.
 
 Tasarımdan sapmalar ve canlı testte bulunanlar:
 
@@ -289,6 +289,7 @@ Tasarımdan sapmalar ve canlı testte bulunanlar:
 | Ardılı açma | Rollup, aynı otomasyon içinde henüz güncellenmemiş olabiliyor → **A6b** eklendi: ardıl, kendi "Kapanan Öncül" rollup'ı değişince kendini "Başlayabilir"e alıyor (testte ~8 sn). |
 | Gecikme | Zaman tetikleyicisi yerine günlük (06:00) zamanlanmış kontrol: geciken bayrağı + 3 gün kala hatırlatma. |
 | "Yalnızca kendi görevini güncelle" | Workiom arayüzü koşullu yetki grubunu (permissionGroups) göndermiyor → rolde alan bazında kısıt var (ekip: yalnızca Durum, %, Notlar, Dokümanlar, gerçekleşen tarihler düzenlenebilir; ekleme/silme/görünüm oluşturma kapalı); "yalnızca bana atanan" kuralı vibe app'te uygulanıyor. Native arayüzde ekip üyesi başkasının görevinin durumunu değiştirebilir — Workiom ekibiyle teyit/yol haritası konusu. |
+| A2 bölündü | Öncül döngüsü (42×20 iç içe adım) ile hiyerarşi döngüsü aynı otomasyonda olunca ikincisi hiç çalışmadı (çalıştırma başına adım limiti). Hiyerarşi **A2b**'ye taşındı (Plan Durumu = Hazır tetikler). Yeni projede tüm zincir ~80 sn: 44 görev, 37 öncül, 38 üst bağ. |
 | WBS 37 adı | Faz "Ruhsat Alımı" ile çakıştığı için kalem adı "Ruhsatın Alınması". |
 | Onay | Vibe app onay/redi doğrudan yapıyor (`AutomationApprovalRequest/Approve|Reject`); Workiom bildirimi üzerinden de yapılabiliyor. |
 

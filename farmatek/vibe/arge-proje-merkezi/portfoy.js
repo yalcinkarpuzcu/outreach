@@ -185,7 +185,7 @@ function showProgress(form, id, name) {
   const steps = [
     ["Proje kaydı oluşturuldu", "done"],
     ["Şablondan görevler ve tarihler oluşturuluyor", "active"],
-    ["Hiyerarşi ve öncül bağları kuruluyor", ""],
+    ["Öncül bağları kuruluyor", ""],
     ["Plan hazır", ""]
   ];
   const ul = el("ul", { class: "steps", "aria-live": "polite" });
@@ -194,7 +194,7 @@ function showProgress(form, id, name) {
     steps.forEach(([t, s]) => ul.append(el("li", { class: s }, el("span", { class: "dot", text: s === "done" ? "✓" : "" }), t)));
   };
   paint();
-  const info = el("p", { class: "lead", text: "Workiom otomasyonları planı kuruyor. 38 görevlik bir şablon için bu genellikle 1–3 dakika sürer; bu pencereyi kapatabilirsiniz." });
+  const info = el("p", { class: "lead", text: "Workiom otomasyonları planı kuruyor. 38 görevlik bir şablon için bu yaklaşık 1–2 dakika sürer; bu pencereyi kapatabilirsiniz." });
   const openBtn = el("a", { class: "btn primary", href: "plan.html?id=" + encodeURIComponent(id), text: "Planı aç →", style: "display:none" });
   const close = el("button", { class: "btn", type: "button", text: "Kapat", onclick: () => { form.parentElement.remove(); load(); } });
   clear(form).append(el("h2", { text: name }), info, ul, el("div", { class: "actions" }, close, openBtn));
@@ -205,7 +205,7 @@ function showProgress(form, id, name) {
       const rec = await getRecord("P", id);
       const plan = lbl(rec?.[fid("P", "Plan Durumu")]);
       if (plan === "Görevler Oluşturuldu") { steps[1][1] = "done"; steps[2][1] = "active"; }
-      if (plan === "Hazır") { steps[1][1] = "done"; steps[2][1] = "done"; steps[3][1] = "done"; paint(); openBtn.style.display = ""; info.textContent = "Plan hazır. Gantt üzerinde inceleyip baseline alabilirsiniz."; load(); return; }
+      if (plan === "Hazır") { steps[1][1] = "done"; steps[2][1] = "done"; steps[3][1] = "done"; paint(); openBtn.style.display = ""; info.textContent = "Plan hazır. Faz hiyerarşisi birkaç saniye içinde tamamlanır; Gantt üzerinde inceleyip baseline alabilirsiniz."; load(); return; }
       paint();
     } catch (e) { if (e instanceof SessionGone) return; }
     if (Date.now() - t0 < 6 * 60 * 1000) setTimeout(tick, 4000);
