@@ -322,10 +322,12 @@ def otomasyon():
             cond(f"SubtractDate({ref(G, 'Bitiş', Z)}, Today()) = 3", then=[
                 notify_field(G, "Sorumlu", f"📅 3 gün kaldı: {ref(G, 'Görev Adı', Z)}", aid=Z),
                 notify_field(G, "Proje Yöneticisi", f"📅 3 gün kaldı: {ref(G, 'Görev Adı', Z)} · {ref(G, 'Proje', Z)}", aid=Z)])]),
+    ])
+    ensure_automation("A7k · Günlük kilometre taşı gecikme kontrolü", {"type": 3, "cronExpression": "5 6 * * *"}, [
         find(KT, [flt(KT, "KT Durumu", val(opt(KT, "KT Durumu", "Bekleniyor")), op=3)], id=Zk, count=500, actions=[
             cond(f"{ref(KT, 'Hedef Tarih', Zk)} < Today()", then=[
                 update([m(KT, "KT Durumu", val(opt(KT, "KT Durumu", "Gecikti")))], aid=Zk),
-                notify_field(KT, "Proje Yöneticisi", f"⚠️ Kilometre taşı gecikti: {ref(KT, 'Kilometre Taşı', Zk)} · {ref(KT, 'Proje', Zk)}", aid=Zk)])]),
+                notify_field(KT, "Proje Yöneticisi", f"⚠️ Kilometre taşı gecikti: {ref(KT, 'Kilometre Taşı', Zk)} · {ref(KT, 'Proje', Zk)}", aid=Zk)])])
     ])
     ensure_automation("A8b · Bitiş güncellenince gecikme bayrağını yeniden değerlendir", t_updated(G, "Bitiş"), [
         cond(f"{ref(G, 'Bitiş')} >= Today()", then=[update([m(G, "Gecikmede", val(False))])])])
@@ -340,14 +342,17 @@ def otomasyon():
                         m(BA, "Baseline No", formula(yeni_no)), m(BA, "Baseline Tarihi", formula("Today()")),
                         m(BA, "Planlanan Başlangıç", src(G, "Başlangıç", Tb)), m(BA, "Planlanan Bitiş", src(G, "Bitiş", Tb)),
                         m(BA, "Proje", src_id()), m(BA, "Görev", src_id(Tb))])]),
-        find(FZ, [flt(FZ, "Proje", src_id())], id=Fb, count=50, actions=[
-            update([m(FZ, "Baseline Başlangıç", src(FZ, "Başlangıç", Fb)), m(FZ, "Baseline Bitiş", src(FZ, "Bitiş", Fb))], aid=Fb)]),
-        find(KT, [flt(KT, "Proje", src_id())], id=Kb, count=50, actions=[
-            update([m(KT, "Baseline Tarih", src(KT, "Hedef Tarih", Kb))], aid=Kb)]),
         update([m(P, "Baseline No", formula(yeni_no)), m(P, "Baseline Tarihi", formula("Today()")),
                 m(P, "Durum", val(opt(P, "Durum", "Devam Ediyor")))]),
         notify_field(P, "Proje Yöneticisi", f"📌 Baseline alındı: {ref(P, 'Proje Adı')}"),
     ])])
+    # Not: bir çalıştırmada yalnızca ilk "kayıt bul" döngüsü çalışıyor → faz ve KT baseline'ı ayrı otomasyonlarda
+    ensure_automation("A9b · Faz baseline", t_updated(P, "Baseline No"), [
+        find(FZ, [flt(FZ, "Proje", src_id())], id=Fb, count=50, actions=[
+            update([m(FZ, "Baseline Başlangıç", src(FZ, "Başlangıç", Fb)), m(FZ, "Baseline Bitiş", src(FZ, "Bitiş", Fb))], aid=Fb)])])
+    ensure_automation("A9c · Kilometre taşı baseline", t_updated(P, "Baseline No"), [
+        find(KT, [flt(KT, "Proje", src_id())], id=Kb, count=50, actions=[
+            update([m(KT, "Baseline Tarih", src(KT, "Hedef Tarih", Kb))], aid=Kb)])])
 
 
 # ───────────────────────────────────────────────────────────── roller (mevcut rollere app 2 eklenir)

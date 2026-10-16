@@ -300,3 +300,26 @@ Tasarımdan sapmalar ve canlı testte bulunanlar:
 **Vibe app yayını (16.10.2026):** `arge-proje-merkezi` v1 yayında → https://farmatek.workiom.com/vibe/arge-proje-merkezi/ (yalnızca oturum açmış tenant kullanıcıları). Paket, Workiom arayüzünün kullandığı `VibeApps/Create` + `Publish` uç noktalarıyla bayt bayt yüklendi; geri indirilen artifact'teki 12 dosyanın hash'i kaynakla aynı. Not: platform, yakında gelecek "write-proxy" için yazma izin listesi (`SetPermissions`) tanımlanmasını öneriyor; şu an etkisiz, o özellik açılmadan önce Projeler ve Görevler listeleri izin listesine eklenmeli.
 
 **Vibe app v2 (16.10.2026, yayında):** Gantt'ta PM için sürükle-bırak (çubuğu taşı, sağ ucundan süre değiştir, uçtaki noktadan başka göreve sürükleyerek FS bağ ekle; kenarda otomatik kaydırma), ardılların otomatik kayması (aç/kapa), kaydetmeden önce etki özeti + Geri al; öncül ekle/kaldır (FS/SS/FF/SF), sorumlu/onaylayıcı değiştir, görev/alt görev ekle-sil; departman ve "bana atananlar" filtresi; her görevde Geçmiş sekmesi; uygulama geneli Değişiklik Günlüğü (History/GetAllPaged); Görevlerim'de Departmanım sekmesi; Portföy'de proje özeti tablosu + Excel; Demo Rehberi sayfası (ihtiyaç → ekran eşlemesi). Yükleme sonrası 15/15 dosya hash eşleşmesi.
+
+---
+
+## 12. Ar-Ge Proje Yönetimi 2 — fazlar ve kilometre taşları ayrı (16.10.2026)
+
+İlk app olduğu gibi duruyor. Yeni app workiom-builder ile kuruldu (`farmatek_arge2.py` → `farmatek_ileri2.py` → `farmatek_seed2.py`).
+
+| Liste | İçerik |
+|---|---|
+| Faz Kütüphanesi · Kilometre Taşı Kütüphanesi · Görev Kütüphanesi | Şablon tarafı. Her kütüphane görevi bir faza ve (varsa) kilometre taşına bağlı; öncüller native bağımlılık. |
+| **Fazlar** | Proje fazları (başlangıç/bitiş, baseline). |
+| **Görevler** | Yalnızca görevler — alt görev yok (sistemin üst/alt görev alanları gizli), her görev **Faz** alanıyla projenin fazına bağlı. |
+| **Kilometre Taşları** | Hedef tarih, durum (Bekleniyor / Ulaşıldı / Gecikti), **Bağlı Görevler**; bağlı görevlerin hepsi kapanınca otomatik "Ulaşıldı". |
+
+Excel'deki 0 günlük satırlar (1, 30, 31, 37) kilometre taşı oldu: Proje Başlatıldı, BE Sonucu Alındı, Dosya Başvurusu Yapıldı, Ruhsat Alındı. Onlara bağlı görevlerin öncülleri kilometre taşının kendi öncüllerine yönlendirildi (ör. Bakanlık İncelemesi ← 26, 28, 29); plan tarihleri değişmedi (toplam 1006 gün). Görev sayısı 34.
+
+**Plan kurulum zinciri:** A1 fazlar → A1b görevler (faza bağlı) → A2 öncüller → A2b kilometre taşları → A2c her KT kendi görevlerini bağlar → "Hazır" + PM bildirimi. Canlı testte ~60 sn: 6 faz, 34 görev (faza bağlı olmayan 0), 33 öncül bağı, 4 KT (4'ü de bağlı), proje dışı bağ 0.
+
+**Test edilenler (canlı):** öncül kilidi · görev tamamlanınca KT "Ulaşıldı" + ardıllar Başlayabilir · onaysız tamamlama → Onay Bekliyor → onay → Tamamlandı → ardıllar açıldı · baseline (görev + faz + KT).
+
+**Workiom kısıtı (bu kurulumda öğrenildi):** bir otomasyon çalıştırmasında yalnızca **ilk** "kayıt bul" döngüsü çalışıyor; sonrakiler atlanıyor (sondaki tekil güncellemeler çalışıyor). Bu yüzden faz/KT baseline'ı (A9b, A9c), KT günlük kontrolü (A7k) ve KT bağlama (A2c) ayrı otomasyonlar.
+
+Roller: mevcut "Ar-Ge ·" rollerine app 2 izinleri eklendi (app 1 izinleri korunuyor). Vibe app henüz app 1'e bağlı.
