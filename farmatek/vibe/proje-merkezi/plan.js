@@ -122,7 +122,7 @@ VIEWS.plan = { title: "Proje Planı", async mount(ctx) {
       edit: { type: "user" }, editable: editable(isG) },
     { key: "pct", title: "%", w: 46, cls: "r", render: t => t.kind === "K" ? "" : Math.round(t.pct || 0) + "%", edit: { type: "number", min: "0", max: "100", get: t => Math.round(t.pct || 0) }, editable: editable(isG) },
     { key: "status", title: "Durum", w: 122, render: t => t.status ? chip(t.status) : (t.summary ? el("span", { class: "muted", text: t.closed ? "Tamamlandı" : "" }) : ""),
-      edit: t => t.kind === "G" ? { type: "select", get: x => x.status, options: () => L.G.f["Durum"].opts.map(x => [x, x]) }
+      edit: t => t.kind === "G" ? { type: "select", get: x => x.status, options: x => { const lk = openPredecessors(x, S.byId).length > 0; return L.G.f["Durum"].opts.map(o => [o, o, lk && AKTIF_DURUMLAR.includes(o) && o !== x.status]); } }
         : t.kind === "K" ? { type: "select", get: x => x.status, options: () => L.K.f["KT Durumu"].opts.map(x => [x, x]) } : null,
       editable: editable(isGK) }
   ];
@@ -238,7 +238,7 @@ VIEWS.plan = { title: "Proje Planı", async mount(ctx) {
     S.pending.clear();
   }
   const changed = t => { const o = S.orig.get(t.id); if (!o) return false; return o.start !== t.start || o.end !== t.end || depKey(o.deps) !== depKey(t.deps); };
-  const depKey = ds => ds.map(d => d.id + ":" + (d.type || 1)).sort().join();
+  const depKey = ds => ds.map(d => d.id + ":" + (d.type || 1) + (d.hard === false ? "s" : "")).sort().join();
 
   /* ── başlık şeridi ──────────────────────────────────────────────── */
   function drawHead() {
@@ -348,7 +348,7 @@ VIEWS.plan = { title: "Proje Planı", async mount(ctx) {
     S.pending.add(t.id);
     afterPlanEdit([t.id]);
   }
-  function addLink(fromId, toId, type) {
+  function addLink(fromId, toId, type, hard) {
     const from = S.byId.get(fromId), to = S.byId.get(toId);
     if (!from || !to || !S.edit) return;
     if (from.kind !== "G") { toast("Bağ yalnızca bir görevden başlayabilir.", "err"); return; }
@@ -356,7 +356,7 @@ VIEWS.plan = { title: "Proje Planı", async mount(ctx) {
     if (to.kind === "K") type = 1;
     if (to.deps.some(d => d.id === fromId)) { toast("Bu bağ zaten var."); return; }
     if (wouldCycle([...S.tasks, ...S.mss], fromId, toId)) { toast("Bu bağ döngü oluşturur: " + to.name + " zaten " + from.name + " görevinden önce geliyor.", "err", 5000); return; }
-    to.deps.push({ id: fromId, type: type || 1, label: from.name });
+    to.deps.push({ id: fromId, type: type || 1, label: from.name, hard: hard !== false });
     S.pending.add(toId);
     afterPlanEdit([fromId]);
     toast((to.kind === "K" ? "Kilometre taşına bağlandı: " : "Bağımlılık eklendi: ") + from.name + " → " + to.name + " (kaydedilmedi)");
@@ -396,7 +396,7 @@ VIEWS.plan = { title: "Proje Planı", async mount(ctx) {
           if (!p) { toast(num + " numaralı satır yok.", "err"); plan.render(); return; }
           if (p.kind !== "G") { toast(num + " · " + p.name + " bir görev değil; öncül yalnızca görev olabilir.", "err", 5000); plan.render(); return; }
           if (p.id === t.id) { toast("Bir görev kendi öncülü olamaz.", "err"); plan.render(); return; }
-          deps.push({ id: p.id, type: t.kind === "K" ? 1 : type, label: p.name });
+          deps.push({ id: p.id, type: t.kind === "K" ? 1 : type, label: p.name, hard: t.deps.find(x => x.id === p.id)?.hard ?? true });
         }
         const old = t.deps; t.deps = [];
         for (const d of deps) if (wouldCycle([...S.tasks, ...S.mss], d.id, t.id)) { t.deps = old; toast("Döngü oluşur: " + d.label, "err", 5000); plan.render(); return; }
@@ -426,8 +426,8 @@ VIEWS.plan = { title: "Proje Planı", async mount(ctx) {
       toast("Kilometre taşı durumu: " + val, "ok");
       return softReload();
     }
-    if (["Devam Ediyor", "Onay Bekliyor", "Tamamlandı"].includes(val) && t.openPreds > 0)
-      toast("Uyarı: " + t.openPreds + " öncül hâlâ açık. Workiom kilidi durumu geri alacak.", "err", 5000);
+    const open = openPredecessors(t, S.byId);
+    if (AKTIF_DURUMLAR.includes(val) && open.length) { blockDialog(t, open, val); plan.render(); return false; }
     await updateRecord("G", t.id, { [fid("G", "Durum")]: val });
     toast(val === "Tamamlandı" && t.approvalNeeded ? "Onay gerekli: görev onaylayıcıya gönderiliyor…" : "Durum: " + val + " — otomasyonlar çalışıyor…", "ok", 4000);
     setTimeout(() => S.alive && softReload(), 3500);
@@ -463,7 +463,7 @@ VIEWS.plan = { title: "Proje Planı", async mount(ctx) {
         if (o.start !== t.start || o.end !== t.end) { p[fid("G", "Başlangıç")] = dayToISO(t.start); p[fid("G", "Bitiş")] = dayToISO(t.end); }
         if (depKey(o.deps) !== depKey(t.deps)) {
           p[fid("G", "Öncüller")] = t.deps.map(d => ({ _id: d.id, dependencyType: d.type || 1 }));
-          p[fid("G", "Öncül Kayıtları")] = t.deps.map(d => d.id);       // kilit otomasyonu bu alanı kullanır
+          p[fid("G", "Öncül Kayıtları")] = t.deps.filter(d => d.hard !== false).map(d => d.id);   // kilit otomasyonu yalnızca zorunlu bağları kullanır
         }
         jobs.push(["G", t.id, p]);
       } else {
@@ -520,8 +520,8 @@ VIEWS.plan = { title: "Proje Planı", async mount(ctx) {
       field("Görev adı", fName, { required: true, wide: true }),
       el("div", { class: "grid2" }, field("Faz", fPhase), field("Departman", fDept)),
       el("div", { class: "grid2" }, field("Başlangıç", fStart), field("Süre (gün)", fDur)),
-      field("Sorumlu", fOwner),
-      after ? el("label", { class: "check" }, fPred, " \"" + after.name + "\" görevinin ardılı olsun (FS)") : null,
+      field("Sorumlu", fOwner, { hint: "Boş bırakılırsa görev sırası geldiğinde (Başlayabilir) departman yöneticisine otomatik atanır." }),
+      after ? el("label", { class: "check" }, fPred, " \"" + after.name + "\" görevinin ardılı olsun (FS, zorunlu: o bitmeden başlatılamaz)") : null,
       el("label", { class: "check" }, fNeed, " Tamamlanması için onay gerekli"));
     m.foot.append(el("button", { class: "btn", type: "button", text: "Vazgeç", onclick: () => m.close() }), ok);
     fName.focus();
@@ -684,7 +684,7 @@ VIEWS.plan = { title: "Proje Planı", async mount(ctx) {
   /* ── detay paneli ───────────────────────────────────────────────── */
   let drawer = null;
   function closeDetail() { if (drawer) { drawer.remove(); drawer = null; } }
-  function openDetail(t) {
+  function openDetail(t, tab) {
     closeDetail();
     if (!t || t.id === "__none") return;
     const body = el("div", { class: "dr-body" });
@@ -709,7 +709,7 @@ VIEWS.plan = { title: "Proje Planı", async mount(ctx) {
       clear(body); panes[name]();
     };
     Object.keys(panes).forEach(n => tabs.append(el("button", { type: "button", role: "tab", text: n, onclick: () => show(n) })));
-    show(Object.keys(panes)[0]);
+    show(tab && panes[tab] ? tab : Object.keys(panes)[0]);
   }
   const kv = rows => el("dl", { class: "kv" }, ...rows.filter(Boolean).flatMap(([k, val]) => [el("dt", { text: k }), el("dd", null, val)]));
   const saveBar = (err, btn) => el("div", { class: "dr-actions" }, err, btn);
@@ -726,13 +726,14 @@ VIEWS.plan = { title: "Proje Planı", async mount(ctx) {
     ]));
     // durum düğmeleri (MS Project'teki "Görev" sekmesi gibi hızlı işlemler)
     const acts = el("div", { class: "quick" });
-    const qb = (txt, st, cls) => acts.append(el("button", { class: "btn sm " + (cls || ""), type: "button", text: txt, onclick: async () => { try { await setStatusOf(t, st); closeDetail(); } catch (e) { if (!(e instanceof SessionGone)) toast(e.message, "err"); } } }));
+    const qb = (txt, st, cls) => acts.append(el("button", { class: "btn sm " + (cls || ""), type: "button", text: txt, onclick: async () => { try { if (await setStatusOf(t, st) !== false) closeDetail(); } catch (e) { if (!(e instanceof SessionGone)) toast(e.message, "err"); } } }));
     if (!t.closed) {
       if (t.status !== "Devam Ediyor") qb("▶ Başlat", "Devam Ediyor");
       qb(t.approvalNeeded ? "✍ Onaya gönder" : "✓ Tamamla", t.approvalNeeded ? "Onay Bekliyor" : "Tamamlandı", "primary");
       if (t.status !== "Beklemede") qb("⏸ Beklemeye al", "Beklemede");
     }
     body.append(el("div", { class: "section-t", text: "Hızlı işlem" }), acts);
+    workflowSection(t, body);
 
     const err = el("div", { class: "error-box", role: "alert" });
     const fName = el("input", { class: "input", value: t.name });
@@ -768,9 +769,50 @@ VIEWS.plan = { title: "Proje Planı", async mount(ctx) {
     });
   }
 
+  /* İş akışı: neyi bekliyor, tamamlanınca ne olur, ardılın sorumlusunu ata */
+  function workflowSection(t, body) {
+    const open = openPredecessors(t, S.byId);
+    body.append(el("div", { class: "section-t", text: "İş akışı" }));
+    const box = el("div", { class: "wf-box" });
+    if (t.closed) box.append(el("p", { class: "wf-ok", text: "✓ Görev kapandı; ardılları açıldı." }));
+    else if (open.length) box.append(el("p", { class: "wf-lock" }, "🔒 Bekliyor: ", ...open.map((p, i) => [i ? ", " : "", el("b", { text: p.name })]).flat(),
+      ". Bunlar tamamlanmadan başlatılamaz."));
+    else box.append(el("p", { class: "wf-ok", text: "▶ Tüm zorunlu öncüller tamam; görev başlatılabilir." }));
+    const succ = [...S.tasks, ...S.mss].filter(x => x.deps.some(d => d.id === t.id));
+    if (!succ.length) box.append(el("p", { class: "muted", text: "Bu görevi bekleyen başka görev yok." }));
+    else {
+      box.append(el("p", { class: "muted", text: "Bu görev tamamlanınca:" }));
+      const ul = el("ul", { class: "wf-next" });
+      for (const s of succ) {
+        const dep = s.deps.find(d => d.id === t.id);
+        const others = s.kind === "G" ? openPredecessors(s, S.byId).filter(p => p.id !== t.id) : s.deps.map(d => S.byId.get(d.id)).filter(p => p && p.id !== t.id && !p.closed);
+        const what = s.kind === "K" ? (others.length ? "kilometre taşı " + others.length + " görev daha bekleyecek" : "◆ kilometre taşına ulaşılır, PM'e bildirim gider")
+          : dep.hard === false ? "görsel bağ; etkilenmez"
+          : s.closed ? "zaten kapandı"
+          : others.length ? "açılmaz, " + others.length + " öncül daha bekleyecek"
+          : "\"Başlayabilir\" olur" + (s.owner ? ", " + userName(s.owner) + " kişisine bildirim gider" : ", departman yöneticisine atanır");
+        const li = el("li", null, el("span", { class: "pn" }, s.kind === "K" ? "◆ " : "", el("b", { text: s.name })), el("small", { text: what }));
+        if (s.kind === "G" && !s.closed && S.edit) {
+          const us = userSelect(s.owner, "— sorumlu yok —");
+          us.classList.add("narrow-sel");
+          us.setAttribute("aria-label", s.name + " sorumlusu");
+          us.addEventListener("change", async () => {
+            if (!us.value) return;
+            try { await updateRecord("G", s.id, { [fid("G", "Sorumlu")]: us.value }); toast(s.name + " atandı", "ok"); softReload(); }
+            catch (e) { if (!(e instanceof SessionGone)) toast(e.message, "err"); }
+          });
+          li.append(us);
+        }
+        ul.append(li);
+      }
+      box.append(ul);
+    }
+    body.append(box);
+  }
+
   function depPane(t, body) {
     const isK = t.kind === "K";
-    body.append(el("p", { class: "hint", text: isK ? "Bu görevlerin hepsi kapandığında kilometre taşına ulaşılır." : "Öncüller bitmeden bu görev başlatılamaz (Workiom öncül kilidi)." }));
+    body.append(el("p", { class: "hint", text: isK ? "Bu görevlerin hepsi kapandığında kilometre taşına ulaşılır." : "Zorunlu öncüller bitmeden bu görev başlatılamaz ya da tamamlanamaz (Workiom öncül kilidi). Görsel bağ yalnızca Gantt'ta ok olarak görünür, kilitlemez." }));
     const ul = el("ul", { class: "pred-list" });
     if (!t.deps.length) ul.append(el("li", { class: "muted", text: isK ? "Bağlı görev yok" : "Öncül yok" }));
     for (const d of t.deps) {
@@ -778,8 +820,12 @@ VIEWS.plan = { title: "Proje Planı", async mount(ctx) {
       ul.append(el("li", null,
         el("span", { class: "pn" }, el("b", { text: "#" + (p?.num ?? "?") + " " }), p ? p.name : d.label, isK ? "" : " (" + DEP_T[d.type || 1] + ")"),
         p ? chip(p.status) : null,
+        isK ? null : el("button", { class: "dep-kind" + (d.hard === false ? " soft" : ""), type: "button", disabled: !S.edit || null,
+          title: d.hard === false ? "Yalnızca görsel: kilitlemez. Zorunlu yapmak için tıklayın." : "Zorunlu: tamamlanmadan bu görev başlatılamaz. Görsel yapmak için tıklayın.",
+          onclick: () => { d.hard = d.hard === false; S.pending.add(t.id); relayout(); openDetail(t, (t.kind === "K" ? "Bağlı görevler" : "Öncüller")); toast("Bağ türü: " + (d.hard ? "zorunlu" : "yalnızca görsel") + " (kaydedilmedi)"); } },
+          d.hard === false ? "Görsel" : "🔒 Zorunlu"),
         S.edit ? el("button", { class: "icon-btn", type: "button", "aria-label": "Kaldır", title: "Kaldır", onclick: () => {
-          t.deps = t.deps.filter(x => x.id !== d.id); S.pending.add(t.id); relayout(); openDetail(t);
+          t.deps = t.deps.filter(x => x.id !== d.id); S.pending.add(t.id); relayout(); openDetail(t, (t.kind === "K" ? "Bağlı görevler" : "Öncüller"));
           toast("Bağ kaldırıldı (kaydedilmedi)");
         } }, icon("x", 14)) : null));
     }
@@ -789,7 +835,8 @@ VIEWS.plan = { title: "Proje Planı", async mount(ctx) {
       const sel = el("select", { class: "input", "aria-label": isK ? "Bağlı görev ekle" : "Öncül ekle" }, el("option", { value: "", text: isK ? "Görev seçin…" : "Öncül seçin…" }),
         ...cand.map(x => el("option", { value: x.id, text: "#" + x.num + " · " + x.name })));
       const typ = el("select", { class: "input narrow", "aria-label": "Bağ türü", disabled: isK || null }, ...[[1, "FS"], [2, "SS"], [3, "FF"], [4, "SF"]].map(([n, l]) => el("option", { value: String(n), text: l })));
-      body.append(el("div", { class: "inline-row" }, sel, typ, el("button", { class: "btn sm", type: "button", text: "Ekle", onclick: () => { if (sel.value) { addLink(sel.value, t.id, Number(typ.value)); openDetail(t); } } })));
+      const kind = el("select", { class: "input narrow", "aria-label": "Zorunluluk", disabled: isK || null }, el("option", { value: "1", text: "Zorunlu" }), el("option", { value: "0", text: "Görsel" }));
+      body.append(el("div", { class: "inline-row" }, sel, typ, kind, el("button", { class: "btn sm", type: "button", text: "Ekle", onclick: () => { if (sel.value) { addLink(sel.value, t.id, Number(typ.value), kind.value === "1"); openDetail(t, (t.kind === "K" ? "Bağlı görevler" : "Öncüller")); } } })));
     }
     if (!isK) {
       const succ = [...S.tasks, ...S.mss].filter(x => x.deps.some(d => d.id === t.id));

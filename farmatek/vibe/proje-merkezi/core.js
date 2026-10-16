@@ -225,7 +225,7 @@ function taskModel(rec) {
     name: g("Görev Adı") || "(adsız)",
     wbs: Number(g("WBS No")) || 0,
     start: start ?? end, end: end ?? start,
-    deps: (g("Öncüller") || []).map(o => ({ id: o._id, type: o.dependencyType || 1, label: o.label })),
+    deps: depsOf(g("Öncüller"), g("Öncül Kayıtları")),
     phase: linkIds(g("Faz"))[0] || null,
     phaseName: linkLabel(g("Faz")),
     project: linkIds(g("Proje"))[0] || null,
@@ -255,6 +255,30 @@ function taskModel(rec) {
   m.milestone = false;
   return m;
 }
+/* Bağlar: Öncüller (Gantt oku) + Öncül Kayıtları (kilit). İkisinde de olan = zorunlu; yalnızca okta olan = görsel */
+function depsOf(arrows, hardLinks) {
+  const hard = new Set(linkIds(hardLinks));
+  const out = (arrows || []).map(o => ({ id: o._id, type: o.dependencyType || 1, label: o.label, hard: hard.has(o._id) }));
+  for (const h of hardLinks || []) if (!out.some(d => d.id === h._id)) out.push({ id: h._id, type: 1, label: h.label, hard: true });
+  return out;
+}
+const AKTIF_DURUMLAR = ["Devam Ediyor", "Onay Bekliyor", "Tamamlandı"];
+/* tamamlanmamış zorunlu öncüller (byId: görev id → model) */
+function openPredecessors(t, byId) {
+  return (t.deps || []).filter(d => d.hard !== false).map(d => byId.get(d.id) || { id: d.id, name: d.label, status: "", closed: false })
+    .filter(p => !p.closed);
+}
+function isBlocked(t, byId) { return !t.closed && (openPredecessors(t, byId).length > 0 || (!byId.size && t.openPreds > 0)); }
+/* İsteği göndermeden durdurur ve nedenini gösterir */
+function blockDialog(t, open, wanted) {
+  const m = openModal({ title: "İşlem engellendi" });
+  m.body.append(el("div", { class: "block-box" }, el("span", { class: "block-ic", "aria-hidden": "true", text: "🔒" }),
+      el("div", null, el("b", { text: t.name }), el("p", { text: "\"" + wanted + "\" yapılamaz: aşağıdaki zorunlu öncül" + (open.length > 1 ? "ler" : "") + " henüz tamamlanmadı. Öncüller kapanınca görev kendiliğinden \"Başlayabilir\" olur ve sorumlusuna bildirim gider." }))),
+    el("ul", { class: "pred-list" }, ...open.map(p => el("li", null, el("span", { class: "pn", text: p.name }), p.status ? chip(p.status) : null, el("small", { class: "muted", text: p.owner ? userName(p.owner) : "" })))),
+    el("p", { class: "hint", text: "Bu kural Workiom'da da tanımlı: görev başka bir ekrandan güncellense bile durum geri alınır." }));
+  m.foot.append(el("button", { class: "btn primary", type: "button", text: "Tamam", onclick: () => m.close() }));
+}
+
 /* Faz (Fazlar listesi) */
 function phaseModel(rec) {
   const g = n => v(rec, "F", n);

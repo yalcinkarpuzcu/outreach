@@ -105,7 +105,7 @@ function createPlan(host, opts) {
     if (t.owner) line("Sorumlu: " + userName(t.owner));
     if (t.baseStart != null && o.showBaseline) line("Baseline: " + dateText(t.baseStart) + (t.kind !== "K" ? " → " + dateText(t.baseEnd) : "") + (t.variance ? " · sapma " + (t.variance > 0 ? "+" : "") + t.variance + " gün" : ""));
     if (t.critical && o.showCritical) line("⚠ Kritik yolda");
-    if (t.deps && t.deps.length) line((t.kind === "K" ? "Bağlı görevler: " : "Öncüller: ") + t.deps.map(d => (byId.get(d.id)?.num ?? "?") + (d.type > 1 ? ["", "", "SS", "FF", "SF"][d.type] : "")).join("; "));
+    if (t.deps && t.deps.length) line((t.kind === "K" ? "Bağlı görevler: " : "Öncüller: ") + t.deps.map(d => (byId.get(d.id)?.num ?? "?") + (d.type > 1 ? ["", "", "SS", "FF", "SF"][d.type] : "") + (d.hard === false ? " (görsel)" : "")).join("; "));
     tip.hidden = false;
     moveTip(ev);
   }
@@ -126,7 +126,7 @@ function createPlan(host, opts) {
     let inp;
     const val = spec.get ? spec.get(t) : "";
     if (spec.type === "select") {
-      inp = el("select", { class: "cell-in" }, ...(spec.options(t)).map(([vv, tx]) => el("option", { value: vv, text: tx, selected: String(vv) === String(val) || null })));
+      inp = el("select", { class: "cell-in" }, ...(spec.options(t)).map(([vv, tx, dis]) => el("option", { value: vv, text: tx + (dis ? " 🔒" : ""), disabled: dis || null, selected: String(vv) === String(val) || null })));
     } else if (spec.type === "user") {
       inp = userSelect(t.owner, "— atanmadı —");
       inp.className = "cell-in";
@@ -285,7 +285,7 @@ function createPlan(host, opts) {
         if (x2 - 10 >= x1 + 6) d = `M${x1},${y1} H${x2 - 10} V${y2} H${x2}`;
         else { const ym = y2 > y1 ? pos.get(t.id) * ROW_H : pos.get(t.id) * ROW_H + ROW_H; d = `M${x1},${y1} h6 V${ym} H${x2 - 10} V${y2} H${x2}`; }
         const crit = o.showCritical && p.critical && t.critical;
-        s.append(svg("path", { d, class: crit ? "crit" : null, "marker-end": crit ? "url(#arrc)" : "url(#arr)" }));
+        s.append(svg("path", { d, class: dep.hard === false ? "soft" : crit ? "crit" : null, "marker-end": crit && dep.hard !== false ? "url(#arrc)" : "url(#arr)" }));
       }
     }
     layer.append(s);

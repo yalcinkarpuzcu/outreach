@@ -7,7 +7,7 @@ const KANBAN = [
   { key: "review", title: "Onayda", sts: ["Onay Bekliyor"], drop: "Onay Bekliyor" },
   { key: "done", title: "Tamamlandı", sts: ["Tamamlandı", "İptal"], drop: "Tamamlandı" }
 ];
-function isLocked(t) { return !t.closed && t.openPreds > 0 && ["Başlamadı", "Başlayabilir"].includes(t.status); }
+function isLocked(t) { return !t.closed && ["Başlamadı", "Başlayabilir"].includes(t.status) && (TASK_INDEX.size ? openPredecessors(t, TASK_INDEX).length > 0 : t.openPreds > 0); }
 function dueText(t) {
   if (t.end == null) return "";
   const d = t.end - todayDay();
@@ -19,10 +19,12 @@ function dueText(t) {
 }
 
 /* Görev durumunu değiştir — kilit/onay kurallarını ön uyarıyla anlatır, otomasyonlar sunucuda çalışır */
+let TASK_INDEX = new Map();     // açık öncül adları için (görevlerim/onaylar yüklenince doldurulur)
 async function changeTaskStatus(t, st) {
   if (st === "Onay Bekliyor" && !t.approvalNeeded) st = "Tamamlandı";
-  if (["Devam Ediyor", "Onay Bekliyor", "Tamamlandı"].includes(st) && isLocked(t)) {
-    toast("🔒 " + t.name + ": " + t.openPreds + " öncül görev tamamlanmadan başlatılamaz.", "err", 5000);
+  const open = TASK_INDEX.size ? openPredecessors(t, TASK_INDEX) : [];
+  if (AKTIF_DURUMLAR.includes(st) && (open.length || (!TASK_INDEX.size && isLocked(t)))) {
+    blockDialog(t, open.length ? open : t.deps.filter(d => d.hard !== false).map(d => ({ name: d.label })), st);
     return false;
   }
   await updateRecord("G", t.id, { [fid("G", "Durum")]: st });
@@ -121,6 +123,7 @@ VIEWS.gorevlerim = { title: "Görevlerim", async mount(ctx) {
       S.depts = d;
       S.myDepts = new Set(d.filter(x => [v(x, "D", "Departman Yöneticisi"), v(x, "D", "Onaylayıcı"), ...(v(x, "D", "Ekip Üyeleri") || [])].some(u => sameUser(u, ME))).map(x => x._id));
       S.all = g.map(taskModel);
+      TASK_INDEX = new Map(S.all.map(t => [t.id, t]));
       draw();
     } catch (e) { stateError(box, e, () => load()); }
   }

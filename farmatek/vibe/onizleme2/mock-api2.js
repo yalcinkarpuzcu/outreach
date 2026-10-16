@@ -213,7 +213,10 @@
           if (r[F("G", "Onay Gerekli")] && r[F("G", "Onay Durumu")]?.label !== "Onaylandı") { r[dur] = opt("Onay Bekliyor"); afterUpdate(l, r, { [dur]: 1 }, prev); return; }
           closeTask(r, tday());
           const succ = store.G.filter(g => (g[F("G", "Öncül Kayıtları")] || []).some(x => x._id === r._id));
-          for (const s of succ) if (s[dur].label === "Başlamadı" && openPreds(s) === 0) { s[dur] = opt("Başlayabilir"); notify(900001, "▶️ " + s[F("G", "Görev Adı")] + " başlayabilir: tüm öncülleri tamamlandı.", "G", s); }
+          for (const s of succ) if (s[dur].label === "Başlamadı" && openPreds(s) === 0) {
+            s[dur] = opt("Başlayabilir"); notify(900001, "▶️ " + s[F("G", "Görev Adı")] + " başlayabilir: tüm öncülleri tamamlandı.", "G", s);
+            if (!s[F("G", "Sorumlu")]) { s[F("G", "Sorumlu")] = ME; notify(900001, "👤 " + s[F("G", "Görev Adı")] + " sırası geldi ve size atandı.", "G", s); }   // A6c taklidi
+          }
           for (const k of reachMilestones()) notify(900001, "🏁 Kilometre taşına ulaşıldı: " + k[F("K", "Kilometre Taşı")], "K", k);
         }
         if (["Revizyon Gerekli", "Beklemede", "Başlamadı", "Başlayabilir"].includes(r[dur].label)) { r[F("G", "Kapalı")] = 0; reachMilestones(); }
