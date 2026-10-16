@@ -106,6 +106,8 @@ def yapi():
                      "lookupFieldId": fg["Proje"]["id"], "linkedFieldId": fp["Proje Yöneticisi"]["id"]})
     ensure_field(KT, {"name": "Proje Yöneticisi", "dataType": 6, "isLookup": True,
                       "lookupFieldId": fkt["Proje"]["id"], "linkedFieldId": fp["Proje Yöneticisi"]["id"]})
+    ensure_field(G, {"name": "Departman Yöneticisi", "dataType": 6, "isLookup": True,
+                     "lookupFieldId": fg["Sorumlu Departman"]["id"], "linkedFieldId": fid("Departmanlar", "Departman Yöneticisi")})
     ensure_field(P, {"name": "Şablon Süresi", "dataType": 1, "isLookup": True,
                      "lookupFieldId": fp["Şablon"]["id"], "linkedFieldId": fid("Proje Şablonları", "Toplam Süre (gün)")})
 
@@ -302,6 +304,12 @@ def otomasyon():
         cond(f"{is_(G, 'Durum', 'Başlamadı')} and {ref(G, 'Açık Öncül Sayısı')} = 0 and {ref(G, 'Öncül Sayısı')} > 0", then=[
             update([m(G, "Durum", val(opt(G, "Durum", "Başlayabilir")))]),
             notify_field(G, "Sorumlu", f"▶️ {ref(G, 'Görev Adı')} başlayabilir: tüm öncülleri tamamlandı.")])])
+
+    # A6c — sırası gelen (Başlayabilir) görevin sorumlusu yoksa departman yöneticisine ata ve bildir
+    ensure_automation("A6c · Başlayabilir göreve sorumlu ata", t_updated(G, "Durum"), [
+        cond(f"{is_(G, 'Durum', 'Başlayabilir')} and IsBlank({ref(G, 'Sorumlu')}) and IsNotBlank({ref(G, 'Departman Yöneticisi')})", then=[
+            update([m(G, "Sorumlu", src(G, "Departman Yöneticisi"))]),
+            notify_field(G, "Departman Yöneticisi", f"👤 {ref(G, 'Görev Adı')} sırası geldi ve size atandı: tüm öncülleri tamamlandı.")])])
 
     # A-KT — bağlı görevlerin hepsi kapanınca kilometre taşına ulaşıldı
     ensure_automation("A-KT · Kilometre taşına ulaşıldı", t_updated(KT, "Kapanan Bağlı Görev"), [

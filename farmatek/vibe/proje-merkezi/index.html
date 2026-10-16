@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Proje Merkezi</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="shell">
+    <aside class="side" id="side">
+      <div class="brand">
+        <svg viewBox="0 0 32 32" width="30" height="30" aria-hidden="true">
+          <rect x="1" y="1" width="30" height="30" rx="9" fill="currentColor" class="brand-bg"/>
+          <rect x="7" y="9" width="11" height="3.4" rx="1.7" fill="#ffffff"/>
+          <rect x="11" y="14.3" width="13" height="3.4" rx="1.7" fill="#ffffff" fill-opacity=".75"/>
+          <rect x="9" y="19.6" width="8" height="3.4" rx="1.7" fill="#ffffff" fill-opacity=".55"/>
+          <path d="M24.5 18.6l2.6 2.6-2.6 2.6-2.6-2.6z" fill="#ffffff"/>
+        </svg>
+        <div><b>Proje Merkezi</b><small>Ar-Ge planlama ve takip</small></div>
+      </div>
+      <nav id="tabs" class="side-nav" aria-label="Ana menü">
+        <a href="#/portfoy" data-v="portfoy" data-ic="portfolio">Genel Bakış</a>
+        <a href="#/plan" data-v="plan" data-ic="plan">Proje Planı</a>
+        <a href="#/takvim" data-v="takvim" data-ic="calendar">Takvim</a>
+        <a href="#/gorevlerim" data-v="gorevlerim" data-ic="board">Görevlerim</a>
+        <a href="#/onaylar" data-v="onaylar" data-ic="approve">Onaylar</a>
+        <a href="#/bildirimler" data-v="bildirimler" data-ic="bell">Bildirimler <span id="tab-bildirim-n" class="cnt" hidden>0</span></a>
+        <div class="nav-sep">Yönetim</div>
+        <a href="#/kutuphane" data-v="kutuphane" data-ic="library">Kütüphane</a>
+        <a href="#/gunluk" data-v="gunluk" data-ic="log">Değişiklik Günlüğü</a>
+      </nav>
+      <div class="side-foot">
+        <button id="theme" class="side-btn" type="button" aria-label="Tema"></button>
+        <div id="whoami" class="whoami"></div>
+      </div>
+    </aside>
+
+    <div class="main-col">
+      <header class="topbar">
+        <button id="menu" class="icon-btn menu-btn" type="button" aria-label="Menüyü aç/kapat" aria-controls="side">
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+        <h1 id="page-title" class="page-title">Genel Bakış</h1>
+        <div class="spacer"></div>
+        <label class="sr-only" for="proj-switch">Proje</label>
+        <select id="proj-switch" class="proj-switch"><option value="">Proje seçin…</option></select>
+        <div class="bell-wrap">
+          <button id="bell" class="tb-btn" type="button" aria-label="Bildirimler" aria-haspopup="true">
+            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M6 17V11a6 6 0 0 1 12 0v6l2 2H4zM10 21h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span id="bell-n" class="badge" hidden>0</span>
+          </button>
+          <div id="bell-pop" class="bell-pop" hidden></div>
+        </div>
+      </header>
+      <div id="ribbon" class="ribbon" role="toolbar" aria-label="Komutlar"></div>
+      <main id="view" class="view">
+        <div class="state"><div class="spinner"></div><p>Yükleniyor…</p></div>
+      </main>
+      <footer id="status" class="statusbar"><span>Hazır</span></footer>
+    </div>
+  </div>
+
+  <script src="schema.js"></script>
+  <script src="core.js"></script>
+  <script src="app.js"></script>
+  <script src="gantt.js"></script>
+  <script src="plan.js"></script>
+  <script src="portfoy.js"></script>
+  <script src="takvim.js"></script>
+  <script src="gorevler.js"></script>
+  <script src="bildirimler.js"></script>
+  <script src="kutuphane.js"></script>
+  <script src="gunluk.js"></script>
+</body>
+</html>
