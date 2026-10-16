@@ -89,6 +89,7 @@ def yapi():
         for n in names:
             if n in fm:
                 c.delete(f"{API}/Fields/Delete", {"listId": list_id(ln), "id": fm[n]["id"]})
+                __import__("wk")._FIELDS.pop(ln, None)
                 print(f"  🗑  {ln}.{n}")
 
     print("── sistem alanı adları")

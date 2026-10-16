@@ -37,8 +37,14 @@ def list_id(name: str) -> str:
     return state()["lists"][name]["id"]
 
 
+_FIELDS: dict[str, list[dict]] = {}
+
+
 def fields(list_name: str) -> list[dict]:
-    return c.get(f"{API}/Fields/GetAll", {"listId": list_id(list_name), "withSystemFields": "true"})["items"]
+    """Alan listesi (önbellekli; alan oluşturma/güncellemede temizlenir)."""
+    if list_name not in _FIELDS:
+        _FIELDS[list_name] = c.get(f"{API}/Fields/GetAll", {"listId": list_id(list_name), "withSystemFields": "true"})["items"]
+    return _FIELDS[list_name]
 
 
 def fmap(list_name: str) -> dict[str, dict]:
@@ -55,11 +61,13 @@ def opt(list_name: str, field_name: str, label: str) -> str:
 
 
 def update_field(list_name: str, field: dict, **changes) -> dict:
+    _FIELDS.pop(list_name, None)
     body = {**field, **changes}
     return c.put(f"{API}/Fields/Update", body, {"listId": list_id(list_name), "id": field["id"]})
 
 
 def create_field(list_name: str, body: dict) -> dict:
+    _FIELDS.pop(list_name, None)
     body = {"isRequired": False, "isVisible": True, **body}
     return c.post(f"{API}/Fields/Create", body, {"listId": list_id(list_name)})
 

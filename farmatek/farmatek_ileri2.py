@@ -20,6 +20,16 @@ from wk import *  # noqa: E402,F401,F403
 
 FZ, FK, KT, KTK = "Fazlar", "Faz Kütüphanesi", "Kilometre Taşları", "Kilometre Taşı Kütüphanesi"
 
+# OTOMASYON=A2b,A2c → yalnızca bu adla başlayan otomasyonları yeniden kur (hepsini kurmak ~4 dk)
+_secili = [x.strip() for x in os.environ.get("OTOMASYON", "").split(",") if x.strip()]
+_ensure_automation = ensure_automation
+
+
+def ensure_automation(name, trigger, actions, active=True):  # noqa: F811
+    if _secili and not any(name.startswith(x + " ") for x in _secili):
+        return None
+    return _ensure_automation(name, trigger, actions, active)
+
 YENI_ADLAR = {
     K: {"Summary": "Görev Adı", "Description": "Açıklama", "Assignee": "Varsayılan Sorumlu", "Due date": "Bitiş", "Status": "Durum"},
     P: {"Summary": "Proje Adı", "Description": "Proje Açıklaması", "Assignee": "Proje Yöneticisi", "Due date": "Hedef Bitiş", "Status": "Durum"},
@@ -228,7 +238,7 @@ def otomasyon():
         ])])
 
     # A2b — kilometre taşları + bağlı görevler, plan hazır
-    Lk, Yk, Mk, Sk, Gk = (new_uuid() for _ in range(5))
+    Lk, Yk = new_uuid(), new_uuid()
     ensure_automation("A2b · Kilometre taşlarını oluştur ve görevlere bağla", t_updated(P, "Plan Durumu"), [
         cond(is_(P, "Plan Durumu", "Öncüller Bağlandı"), then=[
             find(KTK, [flt(KTK, "Şablonlar", src(P, "Şablon"), op=1)], id=Lk, count=50, actions=[
@@ -237,13 +247,16 @@ def otomasyon():
                                 m(KT, "Faz", src_id(Yk)), m(KT, "KT Şablonu", src_id(Lk)), m(KT, "Kritik", src(KTK, "Kritik", Lk)),
                                 m(KT, "Hedef Tarih", formula(f"{start} + {ref(KTK, 'Gün Ofseti', Lk)}")),
                                 m(KT, "KT Durumu", val(opt(KT, "KT Durumu", "Bekleniyor")))])])]),
-            find(KT, [flt(KT, "Proje", src_id())], id=Mk, count=50, actions=[
-                find(K, [flt(K, "Kilometre Taşları", src(KT, "KT Şablonu", Mk), op=1)], id=Sk, count=20, actions=[
-                    find(G, [proje(), flt(G, "Şablon Öğesi", src_id(Sk))], id=Gk, count=1, actions=[
-                        update([m(KT, "Bağlı Görevler", src_id(Gk), append=True)], aid=Mk)])])]),
             _plan("Hazır"),
             notify_field(P, "Proje Yöneticisi", f"Proje planı hazır: {ref(P, 'Proje Adı')}. Fazlar, görevler, öncüller ve kilometre taşları oluşturuldu."),
         ])])
+
+    # A2c — her kilometre taşı oluşunca kendi görevlerini bağlar (A2b içinde ikinci döngü adım limitine takıldı)
+    Sk, Gk = new_uuid(), new_uuid()
+    ensure_automation("A2c · Kilometre taşını görevlerine bağla", t_created(KT), [
+        find(K, [flt(K, "Kilometre Taşları", src(KT, "KT Şablonu"), op=1)], id=Sk, count=20, actions=[
+            find(G, [flt(G, "Proje", src(KT, "Proje")), flt(G, "Şablon Öğesi", src_id(Sk))], id=Gk, count=1, actions=[
+                update([m(KT, "Bağlı Görevler", src_id(Gk), append=True)])])])])
 
     # A3–A6 — görev durum akışı (öncül kilidi, onay, kapanış, ardıllar)
     ONAY = "Onay Geçmişi"
