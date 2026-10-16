@@ -16,9 +16,9 @@ sys.path.insert(0, BUILDER)
 
 from workiom.client import WorkiomClient, WorkiomAPIError  # noqa: E402
 
-# FARMATEK_APP=2 → "Ar-Ge Proje Yönetimi 2" (fazlar / kilometre taşları ayrı listelerde)
+# FARMATEK_APP=2 → "Proje Yönetimi" (eski adı: Ar-Ge Proje Yönetimi 2) (fazlar / kilometre taşları ayrı listelerde)
 _APP2 = os.environ.get("FARMATEK_APP") == "2"
-APP_NAME = "Ar-Ge Proje Yönetimi 2" if _APP2 else "Ar-Ge Proje Yönetimi"
+APP_NAME = "Proje Yönetimi" if _APP2 else "Ar-Ge Proje Yönetimi"
 STATE_PATH = os.path.join(BUILDER, "state", "ar_ge_proje_yönetimi_2.json" if _APP2 else "ar_ge_proje_yönetimi.json")
 API = "/api/services/app"
 
