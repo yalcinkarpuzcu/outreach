@@ -115,3 +115,66 @@ if __name__ == "__main__":
             if g[0] in nolar:
                 s, e = o[g[0]]
                 print(f"  {g[0]:>2} {g[2][:55]:<55} {s:>4}→{e:<4} {tarih(s)} öncül={g[4]}")
+
+
+# ════════════════════════════════════════════════════════════════════════════
+# Model 2 — fazlar ve kilometre taşları ayrı listelerde, görevlerde yalnızca görev
+# (alt görev yok). Excel'deki 0 günlük kilometre taşı satırları (1, 30, 31, 37)
+# KT listesine taşınır; onlara bağlı görevlerin öncülleri KT'nin kendi öncüllerine
+# yönlendirilir, böylece plan tarihleri değişmez.
+# ════════════════════════════════════════════════════════════════════════════
+KT_NOLAR = {1, 30, 31, 37}
+
+# kod, ad, faz, bağlı görevler (tamamlanınca KT'ye ulaşılır), kritik
+KILOMETRE_TASLARI = [
+    ("KT1", "Proje Başlatıldı",              "F1", [2],              True),
+    ("KT2", "BE Sonucu Alındı",              "F5", [26],             True),
+    ("KT3", "Dosya Başvurusu Yapıldı",       "F5", [26, 28, 29],     True),
+    ("KT4", "Ruhsat Alındı",                 "F6", [33, 34, 35, 36], True),
+]
+
+
+def _cozulmus_onculler(no, by_no):
+    """KT satırlarını atlayarak gerçek görev öncüllerini döndürür."""
+    out = []
+    for p in by_no[no][4]:
+        if p in KT_NOLAR:
+            out += _cozulmus_onculler(p, by_no)
+        else:
+            out.append(p)
+    return sorted(set(out))
+
+
+def model2():
+    """{'gorevler': [...], 'fazlar': [...], 'kt': [...], 'sablonlar': {...}} — gün ofsetleri dahil."""
+    by_no = {g[0]: g for g in GOREVLER}
+    gorevler = []
+    for no, faz, ad, sure, onc, dep, kt, onay, vars_ in GOREVLER:
+        if no in KT_NOLAR:
+            continue
+        gorevler.append({"no": no, "faz": faz, "ad": ad, "sure": sure, "onc": _cozulmus_onculler(no, by_no),
+                         "dep": dep, "onay": onay, "vars": vars_})
+    gno = {g["no"]: g for g in gorevler}
+    es, ef = {}, {}
+    for g in sorted(gorevler, key=lambda x: x["no"]):
+        es[g["no"]] = max((ef[p] for p in g["onc"]), default=0)
+        ef[g["no"]] = es[g["no"]] + g["sure"]
+    for g in gorevler:
+        g["s"], g["e"] = es[g["no"]], ef[g["no"]]
+    fazlar = []
+    for kod, ad, sira in FAZLAR:
+        ns = [g for g in gorevler if g["faz"] == kod]
+        fazlar.append({"kod": kod, "ad": ad, "sira": sira, "s": min(g["s"] for g in ns), "e": max(g["e"] for g in ns)})
+    kts = [{"kod": k, "ad": a, "faz": f, "bagli": b, "kritik": kr, "gun": max(ef[n] for n in b)}
+           for k, a, f, b, kr in KILOMETRE_TASLARI]
+    sablonlar = {s: [n for n in nolar if n not in KT_NOLAR] for s, nolar in SABLONLAR.items()}
+    return {"gorevler": gorevler, "fazlar": fazlar, "kt": kts, "sablonlar": sablonlar}
+
+
+if __name__ == "__main__" and len(__import__("sys").argv) > 1 and __import__("sys").argv[1] == "model2":
+    m = model2()
+    print(len(m["gorevler"]), "görev; toplam", max(g["e"] for g in m["gorevler"]), "gün")
+    for f in m["fazlar"]: print(" ", f)
+    for k in m["kt"]: print(" ", k)
+    for g in m["gorevler"]:
+        if g["no"] in (2, 3, 32, 38): print(" ", g)
