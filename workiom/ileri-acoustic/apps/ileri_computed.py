@@ -322,8 +322,8 @@ rollup(M, "Açık Sipariş Miktarı", "Satınalma Talepleri", ST, "Açık Sipari
 rollup(M, "Bekleyen Talep Miktarı", "Satınalma Talepleri", ST, "Bekleyen Talep (gösterge)")
 formula(M, "Serbest Stok", f"{z('Stok Bakiyesi')} - {z('Rezerve Miktar')}")
 formula(M, "Net Durum",
-        f"{z('Stok Bakiyesi')} + {z('Açık Sipariş Miktarı')} + {z('Bekleyen Talep Miktarı')}"
-        f" - {z('Rezerve Miktar')}")
+        f"Round({z('Stok Bakiyesi')} + {z('Açık Sipariş Miktarı')} + {z('Bekleyen Talep Miktarı')}"
+        f" - {z('Rezerve Miktar')}, 2)")
 formula(M, "Kritik mi", f"If({z('Minimum Stok')} > 0 and {z('Stok Bakiyesi')} < {{{{Minimum Stok}}}}, 1, 0)")
 lookup(MI, "Mevcut Stok", "Malzeme", "Stok Bakiyesi")
 lookup(MI, "Net Durum", "Malzeme", "Net Durum")

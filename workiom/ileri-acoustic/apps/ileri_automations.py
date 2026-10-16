@@ -129,6 +129,7 @@ CRM = [
     A("CRM-01", "Yeni talep – ilk yanıt görevi", created("Talepler"), [
         cond("isBlank({{Talep Tarihi}})", [upd({"Talep Tarihi": NOW})]),
         cond("isBlank({{Durum}})", [upd({"Durum": "Yeni"})]),
+        cond("isBlank({{Kaynak}}) and isNotBlank({{Gönderen E-posta}})", [upd({"Kaynak": "Web"})]),
         cond("isNotBlank({{Sorumlu}})", _ilk_yanit_gorevi()),
     ]),
     A("CRM-02", "İlk yanıt zamanını yaz", updated("Talepler", "Durum"), [
@@ -231,7 +232,7 @@ CRM = [
         ]),
     ]),
     A("CRM-13", "Web formu alındı e-postası", created("Talepler"), [
-        cond("{{Kaynak}} = 'Web' and isNotBlank({{Gönderen E-posta}})", email(
+        cond("({{Kaynak}} = 'Web' or isBlank({{Kaynak}})) and isNotBlank({{Gönderen E-posta}})", email(
             "Talebiniz alındı / We received your request – {{Talep No}}",
             "Sayın {{Gönderen Adı}} ({{Gönderen E-posta}}), talebiniz kayıt altına alınmıştır; satış ekibimiz "
             "en kısa sürede dönüş yapacaktır. / Dear {{Gönderen Adı}}, your request has been recorded; "
@@ -633,8 +634,10 @@ URT = [
     ]),
     A("URT-07", "Kalite kontrol", updated("Üretim Planları", "Durum"), [
         cond("{{Durum}} = 'Kalite Kontrol'", [
-            gorev("Concat('Kalite kontrol ve sevke hazırlık – ', {{Plan No}})", "Kalite",
-                  "trigger:İmalat Sorumlusu", PLUS(1), {"İlgili Üretim Planı": "trigger:_id"}),
+            # Sevke Hazır geri çevrildiğinde (URT-08) ikinci kalite görevi açılmasın
+            find("Görevler", [w("İlgili Üretim Planı", "trigger:_id"), w("Görev Türü", "Kalite")],
+                 no_results=[gorev("Concat('Kalite kontrol ve sevke hazırlık – ', {{Plan No}})", "Kalite",
+                                   "trigger:İmalat Sorumlusu", PLUS(1), {"İlgili Üretim Planı": "trigger:_id"})]),
             nf("İmalat Sorumlusu", "{{Plan No}} tüm istasyonları tamamladı; kalite kontrolü yapın."),
         ]),
     ]),
