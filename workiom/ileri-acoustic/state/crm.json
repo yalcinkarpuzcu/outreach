@@ -1,0 +1,169 @@
+{
+  "app_name": "CRM",
+  "app_id": "7137f3e5-9c69-40ac-9e0a-92ce78b4a063",
+  "folders": {},
+  "lists": {
+    "Firmalar": {
+      "id": "59d2a2dc-75c1-432d-b6a9-70347b84f85f",
+      "fields": {
+        "Son Aktivite Tarihi": 6028068,
+        "Son De\u011fi\u015ftirme Tarihi": 6028067,
+        "Son De\u011fi\u015ftiren": 6028066,
+        "Olu\u015fturulma Tarihi": 6028065,
+        "Olu\u015fturan": 6028064,
+        "Firma Ad\u0131": 6028062,
+        "\u0130zleyiciler": 6028063,
+        "M\u00fc\u015fteri Tipi": 6028090,
+        "\u00dclke": 6028091,
+        "\u015eehir": 6028092,
+        "Firma T\u00fcr\u00fc": 6028093,
+        "Sekt\u00f6r": 6028094,
+        "M\u00fc\u015fteri Durumu": 6028095,
+        "Sat\u0131\u015f Temsilcisi": 6028096,
+        "Telefon": 6028097,
+        "E-posta": 6028098,
+        "Web": 6028099,
+        "Ki\u015filer": 6028105,
+        "Talepler": 6028123,
+        "Projeler": 6028193,
+        "Toplam Teklif Tutar\u0131": 6028798,
+        "Kazan\u0131lan Tutar": 6028799
+      },
+      "views": {
+        "T\u00fcm Firmalar": 879899,
+        "Yurt \u0130\u00e7i": 879900,
+        "Yurt D\u0131\u015f\u0131": 879901,
+        "Benim Portf\u00f6y\u00fcm": 879902,
+        "M\u00fc\u015fteri Durumuna G\u00f6re": 879903
+      },
+      "forms": {},
+      "layouts": {}
+    },
+    "Ki\u015filer": {
+      "id": "01be0351-cbfe-4788-9da2-85fbbb233f90",
+      "fields": {
+        "Son Aktivite Tarihi": 6028075,
+        "Son De\u011fi\u015ftirme Tarihi": 6028074,
+        "Son De\u011fi\u015ftiren": 6028073,
+        "Olu\u015fturulma Tarihi": 6028072,
+        "Olu\u015fturan": 6028071,
+        "Ad Soyad": 6028069,
+        "\u0130zleyiciler": 6028070,
+        "Unvan / Rol": 6028100,
+        "Telefon": 6028101,
+        "E-posta": 6028102,
+        "Dil": 6028103,
+        "Firma": 6028104,
+        "Talepler": 6028126,
+        "Firma Sorumlusu": 6028137,
+        "Projeler": 6028195
+      },
+      "views": {
+        "T\u00fcm Ki\u015filer": 879904
+      },
+      "forms": {},
+      "layouts": {}
+    },
+    "Talepler": {
+      "id": "e350ff92-8fef-425b-920e-c9c82d5892c1",
+      "fields": {
+        "Son Aktivite Tarihi": 6028082,
+        "Son De\u011fi\u015ftirme Tarihi": 6028081,
+        "Son De\u011fi\u015ftiren": 6028080,
+        "Olu\u015fturulma Tarihi": 6028079,
+        "Olu\u015fturan": 6028078,
+        "Talep Konusu": 6028076,
+        "\u0130zleyiciler": 6028077,
+        "Talep No": 6028106,
+        "Talep Tarihi": 6028107,
+        "Kaynak": 6028108,
+        "G\u00f6nderen Ad\u0131": 6028109,
+        "G\u00f6nderen Firma": 6028110,
+        "G\u00f6nderen Telefon": 6028111,
+        "G\u00f6nderen E-posta": 6028112,
+        "\u00dclke": 6028113,
+        "\u0130lgilenilen Sistem": 6028114,
+        "Talep \u0130\u00e7eri\u011fi": 6028115,
+        "Ekler": 6028116,
+        "Sorumlu": 6028117,
+        "Durum": 6028118,
+        "Uygun De\u011fil Nedeni": 6028119,
+        "\u0130lk Yan\u0131t Tarihi": 6028120,
+        "M\u00fckerrer \u015e\u00fcphesi": 6028121,
+        "Firma": 6028122,
+        "Yetkili": 6028125,
+        "G\u00f6revler": 6028135,
+        "Proje": 6028197,
+        "\u0130lk Yan\u0131t S\u00fcresi (saat)": 6028800
+      },
+      "views": {
+        "T\u00fcm Talepler": 879905,
+        "Duruma G\u00f6re": 879906,
+        "Kayna\u011fa G\u00f6re": 879907,
+        "Yeni Talepler": 879908
+      },
+      "forms": {
+        "Talep Giri\u015f Formu": "235f7a08-1e2c-4b3f-981c-4446333b8936",
+        "Web Talep Formu": "74f7ab6d-ea7f-4fac-9e7d-87ac09f8c7f9"
+      },
+      "layouts": {}
+    },
+    "G\u00f6revler": {
+      "id": "d18ebef3-6729-4931-b83d-8de1fd020ffe",
+      "fields": {
+        "Son Aktivite Tarihi": 6028089,
+        "Son De\u011fi\u015ftirme Tarihi": 6028088,
+        "Son De\u011fi\u015ftiren": 6028087,
+        "Olu\u015fturulma Tarihi": 6028086,
+        "Olu\u015fturan": 6028085,
+        "G\u00f6rev": 6028083,
+        "\u0130zleyiciler": 6028084,
+        "G\u00f6rev T\u00fcr\u00fc": 6028127,
+        "Sorumlu": 6028128,
+        "Son Tarih": 6028129,
+        "\u00d6ncelik": 6028130,
+        "Durum": 6028131,
+        "A\u00e7\u0131klama": 6028132,
+        "Tamamlanma Tarihi": 6028133,
+        "\u0130lgili Talep": 6028134,
+        "\u0130lgili Proje": 6028712,
+        "\u0130lgili Teklif": 6028714,
+        "\u0130lgili \u00dcretim Plan\u0131": 6028718
+      },
+      "views": {
+        "T\u00fcm G\u00f6revler": 879909,
+        "Duruma G\u00f6re": 879910,
+        "Takvim": 879911,
+        "A\u00e7\u0131k G\u00f6revler": 879912
+      },
+      "forms": {},
+      "layouts": {}
+    }
+  },
+  "automations": {
+    "CRM-02 \u00b7 \u0130lk yan\u0131t zaman\u0131n\u0131 yaz": 21,
+    "CRM-03 \u00b7 Yan\u0131ts\u0131z talep uyar\u0131s\u0131": 22,
+    "CRM-04 \u00b7 Talebi projeye d\u00f6n\u00fc\u015ft\u00fcr": 23,
+    "CRM-05 \u00b7 Uygun de\u011fil nedeni": 24,
+    "CRM-06 \u00b7 Portf\u00f6y de\u011fi\u015fikli\u011fi": 25,
+    "CRM-07a \u00b7 G\u00f6rev atand\u0131": 26,
+    "CRM-07b \u00b7 G\u00f6rev yeniden atand\u0131": 27,
+    "CRM-08 \u00b7 G\u00f6rev son g\u00fcn hat\u0131rlatmas\u0131": 28,
+    "CRM-09 \u00b7 G\u00f6rev tamamland\u0131": 29,
+    "CRM-10 \u00b7 Geciken g\u00f6rev": 30,
+    "CRM-13 \u00b7 Web formu al\u0131nd\u0131 e-postas\u0131": 33,
+    "CRM-14 \u00b7 E-postadan talep olu\u015ftur": 34,
+    "CRM-15 \u00b7 WhatsApp'tan talep olu\u015ftur": 35,
+    "CRM-01 \u00b7 Yeni talep \u2013 ilk yan\u0131t g\u00f6revi": 129,
+    "CRM-12 \u00b7 M\u00fckerrer talep kontrol\u00fc": 131,
+    "CRM-11 \u00b7 Kanal talebi \u2013 e\u015fle\u015ftirme ve atama": 134
+  },
+  "reports": {
+    "Ekip \u0130\u015f Y\u00fck\u00fc \u00b7 A\u00e7\u0131k g\u00f6revler": 210083,
+    "Ekip \u0130\u015f Y\u00fck\u00fc \u00b7 Ki\u015fi baz\u0131nda a\u00e7\u0131k g\u00f6rev": 210084,
+    "Ekip \u0130\u015f Y\u00fck\u00fc \u00b7 G\u00f6rev t\u00fcr\u00fc": 210085,
+    "Sat\u0131\u015f Hunisi \u00b7 Talepler kayna\u011fa g\u00f6re": 210086,
+    "Teklif Takip \u00b7 Ortalama ilk yan\u0131t (saat)": 210087,
+    "Sat\u0131\u015f Hunisi \u00b7 Firmalar m\u00fc\u015fteri tipine g\u00f6re": 210088
+  }
+}

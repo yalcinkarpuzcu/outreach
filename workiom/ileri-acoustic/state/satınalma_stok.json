@@ -1,0 +1,195 @@
+{
+  "app_name": "Sat\u0131nalma & Stok",
+  "app_id": "f158f2fc-9c54-4445-8497-bdfaf7c95cbc",
+  "folders": {},
+  "lists": {
+    "Tedarik\u00e7iler": {
+      "id": "fe2d7fb5-df56-496d-ac36-9253f0ee9484",
+      "fields": {
+        "Son Aktivite Tarihi": 6028609,
+        "Son De\u011fi\u015ftirme Tarihi": 6028608,
+        "Son De\u011fi\u015ftiren": 6028607,
+        "Olu\u015fturulma Tarihi": 6028606,
+        "Olu\u015fturan": 6028605,
+        "Firma Ad\u0131": 6028603,
+        "\u0130zleyiciler": 6028604,
+        "Yetkili": 6028638,
+        "Telefon": 6028639,
+        "E-posta": 6028640,
+        "Tedarik Etti\u011fi Kategoriler": 6028641,
+        "Notlar": 6028642,
+        "Malzemeler": 6028650,
+        "Sat\u0131nalma Talepleri": 6028680
+      },
+      "views": {
+        "T\u00fcm Tedarik\u00e7iler": 879996
+      },
+      "forms": {},
+      "layouts": {}
+    },
+    "Malzemeler": {
+      "id": "6e915bb5-2481-41cc-8b55-ef600e7d4613",
+      "fields": {
+        "Son Aktivite Tarihi": 6028616,
+        "Son De\u011fi\u015ftirme Tarihi": 6028615,
+        "Son De\u011fi\u015ftiren": 6028614,
+        "Olu\u015fturulma Tarihi": 6028613,
+        "Olu\u015fturan": 6028612,
+        "Malzeme Ad\u0131": 6028610,
+        "\u0130zleyiciler": 6028611,
+        "Malzeme Kodu": 6028643,
+        "Kategori": 6028644,
+        "Birim": 6028645,
+        "\u00d6zel \u00dcretim mi": 6028646,
+        "Tedarik S\u00fcresi (g\u00fcn)": 6028647,
+        "Minimum Stok": 6028648,
+        "Varsay\u0131lan Tedarik\u00e7i": 6028649,
+        "Malzeme \u0130htiya\u00e7lar\u0131": 6028657,
+        "Sat\u0131nalma Talepleri": 6028678,
+        "Stok Hareketleri": 6028694,
+        "Re\u00e7ete \u015eablonu": 6028723,
+        "Re\u00e7ete D\u00fczeltmeleri": 6028729,
+        "Re\u00e7ete Kalemleri": 6028733,
+        "Stok Bakiyesi": 6028805,
+        "Rezerve Miktar": 6028806,
+        "A\u00e7\u0131k Sipari\u015f Miktar\u0131": 6028807,
+        "Bekleyen Talep Miktar\u0131": 6028808,
+        "Serbest Stok": 6028809,
+        "Net Durum": 6028810,
+        "Kritik mi": 6028811
+      },
+      "views": {
+        "T\u00fcm Malzemeler": 879997,
+        "Kategoriye G\u00f6re": 879998,
+        "Kritik Stok": 879999
+      },
+      "forms": {},
+      "layouts": {}
+    },
+    "Malzeme \u0130htiya\u00e7lar\u0131": {
+      "id": "4020e255-db60-4ff8-89d7-137d5e15b573",
+      "fields": {
+        "Son Aktivite Tarihi": 6028623,
+        "Son De\u011fi\u015ftirme Tarihi": 6028622,
+        "Son De\u011fi\u015ftiren": 6028621,
+        "Olu\u015fturulma Tarihi": 6028620,
+        "Olu\u015fturan": 6028619,
+        "\u0130htiya\u00e7": 6028617,
+        "\u0130zleyiciler": 6028618,
+        "\u0130htiya\u00e7 Miktar\u0131": 6028651,
+        "Eksik Miktar": 6028652,
+        "Durum": 6028653,
+        "\u00dcretim Plan\u0131": 6028654,
+        "Malzeme": 6028656,
+        "Re\u00e7ete Kalemi": 6028658,
+        "Re\u00e7ete D\u00fczeltmesi": 6028660,
+        "Sat\u0131nalma Talepleri": 6028682,
+        "Birim": 6028699,
+        "Plan Ba\u015flang\u0131\u00e7 Tarihi": 6028700,
+        "\u0130lgili Proje": 6028701,
+        "Tedarik S\u00fcresi (g\u00fcn)": 6028702
+      },
+      "views": {
+        "T\u00fcm \u0130htiya\u00e7lar": 880000,
+        "Eksikler": 880001,
+        "A\u00e7\u0131k \u0130htiya\u00e7lar": 880002
+      },
+      "forms": {},
+      "layouts": {}
+    },
+    "Sat\u0131nalma Talepleri": {
+      "id": "4adbb22e-3eac-4eb4-931c-fa5b479c3739",
+      "fields": {
+        "Son Aktivite Tarihi": 6028630,
+        "Son De\u011fi\u015ftirme Tarihi": 6028629,
+        "Son De\u011fi\u015ftiren": 6028628,
+        "Olu\u015fturulma Tarihi": 6028627,
+        "Olu\u015fturan": 6028626,
+        "A\u00e7\u0131klama": 6028624,
+        "\u0130zleyiciler": 6028625,
+        "Talep No": 6028662,
+        "Miktar": 6028663,
+        "Kaynak": 6028664,
+        "Teklif Tutar\u0131": 6028665,
+        "Para Birimi": 6028666,
+        "Durum": 6028667,
+        "Gerekli Tarih": 6028668,
+        "Beklenen Teslim": 6028669,
+        "Sipari\u015f Tarihi": 6028670,
+        "Teslim Tarihi": 6028671,
+        "Talep Eden": 6028672,
+        "Onaylayan": 6028673,
+        "Onay Tarihi": 6028674,
+        "Ret Nedeni": 6028675,
+        "Not": 6028676,
+        "Malzeme": 6028677,
+        "Tedarik\u00e7i": 6028679,
+        "Malzeme \u0130htiyac\u0131": 6028681,
+        "\u0130lgili \u00dcretim Plan\u0131": 6028683,
+        "\u0130lgili Proje": 6028685,
+        "Stok Hareketleri": 6028696,
+        "Birim": 6028703,
+        "A\u00e7\u0131k Sipari\u015f (g\u00f6sterge)": 6028803,
+        "Bekleyen Talep (g\u00f6sterge)": 6028804
+      },
+      "views": {
+        "T\u00fcm Talepler": 880003,
+        "Duruma G\u00f6re": 880004,
+        "Gerekli Tarih Takvimi": 880005,
+        "Onay Bekleyenler": 880006
+      },
+      "forms": {
+        "Sat\u0131nalma Talebi": "56b231bd-bba2-4d6e-bc45-6e05ba80f07e"
+      },
+      "layouts": {}
+    },
+    "Stok Hareketleri": {
+      "id": "021b79be-b191-4982-b0ec-12ba83131138",
+      "fields": {
+        "Son Aktivite Tarihi": 6028637,
+        "Son De\u011fi\u015ftirme Tarihi": 6028636,
+        "Son De\u011fi\u015ftiren": 6028635,
+        "Olu\u015fturulma Tarihi": 6028634,
+        "Olu\u015fturan": 6028633,
+        "A\u00e7\u0131klama": 6028631,
+        "\u0130zleyiciler": 6028632,
+        "Hareket No": 6028687,
+        "Hareket T\u00fcr\u00fc": 6028688,
+        "Miktar": 6028689,
+        "Tarih": 6028690,
+        "Yapan": 6028691,
+        "Not": 6028692,
+        "Malzeme": 6028693,
+        "\u0130lgili Sat\u0131nalma Talebi": 6028695,
+        "\u0130lgili \u00dcretim Plan\u0131": 6028697,
+        "Birim": 6028704
+      },
+      "views": {
+        "T\u00fcm Hareketler": 880007,
+        "T\u00fcre G\u00f6re": 880008
+      },
+      "forms": {},
+      "layouts": {}
+    }
+  },
+  "automations": {
+    "STN-02 \u00b7 Eksik hesapla \u2013 otomatik sat\u0131nalma talebi": 82,
+    "STN-05 \u00b7 Tedarik\u00e7i teklifi \u2013 e\u015fik kontrol\u00fc": 84,
+    "STN-06 \u00b7 Y\u00f6netici onay\u0131": 85,
+    "STN-07 \u00b7 Onayland\u0131 \u2013 sipari\u015f ver": 86,
+    "STN-08 \u00b7 Sipari\u015f verildi": 87,
+    "STN-09 \u00b7 Teslim al\u0131nd\u0131 \u2013 stok giri\u015fi": 88,
+    "STN-10 \u00b7 Geciken teslimat": 89,
+    "STN-11 \u00b7 Gerekli tarih riski": 90,
+    "STN-13 \u00b7 Kritik stok uyar\u0131s\u0131": 91,
+    "STN-04 \u00b7 Manuel / \u00f6n sipari\u015f talebi": 132,
+    "STN-14 \u00b7 Talep reddedildi": 133
+  },
+  "reports": {
+    "Sat\u0131nalma & Stok \u00b7 A\u00e7\u0131k talepler": 210107,
+    "Sat\u0131nalma & Stok \u00b7 Onay bekleyen": 210108,
+    "Sat\u0131nalma & Stok \u00b7 Talep durumlar\u0131": 210109,
+    "Sat\u0131nalma & Stok \u00b7 Kategoriye g\u00f6re stok": 210110,
+    "Sat\u0131nalma & Stok \u00b7 Malzeme durumu": 210111
+  }
+}

@@ -1,0 +1,225 @@
+{
+  "app_name": "Teknik Hesaplama",
+  "app_id": "9a7e5b90-aa3d-4208-80ff-9f2d2afd80dd",
+  "folders": {},
+  "lists": {
+    "Sistemler": {
+      "id": "66d2f738-16f0-4f89-a5a8-1a2f83af5ef4",
+      "fields": {
+        "Son Aktivite Tarihi": 6028406,
+        "Son De\u011fi\u015ftirme Tarihi": 6028405,
+        "Son De\u011fi\u015ftiren": 6028404,
+        "Olu\u015fturulma Tarihi": 6028403,
+        "Olu\u015fturan": 6028402,
+        "Sistem Ad\u0131": 6028400,
+        "\u0130zleyiciler": 6028401,
+        "Sistem Ailesi": 6028442,
+        "Standart Panel Geni\u015fli\u011fi (cm)": 6028443,
+        "Kal\u0131nl\u0131k (mm)": 6028444,
+        "m\u00b2 Birim Fiyat\u0131": 6028445,
+        "Kap\u0131 Birim Fiyat\u0131": 6028446,
+        "Teleskopik Panel Birim Fiyat\u0131": 6028447,
+        "Aktif mi": 6028448,
+        "Hesap Parametreleri": 6028456,
+        "Re\u00e7ete \u015eablonu": 6028467,
+        "Duvar Kalemleri": 6028504
+      },
+      "views": {
+        "T\u00fcm Sistemler": 879965
+      },
+      "forms": {},
+      "layouts": {}
+    },
+    "Hesap Parametreleri": {
+      "id": "f6207fe6-3782-4deb-b92e-3f51caadf628",
+      "fields": {
+        "Son Aktivite Tarihi": 6028413,
+        "Son De\u011fi\u015ftirme Tarihi": 6028412,
+        "Son De\u011fi\u015ftiren": 6028411,
+        "Olu\u015fturulma Tarihi": 6028410,
+        "Olu\u015fturan": 6028409,
+        "Parametre": 6028407,
+        "\u0130zleyiciler": 6028408,
+        "Parametre Kodu": 6028449,
+        "De\u011fer": 6028450,
+        "Para Birimi": 6028451,
+        "Birim": 6028452,
+        "Ge\u00e7erlilik Tarihi": 6028453,
+        "Son G\u00fcncelleme": 6028454,
+        "Sistem": 6028455
+      },
+      "views": {
+        "T\u00fcm Parametreler": 879966
+      },
+      "forms": {},
+      "layouts": {}
+    },
+    "Re\u00e7ete \u015eablonu": {
+      "id": "6b3a704e-d257-45ad-87ba-022951f85495",
+      "fields": {
+        "Son Aktivite Tarihi": 6028420,
+        "Son De\u011fi\u015ftirme Tarihi": 6028419,
+        "Son De\u011fi\u015ftiren": 6028418,
+        "Olu\u015fturulma Tarihi": 6028417,
+        "Olu\u015fturan": 6028416,
+        "\u015eablon Kodu": 6028414,
+        "\u0130zleyiciler": 6028415,
+        "Liste T\u00fcr\u00fc": 6028457,
+        "Adet Kural\u0131": 6028458,
+        "\u00d6l\u00e7\u00fc Kural\u0131": 6028459,
+        "Adet \u00c7arpan\u0131": 6028460,
+        "Adet Sabiti": 6028461,
+        "\u00d6l\u00e7\u00fc Fark\u0131 (cm)": 6028462,
+        "\u00d6l\u00e7\u00fc Baz\u0131": 6028463,
+        "S\u0131ra": 6028464,
+        "Aktif mi": 6028465,
+        "Sistem": 6028466,
+        "Re\u00e7ete Kalemleri": 6028518,
+        "Malzeme": 6028722,
+        "\u0130stasyon": 6028724
+      },
+      "views": {
+        "T\u00fcm \u015eablon Sat\u0131rlar\u0131": 879967,
+        "Liste T\u00fcr\u00fcne G\u00f6re": 879968
+      },
+      "forms": {},
+      "layouts": {}
+    },
+    "Duvar Kalemleri": {
+      "id": "424e0045-4fc4-48f6-9595-6b4f157decf9",
+      "fields": {
+        "Son Aktivite Tarihi": 6028427,
+        "Son De\u011fi\u015ftirme Tarihi": 6028426,
+        "Son De\u011fi\u015ftiren": 6028425,
+        "Olu\u015fturulma Tarihi": 6028424,
+        "Olu\u015fturan": 6028423,
+        "Duvar": 6028421,
+        "\u0130zleyiciler": 6028422,
+        "Duvar No": 6028468,
+        "Uzunluk L (cm)": 6028469,
+        "Y\u00fckseklik H (cm)": 6028470,
+        "Sistem Adedi": 6028471,
+        "Makara D\u00fczeni": 6028472,
+        "Makara Tipi": 6028473,
+        "Ray Tipi": 6028474,
+        "Ak\u0131stik": 6028475,
+        "Y\u00fczey": 6028476,
+        "Y\u00fczey Kodu/Ad\u0131": 6028477,
+        "Y\u00fczey Kal\u0131nl\u0131\u011f\u0131 (mm)": 6028478,
+        "Y\u00fczey \u0130\u015flemleri": 6028479,
+        "Al\u00fcminyum Boya Tipi": 6028480,
+        "Al\u00fcminyum RAL Kodu": 6028481,
+        "Ray Boya Tipi": 6028482,
+        "Ray RAL Kodu": 6028483,
+        "Tek Kanat Kap\u0131 Adedi": 6028484,
+        "Tek Kanat Kap\u0131 En (cm)": 6028485,
+        "Tek Kanat Kap\u0131 Boy (cm)": 6028486,
+        "\u00c7ift Kanat Kap\u0131 Adedi": 6028487,
+        "\u00c7ift Kanat Kap\u0131 En (cm)": 6028488,
+        "\u00c7ift Kanat Kap\u0131 Boy (cm)": 6028489,
+        "\u0130nce Kap\u0131 TK Adedi": 6028490,
+        "\u0130nce Kap\u0131 TK En (cm)": 6028491,
+        "\u0130nce Kap\u0131 TK Boy (cm)": 6028492,
+        "\u0130nce Kap\u0131 \u00c7K Adedi": 6028493,
+        "\u0130nce Kap\u0131 \u00c7K En (cm)": 6028494,
+        "\u0130nce Kap\u0131 \u00c7K Boy (cm)": 6028495,
+        "Teleskopik Panel": 6028496,
+        "Paspileta": 6028497,
+        "Sabit Par\u00e7a": 6028498,
+        "Ambalaj": 6028499,
+        "Notlar": 6028500,
+        "Teklif Revizyonu": 6028501,
+        "Sistem": 6028503,
+        "Re\u00e7ete D\u00fczeltmeleri": 6028511,
+        "Re\u00e7ete Kalemleri": 6028516,
+        "Standart Panel Geni\u015fli\u011fi (cm)": 6028521,
+        "m\u00b2 Birim Fiyat\u0131": 6028522,
+        "Kap\u0131 Birim Fiyat\u0131": 6028523,
+        "Teleskopik Panel Birim Fiyat\u0131": 6028524
+      },
+      "views": {
+        "T\u00fcm Duvar Kalemleri": 879969
+      },
+      "forms": {
+        "Duvar Ekle": "67629bc3-e145-44a4-9e04-abeac96864e0"
+      },
+      "layouts": {}
+    },
+    "Re\u00e7ete D\u00fczeltmeleri": {
+      "id": "67cca753-6d3e-4ae9-b31c-fc50f05722ed",
+      "fields": {
+        "Son Aktivite Tarihi": 6028434,
+        "Son De\u011fi\u015ftirme Tarihi": 6028433,
+        "Son De\u011fi\u015ftiren": 6028432,
+        "Olu\u015fturulma Tarihi": 6028431,
+        "Olu\u015fturan": 6028430,
+        "A\u00e7\u0131klama / Gerek\u00e7e": 6028428,
+        "\u0130zleyiciler": 6028429,
+        "D\u00fczeltme T\u00fcr\u00fc": 6028505,
+        "Liste T\u00fcr\u00fc": 6028506,
+        "Adet": 6028507,
+        "Giren": 6028508,
+        "Tarih": 6028509,
+        "Duvar Kalemi": 6028510,
+        "Re\u00e7ete Kalemleri": 6028520,
+        "Malzeme \u0130htiya\u00e7lar\u0131": 6028661,
+        "\u00dcretim Plan\u0131": 6028726,
+        "Malzeme": 6028728,
+        "\u0130stasyon": 6028730
+      },
+      "views": {
+        "T\u00fcm D\u00fczeltmeler": 879970
+      },
+      "forms": {},
+      "layouts": {}
+    },
+    "Re\u00e7ete Kalemleri": {
+      "id": "4e1bb008-9568-4005-bee4-4e3d60857859",
+      "fields": {
+        "Son Aktivite Tarihi": 6028441,
+        "Son De\u011fi\u015ftirme Tarihi": 6028440,
+        "Son De\u011fi\u015ftiren": 6028439,
+        "Olu\u015fturulma Tarihi": 6028438,
+        "Olu\u015fturan": 6028437,
+        "Kalem": 6028435,
+        "\u0130zleyiciler": 6028436,
+        "Kaynak": 6028512,
+        "Liste T\u00fcr\u00fc": 6028513,
+        "Manuel Miktar": 6028514,
+        "Duvar Kalemi": 6028515,
+        "Re\u00e7ete \u015eablonu": 6028517,
+        "Re\u00e7ete D\u00fczeltmesi": 6028519,
+        "Teklif Revizyonu": 6028525,
+        "\u015eablon Kodu": 6028526,
+        "Adet \u00c7arpan\u0131": 6028527,
+        "Adet Sabiti": 6028528,
+        "\u00d6l\u00e7\u00fc Fark\u0131 (cm)": 6028529,
+        "\u00d6l\u00e7\u00fc Baz\u0131": 6028530,
+        "Malzeme \u0130htiya\u00e7lar\u0131": 6028659,
+        "Malzeme": 6028732,
+        "\u0130stasyon": 6028734,
+        "Birim": 6028736
+      },
+      "views": {
+        "T\u00fcm Re\u00e7ete Kalemleri": 879971,
+        "Liste T\u00fcr\u00fcne G\u00f6re": 879972,
+        "Al\u00fcminyum Kesim Listesi": 879973,
+        "Ah\u015fap Kesim Listesi": 879974,
+        "Boya Listesi": 879975
+      },
+      "forms": {},
+      "layouts": {}
+    }
+  },
+  "automations": {
+    "HSP-01 \u00b7 Duvar kalemi \u2013 re\u00e7eteyi \u00fcret": 56,
+    "HSP-02 \u00b7 Sistem de\u011fi\u015fti \u2013 re\u00e7eteyi yenile": 57,
+    "HSP-03 \u00b7 Duvar silindi \u2013 re\u00e7eteyi sil": 58,
+    "HSP-05 \u00b7 Manuel d\u00fczeltme \u2013 re\u00e7eteye ekle": 59,
+    "HSP-07 \u00b7 Fiyat parametresi de\u011fi\u015fti": 61,
+    "HSP-08 \u00b7 Fiyat ge\u00e7erlili\u011fi bitiyor": 62,
+    "STN-03 \u00b7 Plan sonras\u0131 manuel d\u00fczeltme": 63,
+    "HSP-06 \u00b7 \u00d6zellik de\u011fi\u015fikli\u011fi (renk vb.)": 122
+  },
+  "reports": {}
+}
