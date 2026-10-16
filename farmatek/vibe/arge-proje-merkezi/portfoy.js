@@ -41,6 +41,7 @@ function renderKPIs() {
     kpi("Açık görev", acik.length, leaves.length ? Math.round(100 * (leaves.length - acik.length) / leaves.length) + "% tamamlandı" : "", "📋"),
     kpi("Geciken görev", late.length, late.length ? "son tarihi geçmiş, kapanmamış" : "gecikme yok", "⏰"),
     kpi("Onay bekleyen", onay.length, "onaycı kararı bekleniyor", "✍️"),
+    kpi("Kritik yolda geciken", late.filter(t => t.critical).length, "proje bitişini doğrudan etkiler", "⚠️"),
     kpi("Yaklaşan kilometre taşı", ms30.length, "önümüzdeki 30 gün", "◆"));
 }
 
@@ -78,6 +79,51 @@ function renderProjects() {
   clear(projectsBox).append(grid);
 }
 
+function projMetrics(p) {
+  const s = projStats(p);
+  const ends = s.leaves.map(t => t.end).filter(x => x != null);
+  const bends = s.leaves.map(t => t.baseEnd).filter(x => x != null);
+  const end = ends.length ? Math.max(...ends) : null, bend = bends.length ? Math.max(...bends) : null;
+  return { ...s, end, sapma: end != null && bend != null ? end - bend : null };
+}
+
+function renderTable() {
+  const box = document.getElementById("summary");
+  if (!PROJ.length) { clear(box); return; }
+  const tbl = el("table", { class: "sum" }, el("thead", null, el("tr", null,
+    ...["Proje", "Durum", "PM", "Tamamlanma", "Geciken", "Kritik yolda geciken", "Onay bekleyen", "Sıradaki kilometre taşı", "Plan bitiş", "Bitiş sapması"].map(h => el("th", { text: h })))));
+  const tb = el("tbody");
+  for (const p of PROJ) {
+    const m = projMetrics(p);
+    tb.append(el("tr", null,
+      el("td", null, el("a", { href: "plan.html?id=" + encodeURIComponent(p._id), text: v(p, "P", "Proje Adı") || "—" })),
+      el("td", null, chip(lbl(v(p, "P", "Durum")))),
+      el("td", { text: userName(v(p, "P", "Proje Yöneticisi")) || "—" }),
+      el("td", null, el("span", { class: "mini-bar" }, el("span", { style: `width:${m.pct}%` })), "%" + m.pct),
+      el("td", null, m.late ? el("span", { class: "tag late", text: String(m.late) }) : "0"),
+      el("td", null, m.crit ? el("span", { class: "tag crit", text: String(m.crit) }) : "0"),
+      el("td", { text: String(m.onay) }),
+      el("td", { text: m.nextMs ? m.nextMs.name + " · " + fmtShort(m.nextMs.start) : "—" }),
+      el("td", { text: fmtDay(m.end) }),
+      el("td", { text: m.sapma == null ? "baseline yok" : (m.sapma > 0 ? "+" : "") + m.sapma + " gün" })));
+  }
+  tbl.append(tb);
+  clear(box).append(el("div", { class: "page-head", style: "margin:0 0 8px" }, el("h2", { style: "margin:0;font-size:15px", text: "Proje özeti" })),
+    el("div", { class: "tbl-wrap" }, tbl));
+}
+
+function exportPortfolio() {
+  const rows = [["Proje", "Proje Durumu", "PM", "WBS", "Görev", "Tür", "Departman", "Sorumlu", "Başlangıç", "Bitiş", "Süre (gün)", "Durum", "% Tamamlanma",
+    "Baseline Bitiş", "Sapma (gün)", "Gecikmede", "Kritik yol", "Kilometre taşı", "Onay gerekli"]];
+  for (const p of PROJ) {
+    const pn = v(p, "P", "Proje Adı"), ps = lbl(v(p, "P", "Durum")), pm = userName(v(p, "P", "Proje Yöneticisi"));
+    TASKS.filter(t => t.project === p._id).sort((a, b) => a.wbs - b.wbs).forEach(t => rows.push([pn, ps, pm, t.wbs, t.name, t.type, t.dept, userName(t.owner),
+      dayToISO(t.start), dayToISO(t.end), t.end - t.start, t.status, Math.round(t.pct || 0), t.baseEnd != null ? dayToISO(t.baseEnd) : "", t.variance || 0,
+      t.late ? "Evet" : "", t.critical ? "Evet" : "", t.milestone ? "Evet" : "", t.approvalNeeded ? "Evet" : ""]));
+  }
+  downloadCSV("ArGe_portfoy_" + dayToISO(todayDay()) + ".csv", rows);
+}
+
 function renderGantt() {
   const items = [];
   PROJ.forEach(p => {
@@ -104,7 +150,8 @@ async function load() {
     const [p, g, s] = await Promise.all([fetchAll("P"), fetchAll("G"), fetchAll("S")]);
     PROJ = p; SABLON = s;
     TASKS = g.map(r => taskModel(r, "G"));
-    renderKPIs(); renderProjects(); renderGantt();
+    for (const p of PROJ) { const ts = TASKS.filter(t => t.project === p._id); if (ts.length) { buildTree(ts); markCritical(ts); } }
+    renderKPIs(); renderProjects(); renderTable(); renderGantt();
   } catch (e) {
     stateError(projectsBox, e, load);
     clear(kpiBox);
@@ -217,6 +264,7 @@ function showProgress(form, id, name) {
 /* ── başlat ────────────────────────────────────────────────────────── */
 document.getElementById("btn-new").addEventListener("click", () => { if (ME) openNew(); });
 document.getElementById("btn-refresh").addEventListener("click", load);
+document.getElementById("btn-csv").addEventListener("click", () => PROJ.length && exportPortfolio());
 document.querySelectorAll("#zoom button").forEach(b => b.addEventListener("click", () => {
   document.querySelectorAll("#zoom button").forEach(x => x.setAttribute("aria-pressed", x === b ? "true" : "false"));
   gantt.setZoom(b.dataset.z);

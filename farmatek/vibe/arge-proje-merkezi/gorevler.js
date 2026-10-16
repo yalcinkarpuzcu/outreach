@@ -1,7 +1,7 @@
 /* Görevlerim: yalnızca kendine atanan görevi güncelleme, öncül kilidi, onaya gönderme, onay kutusu */
 "use strict";
 
-let ME = null, ALL = [], BYID = new Map(), TAB = "mine";
+let ME = null, ALL = [], BYID = new Map(), TAB = "mine", MYDEPTS = new Set();
 const panel = document.getElementById("panel");
 const showClosed = document.getElementById("chk-closed");
 
@@ -18,7 +18,9 @@ function openPredNames(t) {
 async function load() {
   stateLoading(panel, "Görevler yükleniyor…");
   try {
-    const recs = await fetchAll("G", { includeApprovalRequest: true });
+    const [recs, depts] = await Promise.all([fetchAll("G", { includeApprovalRequest: true }), fetchAll("D").catch(() => [])]);
+    MYDEPTS = new Set(depts.filter(d => [v(d, "D", "Departman Yöneticisi"), ...(v(d, "D", "Ekip Üyeleri") || []), v(d, "D", "Onaylayıcı")]
+      .some(u => u && String(u.id) === String(ME.id))).map(d => v(d, "D", "Departman")));
     ALL = recs.map(r => taskModel(r, "G"));
     BYID = new Map(ALL.map(t => [t.id, t]));
     const nMine = mine().filter(t => !t.closed).length, nOnay = myApprovals().length;
@@ -35,6 +37,7 @@ async function load() {
 
 function render() {
   if (TAB === "onay") return renderApprovals();
+  if (TAB === "dept") return renderDept();
   let list = mine();
   if (!showClosed.checked) list = list.filter(t => !t.closed);
   if (!list.length) {
@@ -181,6 +184,9 @@ function openDetail(t) {
   }
 
   if (!own) body.append(el("p", { style: "color:var(--text-muted);font-size:12.5px", text: "Bu görev size atanmadığı için yalnızca görüntüleyebilirsiniz." }));
+  const histBox = el("div");
+  body.append(el("div", { class: "section-t", text: "Değişiklik geçmişi" }), histBox);
+  renderHistory(histBox, "G", t.id);
   const save = el("button", { class: "btn primary", type: "button", text: "Kaydet", disabled: !editable || null });
   save.addEventListener("click", async () => {
     save.disabled = true; clear(err);
@@ -196,6 +202,24 @@ function openDetail(t) {
     foot.append(el("button", { class: "btn", type: "button", text: "⏸ Beklemeye al", onclick: () => { closeDrawer(); setStatus(t, "Beklemede"); } }));
   foot.append(el("a", { class: "btn", href: "plan.html?id=" + encodeURIComponent(t.project), text: "Planda gör" }),
     el("button", { class: "btn", type: "button", text: "Kapat", onclick: closeDrawer }), save);
+}
+
+/* ── departmanım: ekibin görevleri (salt okunur) ───────────────────── */
+function renderDept() {
+  if (!MYDEPTS.size) { stateEmpty(panel, "Bir departmana bağlı değilsiniz", "Departman üyeliği Workiom'daki Departmanlar listesinden yönetilir."); return; }
+  let list = ALL.filter(t => t.type !== "Faz" && MYDEPTS.has(t.dept));
+  if (!showClosed.checked) list = list.filter(t => !t.closed);
+  if (!list.length) { stateEmpty(panel, "Departmanınızda açık görev yok", [...MYDEPTS].join(", ")); return; }
+  list.sort((a, b) => (a.end ?? 0) - (b.end ?? 0));
+  const tbl = el("table", { class: "sum" }, el("thead", null, el("tr", null, ...["Görev", "Proje", "Sorumlu", "Bitiş", "Durum", ""].map(h => el("th", { text: h })))));
+  const tb = el("tbody");
+  for (const t of list) tb.append(el("tr", null,
+    el("td", null, el("b", { text: t.name }), t.late ? el("span", { class: "tag late", style: "margin-inline-start:6px", text: "Gecikti" }) : null),
+    el("td", { text: t.projectName }), el("td", { text: userName(t.owner) || "—" }), el("td", { text: fmtDay(t.end) }), el("td", null, chip(t.status)),
+    el("td", null, el("button", { class: "btn sm", type: "button", text: "Detay", onclick: () => openDetail(t) }))));
+  tbl.append(tb);
+  clear(panel).append(el("p", { class: "hint-bar", text: "Departman: " + [...MYDEPTS].join(", ") + " · Yalnızca size atanan görevleri güncelleyebilirsiniz; diğerleri salt okunurdur." }),
+    el("div", { class: "card tbl-wrap" }, tbl));
 }
 
 /* ── onay kutusu ──────────────────────────────────────────────────── */
@@ -293,10 +317,12 @@ function selectTab(tab) {
   TAB = tab;
   document.getElementById("tab-mine").setAttribute("aria-selected", tab === "mine" ? "true" : "false");
   document.getElementById("tab-onay").setAttribute("aria-selected", tab === "onay" ? "true" : "false");
+  document.getElementById("tab-dept").setAttribute("aria-selected", tab === "dept" ? "true" : "false");
   render();
 }
 document.getElementById("tab-mine").addEventListener("click", () => selectTab("mine"));
 document.getElementById("tab-onay").addEventListener("click", () => selectTab("onay"));
+document.getElementById("tab-dept").addEventListener("click", () => selectTab("dept"));
 document.getElementById("btn-refresh").addEventListener("click", load);
 showClosed.addEventListener("change", render);
 

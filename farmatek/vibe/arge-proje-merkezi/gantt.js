@@ -6,15 +6,28 @@ const ROW_H = 34, HEAD_H = 48;
 const SVGNS = "http://www.w3.org/2000/svg";
 
 function createGantt(host, opts) {
-  const o = Object.assign({ zoom: "ay", showBaseline: true, mode: "plan", onSelect: null }, opts || {});
+  const o = Object.assign({ zoom: "ay", showBaseline: true, mode: "plan", onSelect: null,
+    editable: null,      // t => bool: çubuk sürüklenebilir mi (yalnızca PM)
+    onDragEnd: null,     // (t, yeniBaşlangıç, yeniBitiş)
+    onLink: null,        // (öncülId, ardılId) — çubuk ucundan diğer göreve sürükleyerek bağ
+    rowFilter: null,     // t => bool (yaprak görevler için; özetler bir torunu görünürse gösterilir)
+    pending: null        // Set: kaydedilmemiş değişikliği olan görev id'leri
+  }, opts || {});
+  let suppressClick = false;
   const collapsed = new Set();
   let tasks = [], roots = [], selected = null;
   const tip = el("div", { class: "tooltip", role: "tooltip", hidden: true });
   document.body.append(tip);
 
+  function visibleTree(t) {
+    if (!o.rowFilter) return true;
+    if (!t.children.length) return o.rowFilter(t);
+    return t.children.some(visibleTree);
+  }
   function flatten() {
     const out = [];
     const walk = (t, depth) => {
+      if (!visibleTree(t)) return;
       t.depth = depth;
       out.push(t);
       if (!collapsed.has(t.id)) t.children.forEach(c => walk(c, depth + 1));
@@ -101,6 +114,7 @@ function createGantt(host, opts) {
 
   function render() {
     hideTip();
+    const keepX = host.scrollLeft, keepY = host.scrollTop;
     const rows = flatten();
     const [minD, maxD] = range();
     const ppd = ZOOM[o.zoom];
@@ -152,19 +166,25 @@ function createGantt(host, opts) {
         if (o.showBaseline && t.baseStart != null && !t.summary) {
           right.append(el("div", { class: "base", style: `left:${X(t.baseStart)}px;width:${Math.max(3, ((t.baseEnd ?? t.baseStart) - t.baseStart) * ppd)}px`, title: "Baseline" }));
         }
+        const canDrag = !t.summary && o.editable && o.editable(t);
+        const pend = o.pending && o.pending.has(t.id) ? " pend" : "";
         if (t.milestone && !t.summary && t.end - t.start <= 0) {
-          right.append(el("div", { class: "ms " + barClass(t) + (t.critical ? " crit" : ""), style: `left:${X(t.start)}px`, ...hov }));
+          const ms = el("div", { class: "ms " + barClass(t) + (t.critical ? " crit" : "") + (canDrag ? " drag" : "") + pend, style: `left:${X(t.start)}px`, ...hov });
+          right.append(ms);
+          if (canDrag) { bindDrag(ms, t, ppd, X); right.append(linkHandle(t, X(t.start) + 10, ppd, X)); }
           right.append(el("div", { class: "bar-label", style: `left:${X(t.start) + 12}px`, text: t.name }));
         } else {
           const w = Math.max(3, (t.end - t.start) * ppd);
-          const bar = el("div", { class: "bar " + (t.summary ? "summary" : barClass(t)) + (t.critical ? " crit" : ""), style: `left:${X(t.start)}px;width:${w}px`, ...hov });
+          const bar = el("div", { class: "bar " + (t.summary ? "summary" : barClass(t)) + (t.critical ? " crit" : "") + (canDrag ? " drag" : "") + pend, style: `left:${X(t.start)}px;width:${w}px`, ...hov });
           if (!t.summary && t.pct > 0 && t.pct < 100) bar.append(el("span", { class: "pct", style: `width:${t.pct}%` }));
+          if (canDrag) { bar.append(el("span", { class: "h-end", title: "Süreyi değiştirmek için sürükleyin" })); bindDrag(bar, t, ppd, X); }
           right.append(bar);
+          if (canDrag) right.append(linkHandle(t, X(t.start) + w + 2, ppd, X));
           if (o.zoom !== "yil") right.append(el("div", { class: "bar-label", style: `left:${X(t.start) + w + 6}px`, text: t.summary ? "" : (o.mode === "kutuphane" ? t.dept : userName(t.owner)) }));
         }
       }
-      const row = el("div", { class: "g-row" + (t.summary ? " summary" : "") + (selected === t.id ? " sel" : ""), role: "row", tabindex: "0",
-        onclick: () => { selected = t.id; render(); o.onSelect && o.onSelect(t); },
+      const row = el("div", { class: "g-row" + (t.summary ? " summary" : "") + (selected === t.id ? " sel" : ""), role: "row", tabindex: "0", "data-id": t.id,
+        onclick: () => { if (suppressClick) { suppressClick = false; return; } selected = t.id; render(); o.onSelect && o.onSelect(t); },
         onkeydown: ev => { if (ev.key === "Enter") { selected = t.id; render(); o.onSelect && o.onSelect(t); } } }, left, right);
       body.append(row);
     });
@@ -219,8 +239,104 @@ function createGantt(host, opts) {
     }
     layer.append(svg);
 
+    linkLayer = { layer, svg };
     clear(host).append(g);
+    host.scrollLeft = keepX; host.scrollTop = keepY;
     if (!rows.length) stateEmpty(host, "Görüntülenecek görev yok", "Bu görünümde görev bulunmuyor.");
+  }
+
+  /* ── sürükle-bırak: taşı / süre / bağ ─────────────────────────────── */
+  let linkLayer = null;
+  function dragTip(ev, text) {
+    clear(tip); tip.append(el("b", { text })); tip.hidden = false; moveTip(ev);
+  }
+  function bindDrag(node, t, ppd, X) {
+    node.addEventListener("pointerdown", ev => {
+      if (ev.button !== 0) return;
+      ev.preventDefault(); ev.stopPropagation();
+      const mode = ev.target.classList.contains("h-end") ? "resize" : "move";
+      const x0 = ev.clientX, left0 = X(t.start), w0 = (t.end - t.start) * ppd;
+      let dd = 0;
+      node.setPointerCapture(ev.pointerId);
+      node.classList.add("dragging");
+      const move = e => {
+        dd = Math.round((e.clientX - x0) / ppd);
+        if (mode === "move") {
+          node.style.left = (left0 + dd * ppd) + "px";
+          dragTip(e, fmtDay(t.start + dd) + " → " + fmtDay(t.end + dd) + (dd ? "  (" + (dd > 0 ? "+" : "") + dd + " gün)" : ""));
+        } else {
+          dd = Math.max(dd, -(t.end - t.start));
+          node.style.width = Math.max(3, w0 + dd * ppd) + "px";
+          dragTip(e, "Süre: " + (t.end - t.start + dd) + " gün · bitiş " + fmtDay(t.end + dd));
+        }
+      };
+      const up = () => {
+        node.removeEventListener("pointermove", move);
+        node.removeEventListener("pointerup", up);
+        node.removeEventListener("pointercancel", up);
+        node.classList.remove("dragging");
+        hideTip();
+        if (dd !== 0) {
+          suppressClick = true;
+          setTimeout(() => { suppressClick = false; }, 0);
+          if (mode === "move") o.onDragEnd && o.onDragEnd(t, t.start + dd, t.end + dd);
+          else o.onDragEnd && o.onDragEnd(t, t.start, t.end + dd);
+        }
+      };
+      node.addEventListener("pointermove", move);
+      node.addEventListener("pointerup", up);
+      node.addEventListener("pointercancel", up);
+    });
+  }
+  function linkHandle(t, x, ppd, X) {
+    const h = el("span", { class: "h-link", style: `left:${x}px`, title: "Bağımlılık eklemek için başka bir göreve sürükleyin" });
+    h.addEventListener("pointerdown", ev => {
+      if (ev.button !== 0 || !linkLayer) return;
+      ev.preventDefault(); ev.stopPropagation();
+      h.setPointerCapture(ev.pointerId);
+      const lr0 = linkLayer.layer.getBoundingClientRect();
+      const hr = h.getBoundingClientRect();
+      const sx = hr.left + hr.width / 2 - lr0.left, sy = hr.top + hr.height / 2 - lr0.top;
+      const line = document.createElementNS(SVGNS, "path");
+      line.setAttribute("class", "linking");
+      linkLayer.svg.append(line);
+      let target = null, lastE = null;
+      const auto = setInterval(() => {            // kenara yaklaşınca Gantt'ı kaydır (görünmeyen satıra bağ)
+        if (!lastE) return;
+        const hr2 = host.getBoundingClientRect();
+        let dy = 0, dx = 0;
+        const bottom = Math.min(hr2.bottom, innerHeight), right = Math.min(hr2.right, innerWidth);
+        if (lastE.clientY > bottom - 40) dy = 14; else if (lastE.clientY < Math.max(hr2.top, 0) + 60) dy = -14;
+        if (lastE.clientX > right - 30) dx = 18;
+        if (dy || dx) { host.scrollTop += dy; host.scrollLeft += dx; move(lastE); }
+      }, 30);
+      const move = e => {
+        lastE = e;
+        const lr = linkLayer.layer.getBoundingClientRect();
+        line.setAttribute("d", `M${sx + lr0.left - lr.left},${sy + lr0.top - lr.top} L${e.clientX - lr.left},${e.clientY - lr.top}`);
+        const under = document.elementFromPoint(e.clientX, e.clientY);
+        const row = under && under.closest && under.closest(".g-row");
+        document.querySelectorAll(".g-row.link-target").forEach(r => r.classList.remove("link-target"));
+        target = row && row.dataset.id !== t.id ? row.dataset.id : null;
+        if (target) row.classList.add("link-target");
+        dragTip(e, target ? "Bırakın: " + t.name + " → bu görev (FS)" : "Ardıl görevin satırına sürükleyin");
+      };
+      const up = () => {
+        clearInterval(auto);
+        h.removeEventListener("pointermove", move);
+        h.removeEventListener("pointerup", up);
+        h.removeEventListener("pointercancel", up);
+        line.remove(); hideTip();
+        document.querySelectorAll(".g-row.link-target").forEach(r => r.classList.remove("link-target"));
+        suppressClick = true;
+        setTimeout(() => { suppressClick = false; }, 0);
+        if (target) o.onLink && o.onLink(t.id, target);
+      };
+      h.addEventListener("pointermove", move);
+      h.addEventListener("pointerup", up);
+      h.addEventListener("pointercancel", up);
+    });
+    return h;
   }
 
   return {
@@ -232,6 +348,7 @@ function createGantt(host, opts) {
     },
     setZoom(z) { o.zoom = z; render(); },
     setBaseline(b) { o.showBaseline = b; render(); },
+    setOption(k, val) { o[k] = val; render(); },
     collapseWhere(fn) { collapsed.clear(); tasks.filter(t => t.children.length && fn(t)).forEach(t => collapsed.add(t.id)); render(); },
     collapseAll(on) { collapsed.clear(); if (on) tasks.filter(t => t.children.length).forEach(t => collapsed.add(t.id)); render(); },
     select(id) { selected = id; render(); },

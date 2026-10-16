@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Değişiklik Günlüğü · Ar-Ge Proje Merkezi</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="topbar"></header>
+<main style="max-width:1080px">
+  <div class="page-head">
+    <div>
+      <h1>Değişiklik Günlüğü</h1>
+      <p>Ar-Ge uygulamasındaki tüm kayıt değişiklikleri: kim, ne zaman, hangi alanı neden neye değiştirdi. Otomasyonların yaptıkları ayrıca işaretlidir.</p>
+    </div>
+    <div class="toolbar"><button class="btn" type="button" id="btn-refresh">↻ Yenile</button></div>
+  </div>
+  <div class="filters">
+    <label for="f-list" class="sr">Liste</label>
+    <select class="input" id="f-list">
+      <option value="">Tüm listeler</option>
+      <option>Görevler</option><option>Projeler</option><option>Onay Geçmişi</option><option>Baseline Arşivi</option><option>Görev Kütüphanesi</option>
+    </select>
+    <label for="f-q" class="sr">Ara</label>
+    <input class="input" id="f-q" type="search" placeholder="Görev, proje veya kişi ara">
+    <label class="btn" style="cursor:pointer"><input type="checkbox" id="f-user"> Yalnızca kullanıcı işlemleri</label>
+    <label class="btn" style="cursor:pointer"><input type="checkbox" id="f-dates"> Yalnızca tarih / sorumlu / durum</label>
+  </div>
+  <section class="card" style="padding:14px 16px" id="log" aria-live="polite"></section>
+  <div style="text-align:center;margin-top:12px"><button class="btn" type="button" id="btn-more" hidden>Daha fazla yükle</button></div>
+</main>
+<script src="schema.js"></script>
+<script src="app.js"></script>
+<script src="gecmis.js"></script>
+</body>
+</html>

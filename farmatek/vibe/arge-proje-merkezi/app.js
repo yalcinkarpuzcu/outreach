@@ -89,7 +89,7 @@ async function api(method, path, body) {
 }
 
 /* ── Şema erişimi ───────────────────────────────────────────────────── */
-const L = { P: SCHEMA.P, G: SCHEMA.G, K: SCHEMA.K, S: SCHEMA.S };
+const L = { P: SCHEMA.P, G: SCHEMA.G, K: SCHEMA.K, S: SCHEMA.S, D: SCHEMA.D };
 function fid(list, name) {
   const f = L[list].f[name];
   if (!f) throw new Error("Şemada alan yok: " + list + "." + name);
@@ -308,7 +308,8 @@ async function initShell(active) {
   const brand = el("div", { class: "brand" });
   const svgIcon = new DOMParser().parseFromString(ICON_FLASK.replace("<svg ", '<svg xmlns="http://www.w3.org/2000/svg" '), "image/svg+xml").documentElement;
   brand.append(document.importNode(svgIcon, true), el("div", null, "Ar-Ge Proje Merkezi", el("small", { text: "İlaç Ar-Ge planlama & takip" })));
-  const links = [["index.html", "Portföy", "portfoy"], ["gorevlerim.html", "Görevlerim", "gorev"], ["kutuphane.html", "Görev Kütüphanesi", "kutuphane"]];
+  const links = [["index.html", "Portföy", "portfoy"], ["gorevlerim.html", "Görevlerim", "gorev"], ["kutuphane.html", "Görev Kütüphanesi", "kutuphane"],
+    ["gecmis.html", "Değişiklik Günlüğü", "gecmis"], ["rehber.html", "Demo Rehberi", "rehber"]];
   const nav = el("nav", { class: "nav", "aria-label": "Ana menü" });
   for (const [href, text, key] of links) {
     const a = el("a", { href, text, "aria-current": key === active ? "page" : null });
@@ -326,6 +327,79 @@ async function initShell(active) {
     if (!(e instanceof SessionGone)) who.textContent = "";
     throw e;
   }
+}
+
+/* ── Kullanıcılar (seçiciler için) ───────────────────────────────── */
+let usersPromise = null;
+function listUsers() {
+  if (!usersPromise) {
+    usersPromise = api("GET", "/api/services/app/User/GetAll?isActive=true")
+      .catch(e => { if (e instanceof SessionGone) throw e; return api("GET", "/api/services/app/User/GetUsers?MaxResultCount=500"); })
+      .then(r => (Array.isArray(r) ? r : (r.items || [])).filter(u => u.isActive !== false)
+        .map(u => ({ id: String(u.id), name: [u.name, u.surname].filter(Boolean).join(" ") || u.emailAddress, email: u.emailAddress || u.userName }))
+        .sort((a, b) => a.name.localeCompare(b.name, "tr")))
+      .catch(e => { usersPromise = null; throw e; });
+  }
+  return usersPromise;
+}
+function userSelect(id, current, placeholder) {
+  const sel = el("select", { class: "input", id }, el("option", { value: "", text: placeholder || "— seçin —" }));
+  listUsers().then(us => {
+    us.forEach(u => sel.append(el("option", { value: u.email, text: u.name, selected: current && String(current.id) === u.id ? true : null })));
+  }).catch(e => { if (!(e instanceof SessionGone)) { sel.disabled = true; sel.title = "Kullanıcı listesi alınamadı: " + e.message; } });
+  return sel;
+}
+
+/* ── Değişiklik geçmişi (Workiom kayıt geçmişi) ────────────────────── */
+const ISLEM = { 0: "oluşturdu", 1: "güncelledi", 2: "sildi", 3: "geri yükledi", 8: "onay adımı" };
+function histValue(x) {
+  if (x == null || x === "") return "—";
+  if (Array.isArray(x)) return x.map(histValue).join(", ");
+  if (typeof x === "object") return x.label || x.fullname || x.FileName || JSON.stringify(x);
+  const m = /^#?(\d{4}-\d{2}-\d{2})T[\d:.]+Z?#?/.exec(String(x));
+  if (m) return fmtDay(Math.round(Date.UTC(+m[1].slice(0, 4), +m[1].slice(5, 7) - 1, +m[1].slice(8, 10)) / 864e5));
+  if (x === "true" || x === true) return "Evet";
+  if (x === "false" || x === false) return "Hayır";
+  return String(x);
+}
+function fmtStamp(iso) {
+  const d = new Date(iso);
+  if (isNaN(d)) return "";
+  return d.toLocaleDateString("tr-TR", { day: "2-digit", month: "short", year: "numeric" }) + " " + d.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
+}
+function histEntry(h, withItem) {
+  const auto = h.automationId != null;
+  const li = el("li", { class: auto ? "auto" : "user" });
+  const who = (h.username || "Sistem") + (auto ? " · otomasyon" : "");
+  li.append(el("div", { class: "when", text: fmtStamp(h.date) + " · " + who }));
+  if (withItem) li.append(el("div", null, el("b", { text: h.itemName || "" }), " ", el("span", { class: "tag", text: h.listName || "" })));
+  if (h.approvalRequestItem) {
+    const a = h.approvalRequestItem;
+    const st = { 0: "onay talebi açıldı", 1: "ONAYLANDI", 2: "REDDEDİLDİ", 3: "süresi doldu" }[a.requestStatus] ?? "onay";
+    li.append(el("div", { class: "chg", text: "✍ " + (a.requestTitle || "Onay") + ": " + st }));
+    return li;
+  }
+  const rec = h.record || {}, prev = h.previousRecord || {};
+  const keys = Object.keys(rec).filter(k => !/^Last |^Creation|^Creator/.test(k));
+  if (!keys.length) li.append(el("div", { class: "chg", text: "Kaydı " + (ISLEM[h.action] || "değiştirdi") }));
+  for (const k of keys) {
+    const c = el("div", { class: "chg" }, el("b", { text: k + ": " }));
+    if (k in prev) c.append(el("s", { text: histValue(prev[k]) }), " → ");
+    c.append(histValue(rec[k]));
+    li.append(c);
+  }
+  return li;
+}
+async function renderHistory(box, list, recordId) {
+  stateLoading(box, "Geçmiş yükleniyor…");
+  try {
+    const q = "listId=" + encodeURIComponent(L[list].id) + "&recordId=" + encodeURIComponent(recordId) +
+      "&showHistory=true&showComments=true&showConversations=false&showApprovalRequest=true&MaxResultCount=100&SkipCount=0";
+    const r = await api("GET", "/api/services/app/History/GetAll?" + q);
+    const items = (Array.isArray(r) ? r : (r.items || [])).filter(h => h.isVisible !== false);
+    if (!items.length) { clear(box).append(el("p", { class: "hint", text: "Kayıtlı değişiklik yok." })); return; }
+    clear(box).append(el("ul", { class: "hist" }, ...items.map(h => histEntry(h, false))));
+  } catch (e) { if (!(e instanceof SessionGone)) clear(box).append(el("p", { class: "hint", text: "Geçmiş alınamadı: " + e.message })); }
 }
 
 /* CSV (Excel uyumlu, UTF-8 BOM, noktalı virgül) */

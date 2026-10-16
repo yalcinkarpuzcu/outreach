@@ -12,10 +12,18 @@
   const oid = () => "m" + String(++seq).padStart(23, "0");
   const iso = day => new Date((day) * 864e5 - 3 * 3600e3).toISOString().replace(".000", "");   // TR gece yarısı (UTC-3s)
   const tday = () => { const d = new Date(); return Math.round(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 864e5); };
-  const store = { P: [], G: [], K: [], S: [] };
+  const store = { P: [], G: [], K: [], S: [], D: [] };
+  const HIST = [];
+  const USERS = [{ id: 900001, name: "Demo", surname: "Kullanıcı", emailAddress: "demo@ornek.com", isActive: true },
+                 { id: 900002, name: "Analitik", surname: "Uzmanı", emailAddress: "a@ornek.com", isActive: true },
+                 { id: 900003, name: "Formülasyon", surname: "Uzmanı", emailAddress: "f@ornek.com", isActive: true }];
+  const uByEmail = e => { const u = USERS.find(x => x.emailAddress === e); return u ? { id: String(u.id), fullname: u.name + " " + u.surname, emailAddress: u.emailAddress } : null; };
   const ids = l => SCHEMA[l].id;
   const listKey = id => Object.keys(store).find(k => SCHEMA[k].id === id);
 
+  ["Proje Yönetimi", "Formülasyon Geliştirme", "Analitik Metot Geliştirme", "Ruhsat", "Kalite Güvence"].forEach(d => {
+    const r = { _id: "d-" + d.slice(0, 3) }; r[F("D", "Departman")] = d; r[F("D", "Ekip Üyeleri")] = [meU]; store.D.push(r);
+  });
   /* şablonlar + kütüphane */
   const sab = {};
   MOCK_TEMPLATE.sablonlar.forEach((s, i) => {
@@ -145,11 +153,20 @@
     if (path.endsWith("/Data/Get")) { recompute(); return json(store[listKey(q.get("listId"))].find(r => r._id === q.get("id"))); }
     if (path.endsWith("/Data/UpdatePartial")) {
       const k = listKey(q.get("listId")), r = store[k].find(x => x._id === q.get("id"));
+      const before = {}, after = {};
       for (const [fidk, val] of Object.entries(body)) {
+        const fn = Object.entries(SCHEMA[k].f).find(([, e]) => String(e.id) === fidk)?.[0];
+        if (fn) { before[fn] = r[fidk]?.label ?? r[fidk]; }
         const fname = Object.entries(SCHEMA[k].f).find(([, e]) => String(e.id) === fidk)?.[0];
         const t = SCHEMA[k].f[fname]?.t;
         r[fidk] = (t === 16 || t === 4) && typeof val === "string" ? opt(k, fname, val) : (t === 2 && val ? iso(Math.round(Date.UTC(...val.split("-").map((x, i) => i === 1 ? x - 1 : +x)) / 864e5)) : val);
+        if (t === 21 && Array.isArray(val)) r[fidk] = val.map(d => ({ ...d, label: store.G.find(x => x._id === d._id)?.[F("G", "Görev Adı")] || "" }));
+        if (t === 5 && Array.isArray(val)) r[fidk] = val.map(x => typeof x === "string" ? { _id: x, label: (store.G.find(g => g._id === x) || store.P.find(g => g._id === x) || {})[F(k === "G" && store.P.some(p => p._id === x) ? "P" : "G", store.P.some(p => p._id === x) ? "Proje Adı" : "Görev Adı")] || "" } : x);
+        if (t === 6 && typeof val === "string") r[fidk] = uByEmail(val);
+        if (fname) after[fname] = r[fidk]?.label ?? (Array.isArray(r[fidk]) ? r[fidk].map(x => x.label).join(", ") : r[fidk]);
       }
+      HIST.unshift({ recordId: r._id, listName: SCHEMA[k].name, itemName: r[F(k, k === "P" ? "Proje Adı" : k === "G" ? "Görev Adı" : Object.keys(SCHEMA[k].f)[0])], action: 1,
+        username: "Demo Kullanıcı", date: new Date().toISOString(), record: after, previousRecord: before, isVisible: true });
       if (k === "G" && body[F("G", "Durum")]) setTimeout(() => automationOnStatus(r), 600);
       if (k === "P" && body[F("P", "Durum")] === "Plan Onaylandı (Baseline)") setTimeout(() => {
         for (const g of store.G.filter(x => x[F("G", "Proje")][0]._id === r._id)) { g[F("G", "Baseline Başlangıç")] = g[F("G", "Başlangıç")]; g[F("G", "Baseline Bitiş")] = g[F("G", "Bitiş")]; }
@@ -171,8 +188,41 @@
         setTimeout(() => { p[F("P", "Plan Durumu")] = opt("P", "Plan Durumu", "Hazır"); }, 7500);
         return json({ id: p._id });
       }
-      const r = { _id: oid(), ...body }; store[k].push(r); return json({ id: r._id });
+      const r = { _id: "n" + oid().slice(1) };
+      store[k].push(r);
+      for (const [fidk, val] of Object.entries(body)) {
+        const fname = Object.entries(SCHEMA[k].f).find(([, e]) => String(e.id) === fidk)?.[0];
+        const t = SCHEMA[k].f[fname]?.t;
+        if ((t === 16 || t === 4) && typeof val === "string") r[fidk] = opt(k, fname, val);
+        else if (t === 2 && val) r[fidk] = iso(Math.round(Date.UTC(...val.split("-").map((x, i) => i === 1 ? x - 1 : +x)) / 864e5));
+        else if (t === 21) r[fidk] = val.map(d => ({ ...d, label: store.G.find(x => x._id === d._id)?.[F("G", "Görev Adı")] || "" }));
+        else if (t === 5) r[fidk] = val.map(x => ({ _id: x, label: (store.P.find(p => p._id === x)?.[F("P", "Proje Adı")]) || (store.G.find(g => g._id === x)?.[F("G", "Görev Adı")]) || (store.D.find(d => d._id === x)?.[F("D", "Departman")]) || "" }));
+        else if (t === 6) r[fidk] = uByEmail(val);
+        else r[fidk] = val;
+      }
+      HIST.unshift({ recordId: r._id, listName: SCHEMA[k].name, itemName: r[F(k, "Görev Adı")], action: 0, username: "Demo Kullanıcı", date: new Date().toISOString(), record: {}, previousRecord: {}, isVisible: true });
+      recompute();
+      return json({ id: r._id });
     }
+    if (path.endsWith("/Data/Delete")) {
+      const k = listKey(q.get("listId")); store[k] = store[k].filter(x => x._id !== q.get("id")); recompute(); return json(null);
+    }
+    if (path.endsWith("/History/GetAll")) {
+      const id = q.get("recordId");
+      const seed = [{ recordId: id, listName: "Görevler", itemName: "", action: 1, automationId: 135, username: "Demo Kullanıcı", date: new Date(Date.now() - 86400e3 * 3).toISOString(), record: { Durum: "Başlayabilir" }, previousRecord: { Durum: "Başlamadı" }, isVisible: true },
+                    { recordId: id, listName: "Görevler", itemName: "", action: 1, username: "Demo Kullanıcı", date: new Date(Date.now() - 86400e3 * 9).toISOString(), record: { Bitiş: "#2026-07-09T00:00:00.0000000Z#/D/" }, previousRecord: { Bitiş: "#2026-06-29T00:00:00.0000000Z#/D/" }, isVisible: true },
+                    { recordId: id, listName: "Görevler", itemName: "", action: 0, automationId: 132, username: "Demo Kullanıcı", date: new Date(Date.now() - 86400e3 * 190).toISOString(), record: {}, previousRecord: {}, isVisible: true }];
+      return new Response(JSON.stringify({ success: true, result: [...HIST.filter(h => h.recordId === id), ...seed] }), { headers: { "Content-Type": "application/json" } });
+    }
+    if (path.endsWith("/History/GetAllPaged")) {
+      const names = store.G.slice(0, 40);
+      const synth = names.map((g, i) => ({ recordId: g._id, listName: "Görevler", itemName: g[F("G", "Görev Adı")], action: 1, automationId: i % 3 ? 135 : null, username: i % 3 ? "Demo Kullanıcı" : "Analitik Uzmanı",
+        date: new Date(Date.now() - i * 5.3 * 3600e3).toISOString(), record: i % 2 ? { Durum: "Tamamlandı", "% Tamamlanma": "100" } : { Bitiş: "#2026-08-12T00:00:00.0000000Z#/D/" },
+        previousRecord: i % 2 ? { Durum: "Devam Ediyor", "% Tamamlanma": "70" } : { Bitiş: "#2026-08-02T00:00:00.0000000Z#/D/" }, isVisible: true }));
+      const skip = body?.skipCount || 0;
+      return new Response(JSON.stringify({ success: true, result: [...HIST, ...synth].slice(skip, skip + (body?.maxResultCount || 100)) }), { headers: { "Content-Type": "application/json" } });
+    }
+    if (path.endsWith("/User/GetAll") || path.endsWith("/User/GetUsers")) return json({ items: USERS, totalCount: USERS.length });
     if (path.includes("/AutomationApprovalRequest/")) {
       const rid = q.get("approvalRequestId"), r = store.G.find(x => x.approvalRequest?.requestId === rid);
       if (r) {

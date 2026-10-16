@@ -1,5 +1,6 @@
 /* Ar-Ge Proje Merkezi — canlı şema keşfinden üretildi (farmatek.workiom.com, 'Ar-Ge Proje Yönetimi'). Elle düzenlemeyin. */
 const SCHEMA = {
+ "APP": { "id": "4d6bc914-43c2-490f-8b64-ff426c2e66dc", "name": "Ar-Ge Proje Yönetimi" },
  "P": {
   "id": "75f4cb5f-8f23-4d33-b23c-bb84147d7a0d",
   "name": "Projeler",
@@ -218,6 +219,14 @@ const SCHEMA = {
    "Proje Yöneticisi": {
     "id": 6025658,
     "t": 6
+   },
+   "Öncül Kayıtları": {
+    "id": 6025635,
+    "t": 5
+   },
+   "Alt Görevler": {
+    "id": 6025563,
+    "t": 5
    }
   }
  },
@@ -315,6 +324,29 @@ const SCHEMA = {
    "Toplam Süre (gün)": {
     "id": 6025671,
     "t": 1
+   }
+  }
+ },
+ "D": {
+  "id": "9a425108-9c36-4554-975a-e1fea006ef42",
+  "name": "Departmanlar",
+  "f": {
+   "Departman": {
+    "id": 6025517,
+    "t": 0,
+    "req": true
+   },
+   "Departman Yöneticisi": {
+    "id": 6025586,
+    "t": 6
+   },
+   "Onaylayıcı": {
+    "id": 6025587,
+    "t": 6
+   },
+   "Ekip Üyeleri": {
+    "id": 6025588,
+    "t": 18
    }
   }
  }

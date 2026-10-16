@@ -20,7 +20,7 @@ document.addEventListener("click", e => {
 }, true);
 </script>"""
 pages = {}
-for html in ["index.html", "plan.html", "gorevlerim.html", "kutuphane.html"]:
+for html in ["index.html", "plan.html", "gorevlerim.html", "kutuphane.html", "gecmis.html", "rehber.html"]:
     doc = (SRC / html).read_text()
     doc = doc.replace('<link rel="stylesheet" href="styles.css">', "<style>" + css + "</style>")
     def inline(m):
@@ -44,7 +44,7 @@ body { background: var(--bg); color: var(--fg); display: flex; flex-direction: c
   background: var(--banner-bg); color: var(--banner); font: 600 13px/1.4 system-ui, sans-serif; border-bottom: 1px solid var(--line); }
 iframe { flex: 1; width: 100%; border: 0; background: var(--bg); }
 </style>
-<div class="pv" role="note">Önizleme — örnek veri, Workiom'a bağlı değil. Sayfalar arası geçişte örnek veri baştan yüklenir; Excel indirme önizlemede çalışmaz.</div>
+<div class="pv" role="note">Önizleme — örnek veri, Workiom'a bağlı değil. Sayfalar arası geçişte örnek veri baştan yüklenir; Excel indirme önizlemede çalışmaz. Gantt'ta çubukları sürükleyebilirsiniz (PM rolü).</div>
 <iframe id="app" title="Ar-Ge Proje Merkezi önizleme"></iframe>
 <script>
 const PAGES = """ + json.dumps(pages).replace("</", "<\\/") + """;

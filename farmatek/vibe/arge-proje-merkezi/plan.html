@@ -26,10 +26,19 @@
       <button class="btn" type="button" id="btn-fold">Fazları daralt</button>
       <label class="btn" style="cursor:pointer"><input type="checkbox" id="chk-base" checked> Baseline</label>
       <button class="btn" type="button" id="btn-csv">⤓ Excel</button>
+      <button class="btn" type="button" id="btn-add" hidden>＋ Görev ekle</button>
       <button class="btn primary" type="button" id="btn-baseline" hidden>📌 Baseline al</button>
     </div>
   </div>
   <section class="kpis" id="kpis" aria-label="Proje göstergeleri"></section>
+  <div class="pending-bar" id="pending" role="status" aria-live="polite" hidden></div>
+  <div class="filters">
+    <label for="f-dept" class="sr">Departman</label>
+    <select class="input" id="f-dept"><option value="">Tüm departmanlar</option></select>
+    <label class="btn" style="cursor:pointer"><input type="checkbox" id="f-mine"> Yalnızca bana atananlar</label>
+    <label class="btn" style="cursor:pointer" title="Bir görev kaydırıldığında ardıllarını öncül kurallarına göre otomatik kaydır"><input type="checkbox" id="chk-casc" checked> Bağımlıları otomatik kaydır</label>
+  </div>
+  <p class="hint-bar" id="pm-hint"></p>
   <div class="legend">
     <span><i style="background:#8fa6bd"></i>Başlamadı</span>
     <span><i style="background:var(--accent)"></i>Başlayabilir</span>
