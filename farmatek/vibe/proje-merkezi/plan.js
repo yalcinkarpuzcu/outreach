@@ -81,7 +81,8 @@ VIEWS.plan = { title: "Proje Planı", async mount(ctx) {
   const S = {
     proj: null, phases: [], tasks: [], mss: [], depts: [], rows: [], items: [], byId: new Map(),
     orig: new Map(), pending: new Set(), edit: false, isPM: false,
-    casc: true, filter: "all", fDept: "", fOwner: "", q: "", alive: true
+    casc: true, filter: "all", fDept: "", fOwner: "", q: "", alive: true,
+    bls: [], blSel: "", blItems: []          // baseline katmanı: projenin baseline'ları, karşılaştırılan, kalemleri
   };
   const hasPending = () => [...S.pending].some(id => { const t = S.byId.get(id); return t && changed(t); });
 
@@ -160,20 +161,25 @@ VIEWS.plan = { title: "Proje Planı", async mount(ctx) {
   async function load(keepSel) {
     if (!S.items.length) stateLoading(gHost, "Plan yükleniyor…");
     try {
-      const [p, phases, tasks, mss, depts] = await Promise.all([
+      const [p, phases, tasks, mss, depts, bls] = await Promise.all([
         getRecord("P", PID),
         fetchAll("F").then(rs => rs.filter(r => linkIds(v(r, "F", "Proje")).includes(PID))),
         fetchAll("G", { includeApprovalRequest: true }).then(rs => rs.filter(r => linkIds(v(r, "G", "Proje")).includes(PID))),
         fetchAll("K").then(rs => rs.filter(r => linkIds(v(r, "K", "Proje")).includes(PID))),
-        S.depts.length ? S.depts : fetchAll("D").catch(() => [])
+        S.depts.length ? S.depts : fetchAll("D").catch(() => []),
+        fetchAll("BL").then(rs => rs.filter(r => linkIds(v(r, "BL", "Proje")).includes(PID))).catch(() => [])
       ]);
       if (!S.alive) return;
+      S.bls = bls.map(blModel).sort((a, b) => a.no - b.no);
+      if (S.blSel && !S.bls.some(b => b.id === S.blSel)) S.blSel = "";
+      S.blItems = S.blSel ? await blItemsOf(S.blSel) : [];
       S.proj = p; S.depts = depts;
       S.isPM = sameUser(v(p, "P", "Proje Yöneticisi"), ME);
       if (!S.loadedOnce) { S.edit = S.isPM; S.loadedOnce = true; }
       S.phases = phases.map(phaseModel);
       S.tasks = tasks.map(taskModel);
       S.mss = mss.map(msModel);
+      applyBaseline();
       build();
       snapshot();
       drawHead();
@@ -199,6 +205,23 @@ VIEWS.plan = { title: "Proje Planı", async mount(ctx) {
         el("li", { class: k < i ? "done" : k === i ? "now" : "" }, el("span", { class: "dot" }), s))),
       el("p", { class: "muted", text: "Şablondan fazlar, görevler, öncüller ve kilometre taşları oluşturuluyor. Sayfa kendiliğinden yenilenir." })));
     setTimeout(() => S.alive && load(), 4000);
+  }
+
+  /* seçili baseline'ın kalemleri Gantt'taki gri çubukları ve sapmayı belirler ("" = kayıtlardaki son baseline) */
+  function applyBaseline() {
+    if (!S.blSel) return;
+    const by = key => new Map(S.blItems.filter(k => k[key]).map(k => [k[key], k]));
+    const g = by("gorev"), f = by("faz"), k = by("kt");
+    for (const t of S.tasks) { const x = g.get(t.id); t.baseStart = x ? x.s : null; t.baseEnd = x ? x.e : null; t.variance = x && t.end != null ? t.end - x.e : 0; }
+    for (const t of S.phases) { const x = f.get(t.id); t.baseStart = x ? x.s : null; t.baseEnd = x ? x.e : null; }
+    for (const t of S.mss) { const x = k.get(t.id); t.baseStart = t.baseEnd = x ? x.s : null; t.variance = x && t.start != null ? t.start - x.s : 0; }
+  }
+  async function compareWith(id) {
+    S.blSel = id;
+    S.blItems = id ? await blItemsOf(id) : [];
+    await load(true);
+    const b = S.bls.find(x => x.id === id);
+    toast(b ? "Karşılaştırma: BL" + b.no + " (" + fmtDay(b.date) + ")" : "Karşılaştırma: son baseline");
   }
 
   function build() {
@@ -300,6 +323,14 @@ VIEWS.plan = { title: "Proje Planı", async mount(ctx) {
       rgroup("Göster",
         el("div", { class: "rcol" },
           rcheck("Baseline", showBase, on => { showBase = on; plan.setOption("showBaseline", on); }),
+          (() => {
+            const last = S.bls[S.bls.length - 1];
+            const s = el("select", { class: "rsel", "aria-label": "Karşılaştırılan baseline", title: "Gri çubuklar ve sapma bu baseline'a göre" },
+              el("option", { value: "", text: last ? "Son baseline (BL" + last.no + ")" : "Baseline yok" }),
+              ...S.bls.map(b => el("option", { value: b.id, text: "BL" + b.no + " · " + fmtShort(b.date), selected: b.id === S.blSel || null })));
+            s.addEventListener("change", () => compareWith(s.value).catch(e => { if (!(e instanceof SessionGone)) toast(e.message, "err"); }));
+            return s;
+          })(),
           rcheck("Kritik yol", showCrit, on => { showCrit = on; plan.setOption("showCritical", on); }),
           colMenu)),
       rgroup("Filtre",
@@ -648,12 +679,26 @@ VIEWS.plan = { title: "Proje Planı", async mount(ctx) {
   async function takeBaseline() {
     if (!guardPending()) return;
     const no = Number(v(S.proj, "P", "Baseline No")) || 0;
-    const ok = await confirmDialog("Baseline " + (no + 1) + " alınsın mı?",
-      "Tüm görevlerin, fazların ve kilometre taşlarının mevcut tarihleri Baseline " + (no + 1) + " olarak kaydedilir ve arşive yazılır. Sapma bundan sonra bu plana göre hesaplanır. Proje durumu 'Devam Ediyor' olur.", "Baseline al");
-    if (!ok) return;
+    const reason = await new Promise(res => {
+      const m = openModal({ title: "Baseline " + (no + 1) + " alınsın mı?", onClose: () => res(null) });
+      const ta = el("textarea", { class: "input", rows: "3", placeholder: no ? "ör. Tedarik gecikmesi nedeniyle API temini 30 gün kaydırıldı" : "ör. İlk plan onayı" });
+      const err = el("div", { class: "error-box", role: "alert" });
+      m.body.append(el("p", { class: "lead", text: "Görevlerin, fazların ve kilometre taşlarının mevcut tarihleri \"" + (v(S.proj, "P", "Proje Adı") || "") + " · BL" + (no + 1) + "\" olarak kaydedilir. Kalemler Baseline Kalemleri listesine yazılır; önceki baseline'lar olduğu gibi kalır." }),
+        no ? reqNote() : null, err, field("Gerekçe", ta, { required: !!no, hint: no ? "Yeniden baseline'da neden plan değiştiğini yazın (denetim izi)." : "İsteğe bağlı." }));
+      const ok = el("button", { class: "btn primary", type: "button", text: "Baseline " + (no + 1) + " al" });
+      m.foot.append(el("button", { class: "btn", type: "button", text: "Vazgeç", onclick: () => m.close() }), ok);
+      ok.addEventListener("click", () => {
+        if (no && !ta.value.trim()) { err.textContent = "Eksik zorunlu alan: Gerekçe"; ta.setAttribute("aria-invalid", "true"); ta.focus(); return; }
+        m.back.remove(); res(ta.value.trim());
+      });
+      ta.focus();
+    });
+    if (reason == null) return;
     setStatus(el("span", { class: "spinner sm" }), "Baseline alınıyor… (otomasyon çalışıyor)");
     try {
-      await updateRecord("P", PID, { [fid("P", "Durum")]: "Plan Onaylandı (Baseline)" });
+      const p0 = { [fid("P", "Durum")]: "Plan Onaylandı (Baseline)" };
+      if (reason) p0[fid("P", "Baseline Gerekçesi")] = reason;
+      await updateRecord("P", PID, p0);
       const t0 = Date.now();
       while (Date.now() - t0 < 180000 && S.alive) {
         await new Promise(r => setTimeout(r, 4000));
@@ -662,6 +707,7 @@ VIEWS.plan = { title: "Proje Planı", async mount(ctx) {
       }
       await new Promise(r => setTimeout(r, 4000));
       toast("Baseline " + (no + 1) + " alındı", "ok");
+      S.blSel = "";
       load(true);
     } catch (e) { if (!(e instanceof SessionGone)) toast(e.message, "err"); }
   }
@@ -703,7 +749,7 @@ VIEWS.plan = { title: "Proje Planı", async mount(ctx) {
     if (t.kind === "G") Object.assign(panes, { "Genel": () => taskGeneral(t, body), "Öncüller": () => depPane(t, body), "Notlar & Dokümanlar": () => notesPane(t, body), "Yorumlar": () => renderComments(body, "G", t.id), "Geçmiş": () => renderHistory(body, "G", t.id) });
     else if (t.kind === "K") Object.assign(panes, { "Genel": () => msGeneral(t, body), "Bağlı görevler": () => depPane(t, body), "Geçmiş": () => renderHistory(body, "K", t.id) });
     else if (t.kind === "F") Object.assign(panes, { "Genel": () => phaseGeneral(t, body), "Geçmiş": () => renderHistory(body, "F", t.id) });
-    else Object.assign(panes, { "Proje": () => projectGeneral(body), "Yorumlar": () => renderComments(body, "P", PID), "Geçmiş": () => renderHistory(body, "P", PID) });
+    else Object.assign(panes, { "Proje": () => projectGeneral(body), "Baseline'lar": () => baselinePane(body), "Yorumlar": () => renderComments(body, "P", PID), "Geçmiş": () => renderHistory(body, "P", PID) });
     const show = name => {
       tabs.querySelectorAll("button").forEach(b => b.setAttribute("aria-selected", b.textContent === name ? "true" : "false"));
       clear(body); panes[name]();
@@ -926,6 +972,33 @@ VIEWS.plan = { title: "Proje Planı", async mount(ctx) {
       try { await updateRecord("F", t.id, p); toast("Faz kaydedildi", "ok"); closeDetail(); softReload(); }
       catch (e) { if (!(e instanceof SessionGone)) err.textContent = e.message; btn.disabled = false; }
     });
+  }
+
+  async function baselinePane(body) {
+    if (!S.bls.length) { body.append(el("p", { class: "muted", text: "Bu projede henüz baseline alınmadı. Plan onaylanınca şeritten \"Baseline al\" deyin." })); return; }
+    stateLoading(body, "Baseline'lar yükleniyor…");
+    try {
+      const all = await fetchAll("B");
+      const cur = Math.max(...S.tasks.map(t => t.end).filter(x => x != null));
+      const list = el("div", { class: "bl-list" });
+      for (const b of [...S.bls].reverse()) {
+        const items = all.filter(r => linkIds(v(r, "B", "Baseline")).includes(b.id)).map(blItem);
+        const ends = items.filter(k => k.tur === "Görev" && k.e != null).map(k => k.e);
+        const end = ends.length ? Math.max(...ends) : null;
+        const cnt = t => items.filter(k => k.tur === t).length;
+        const diff = end != null && isFinite(cur) ? cur - end : null;
+        list.append(el("article", { class: "bl-card" + (b.id === S.blSel || (!S.blSel && b === S.bls[S.bls.length - 1]) ? " on" : "") },
+          el("div", { class: "bl-h" }, el("b", { text: "BL" + b.no }), el("span", { class: "muted", text: fmtDay(b.date) + (b.by ? " · " + userName(b.by) : "") })),
+          b.reason ? el("p", { class: "bl-r", text: b.reason }) : el("p", { class: "muted", text: "Gerekçe girilmemiş" }),
+          el("div", { class: "bl-s" },
+            el("span", { text: cnt("Görev") + " görev · " + cnt("Faz") + " faz · " + cnt("Kilometre Taşı") + " KT" }),
+            el("span", { text: "Planlanan bitiş " + fmtDay(end) }),
+            diff == null ? null : el("span", { class: diff > 0 ? "bad" : diff < 0 ? "good" : "", text: "Bugünkü plan " + (diff > 0 ? "+" : "") + diff + " gün" })),
+          el("button", { class: "btn sm", type: "button", text: b.id === S.blSel ? "Karşılaştırılıyor" : "Bununla karşılaştır", disabled: b.id === S.blSel || null,
+            onclick: () => { closeDetail(); compareWith(b.id).catch(e => { if (!(e instanceof SessionGone)) toast(e.message, "err"); }); } })));
+      }
+      clear(body).append(el("p", { class: "hint", text: "Her baseline, alındığı andaki planın fotoğrafıdır. Kalemler Workiom'da Baseline Kalemleri listesindedir." }), list);
+    } catch (e) { if (!(e instanceof SessionGone)) clear(body).append(el("p", { class: "hint", text: "Baseline'lar alınamadı: " + e.message })); }
   }
 
   function projectGeneral(body) { projectForm(S.proj, body, () => { closeDetail(); load(true); loadProjects(); }); }

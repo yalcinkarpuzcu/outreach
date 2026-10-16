@@ -61,6 +61,10 @@ const SCHEMA = {
     "t": 1,
     "ro": true
    },
+   "Baseline Gerekçesi": {
+    "id": 6027671,
+    "t": 0
+   },
    "Proje Açıklaması": {
     "id": 6025749,
     "t": 0
@@ -271,6 +275,11 @@ const SCHEMA = {
     "t": 1,
     "ro": true
    },
+   "Departman Yöneticisi": {
+    "id": 6026886,
+    "t": 6,
+    "ro": true
+   },
    "Açıklama": {
     "id": 6025769,
     "t": 0
@@ -435,7 +444,7 @@ const SCHEMA = {
  },
  "B": {
   "id": "dee3fde4-6bba-4c0e-9d71-d5570b795cea",
-  "name": "Baseline Arşivi",
+  "name": "Baseline Kalemleri",
   "f": {
    "Başlık": {
     "id": 6025795,
@@ -469,6 +478,78 @@ const SCHEMA = {
    "Görev": {
     "id": 6025889,
     "t": 5
+   },
+   "Baseline": {
+    "id": 6027672,
+    "t": 5
+   },
+   "Tür": {
+    "id": 6027673,
+    "t": 4,
+    "opts": [
+     "Görev",
+     "Faz",
+     "Kilometre Taşı"
+    ]
+   },
+   "Faz": {
+    "id": 6027674,
+    "t": 5
+   },
+   "Kilometre Taşı": {
+    "id": 6027675,
+    "t": 5
+   },
+   "Güncel Bitiş (Görev)": {
+    "id": 6027676,
+    "t": 2,
+    "ro": true
+   },
+   "Güncel Bitiş (Faz)": {
+    "id": 6027677,
+    "t": 2,
+    "ro": true
+   },
+   "Güncel Tarih (KT)": {
+    "id": 6027678,
+    "t": 2,
+    "ro": true
+   },
+   "Sapma (gün)": {
+    "id": 6027679,
+    "t": 1,
+    "ro": true
+   }
+  }
+ },
+ "BL": {
+  "id": "e27bd11b-3f72-4a97-92ba-e8e4cc89517e",
+  "name": "Baseline'lar",
+  "f": {
+   "Baseline": {
+    "id": 6027659,
+    "t": 0,
+    "req": true
+   },
+   "Proje": {
+    "id": 6027666,
+    "t": 5
+   },
+   "Baseline No": {
+    "id": 6027667,
+    "t": 1
+   },
+   "Baseline Tarihi": {
+    "id": 6027668,
+    "t": 2
+   },
+   "Alan": {
+    "id": 6027669,
+    "t": 6
+   },
+   "Gerekçe": {
+    "id": 6027670,
+    "t": 0
    }
   }
  },

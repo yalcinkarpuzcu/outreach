@@ -279,6 +279,19 @@ function blockDialog(t, open, wanted) {
   m.foot.append(el("button", { class: "btn primary", type: "button", text: "Tamam", onclick: () => m.close() }));
 }
 
+/* Baseline (Baseline'lar listesi) ve kalemleri (Baseline Kalemleri) */
+function blModel(r) {
+  return { id: r._id, no: Number(v(r, "BL", "Baseline No")) || 0, name: v(r, "BL", "Baseline") || "", date: toDay(v(r, "BL", "Baseline Tarihi")),
+    by: v(r, "BL", "Alan") || null, reason: v(r, "BL", "Gerekçe") || "" };
+}
+function blItem(r) {
+  return { tur: lbl(v(r, "B", "Tür")) || "Görev", gorev: linkIds(v(r, "B", "Görev"))[0] || null, faz: linkIds(v(r, "B", "Faz"))[0] || null,
+    kt: linkIds(v(r, "B", "Kilometre Taşı"))[0] || null, s: toDay(v(r, "B", "Planlanan Başlangıç")), e: toDay(v(r, "B", "Planlanan Bitiş")) };
+}
+async function blItemsOf(blId) {
+  return (await fetchAll("B")).filter(r => linkIds(v(r, "B", "Baseline")).includes(blId)).map(blItem);
+}
+
 /* Faz (Fazlar listesi) */
 function phaseModel(rec) {
   const g = n => v(rec, "F", n);

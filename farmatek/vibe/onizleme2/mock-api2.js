@@ -22,7 +22,7 @@
   const iso = day => new Date(day * 864e5 - 3 * 3600e3).toISOString().replace(".000", "");
   const dayOf = s => { if (!s) return null; const d = new Date(s); return Math.round(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 864e5); };
   const tday = () => { const d = new Date(); return Math.round(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 864e5); };
-  const KEYS = ["P", "F", "G", "K", "O", "B", "D", "S", "GK", "FK", "KK"];
+  const KEYS = ["P", "F", "G", "K", "O", "B", "BL", "D", "S", "GK", "FK", "KK"];
   const store = Object.fromEntries(KEYS.map(k => [k, []]));
   const keyOf = id => KEYS.find(k => SCHEMA[k].id === id);
   const lnk = (rec, l, nameField) => ({ _id: rec._id, label: rec[F(l, nameField)] });
@@ -115,12 +115,12 @@
   const t0 = tday();
   // demo 1: 140 gün önce başlamış, baseline alınmış, bazı görevler bitmiş/gecikmiş
   const [p1, g1] = makeProject("Calcium Carbonate 500 mg Film Tablet", "Yeni Ürün", t0 - 140, { urun: "Kalsiyum karbonat" });
-  Object.values(g1).forEach(r => { r[F("G", "Baseline Başlangıç")] = r[F("G", "Başlangıç")]; r[F("G", "Baseline Bitiş")] = r[F("G", "Bitiş")]; });
-  store.F.filter(f => f[F("F", "Proje")][0]._id === p1._id).forEach(f => { f[F("F", "Baseline Başlangıç")] = f[F("F", "Başlangıç")]; f[F("F", "Baseline Bitiş")] = f[F("F", "Bitiş")]; });
-  store.K.filter(k => k[F("K", "Proje")][0]._id === p1._id).forEach(k => { k[F("K", "Baseline Tarih")] = k[F("K", "Hedef Tarih")]; });
-  p1[F("P", "Baseline No")] = 1; p1[F("P", "Baseline Tarihi")] = iso(t0 - 138);
+  takeBL(p1, 1, t0 - 138, "İlk plan onayı");
   [2, 3, 5, 6, 7, 8, 4, 11].forEach(n => g1[n] && closeTask(g1[n]));
   [9, 10, 12, 13, 14].forEach(n => { const r = g1[n]; r[F("G", "Durum")] = opt("Devam Ediyor"); r[F("G", "% Tamamlanma")] = n === 9 ? 70 : 40; r[F("G", "Gerçekleşen Başlangıç")] = r[F("G", "Başlangıç")]; });
+  // ikinci baseline: tedarik gecikmesi sonrası yeniden plan (BE ve sonrası 20 gün ileri)
+  Object.values(g1).filter(r => r[F("G", "WBS No")] >= 26).forEach(r => { r[F("G", "Başlangıç")] = iso(dayOf(r[F("G", "Başlangıç")]) + 20); r[F("G", "Bitiş")] = iso(dayOf(r[F("G", "Bitiş")]) + 20); });
+  takeBL(p1, 2, t0 - 60, "BE çalışması merkezinin kapasitesi nedeniyle BE ve sonrası 20 gün kaydırıldı.");
   // 9 numarayı geciktir (bitişi geçti)
   g1[9][F("G", "Bitiş")] = iso(t0 - 6); g1[9][F("G", "Notlar")] = "Tedarikçiden COA bekleniyor.";
   g1[12][F("G", "Durum")] = opt("Onay Bekliyor"); g1[12][F("G", "Onay Gerekli")] = true; g1[12][F("G", "Onay Durumu")] = opt("Bekliyor"); g1[12][F("G", "% Tamamlanma")] = 100;
@@ -182,6 +182,25 @@
     return reached;
   }
 
+  /* A9 taklidi: Baseline kaydı + görev / faz / KT kalemleri */
+  function takeBL(p, no, day, reason) {
+    const pl = lnk(p, "P", "Proje Adı");
+    const bl = { _id: oid(), [F("BL", "Baseline")]: p[F("P", "Proje Adı")] + " · BL" + no, [F("BL", "Proje")]: [pl], [F("BL", "Baseline No")]: no,
+      [F("BL", "Baseline Tarihi")]: iso(day), [F("BL", "Alan")]: ME, [F("BL", "Gerekçe")]: reason || "" };
+    store.BL.push(bl);
+    const bll = lnk(bl, "BL", "Baseline");
+    const item = (tur, ad, extra, s, e) => store.B.push({ _id: oid(), [F("B", "Başlık")]: "BL" + no + " · " + ad, [F("B", "Baseline")]: [bll], [F("B", "Tür")]: opt(tur),
+      [F("B", "Proje")]: [pl], [F("B", "Baseline No")]: no, [F("B", "Baseline Tarihi")]: iso(day), [F("B", "Planlanan Başlangıç")]: s, [F("B", "Planlanan Bitiş")]: e, ...extra });
+    const of = (l) => store[l].filter(x => x[F(l, "Proje")]?.[0]?._id === p._id);
+    of("G").forEach(g => { g[F("G", "Baseline Başlangıç")] = g[F("G", "Başlangıç")]; g[F("G", "Baseline Bitiş")] = g[F("G", "Bitiş")];
+      item("Görev", g[F("G", "Görev Adı")], { [F("B", "Görev")]: [lnk(g, "G", "Görev Adı")] }, g[F("G", "Başlangıç")], g[F("G", "Bitiş")]); });
+    of("F").forEach(f => { f[F("F", "Baseline Başlangıç")] = f[F("F", "Başlangıç")]; f[F("F", "Baseline Bitiş")] = f[F("F", "Bitiş")];
+      item("Faz", f[F("F", "Faz")], { [F("B", "Faz")]: [lnk(f, "F", "Faz")] }, f[F("F", "Başlangıç")], f[F("F", "Bitiş")]); });
+    of("K").forEach(k => { k[F("K", "Baseline Tarih")] = k[F("K", "Hedef Tarih")];
+      item("Kilometre Taşı", k[F("K", "Kilometre Taşı")], { [F("B", "Kilometre Taşı")]: [lnk(k, "K", "Kilometre Taşı")] }, k[F("K", "Hedef Tarih")], k[F("K", "Hedef Tarih")]); });
+    p[F("P", "Baseline No")] = no; p[F("P", "Baseline Tarihi")] = iso(day);
+  }
+
   /* ── yazma: değer biçimi dönüşümü + otomasyon taklidi ─────────── */
   function toStored(l, fidStr, val) {
     const f = Object.values(SCHEMA[l].f).find(x => String(x.id) === fidStr);
@@ -224,11 +243,9 @@
     }
     if (l === "P" && F("P", "Durum") in payload && r[F("P", "Durum")].label === "Plan Onaylandı (Baseline)") {
       setTimeout(() => {
-        const pid = r._id, no = (Number(r[F("P", "Baseline No")]) || 0) + 1;
-        store.G.filter(g => g[F("G", "Proje")]?.[0]?._id === pid).forEach(g => { g[F("G", "Baseline Başlangıç")] = g[F("G", "Başlangıç")]; g[F("G", "Baseline Bitiş")] = g[F("G", "Bitiş")]; });
-        store.F.filter(g => g[F("F", "Proje")]?.[0]?._id === pid).forEach(g => { g[F("F", "Baseline Başlangıç")] = g[F("F", "Başlangıç")]; g[F("F", "Baseline Bitiş")] = g[F("F", "Bitiş")]; });
-        store.K.filter(g => g[F("K", "Proje")]?.[0]?._id === pid).forEach(g => { g[F("K", "Baseline Tarih")] = g[F("K", "Hedef Tarih")]; });
-        r[F("P", "Baseline No")] = no; r[F("P", "Baseline Tarihi")] = iso(tday()); r[F("P", "Durum")] = opt("Devam Ediyor");
+        const no = (Number(r[F("P", "Baseline No")]) || 0) + 1;
+        takeBL(r, no, tday(), r[F("P", "Baseline Gerekçesi")]);
+        r[F("P", "Baseline Gerekçesi")] = null; r[F("P", "Durum")] = opt("Devam Ediyor");
         notify(900001, "📌 Baseline alındı: " + r[F("P", "Proje Adı")], "P", r);
       }, 1500);
     }
