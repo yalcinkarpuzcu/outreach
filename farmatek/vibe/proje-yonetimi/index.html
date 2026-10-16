@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Proje Yönetimi</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app">
+    <header class="titlebar">
+      <div class="brand">
+        <svg viewBox="0 0 32 32" width="26" height="26" aria-hidden="true">
+          <rect x="2" y="2" width="28" height="28" rx="6" fill="#ffffff" fill-opacity=".14"/>
+          <rect x="7" y="9" width="10" height="3.2" rx="1.6" fill="#ffffff"/>
+          <rect x="11" y="14.4" width="13" height="3.2" rx="1.6" fill="#9fe3b5"/>
+          <rect x="15" y="19.8" width="8" height="3.2" rx="1.6" fill="#ffffff"/>
+          <path d="M25.5 18.6l2.4 2.4-2.4 2.4-2.4-2.4z" fill="#ffd66b"/>
+        </svg>
+        <span>Proje Yönetimi</span>
+      </div>
+      <label class="sr-only" for="proj-switch">Proje</label>
+      <select id="proj-switch" class="proj-switch"><option value="">Proje seçin…</option></select>
+      <div class="spacer"></div>
+      <button id="theme" class="tb-btn" type="button" aria-label="Tema"></button>
+      <div class="bell-wrap">
+        <button id="bell" class="tb-btn" type="button" aria-label="Bildirimler" aria-haspopup="true">
+          <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M6 17V11a6 6 0 0 1 12 0v6l2 2H4zM10 21h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span id="bell-n" class="badge" hidden>0</span>
+        </button>
+        <div id="bell-pop" class="bell-pop" hidden></div>
+      </div>
+      <div id="whoami" class="whoami"></div>
+    </header>
+
+    <nav id="tabs" class="tabs" aria-label="Ana menü">
+      <a href="#/portfoy" data-v="portfoy">Portföy</a>
+      <a href="#/plan" data-v="plan">Proje Planı</a>
+      <a href="#/gorevlerim" data-v="gorevlerim">Görevlerim</a>
+      <a href="#/onaylar" data-v="onaylar">Onaylar</a>
+      <a href="#/bildirimler" data-v="bildirimler">Bildirimler <span id="tab-bildirim-n" class="cnt" hidden>0</span></a>
+      <a href="#/kutuphane" data-v="kutuphane">Kütüphane</a>
+      <a href="#/gunluk" data-v="gunluk">Değişiklik Günlüğü</a>
+    </nav>
+    <div id="ribbon" class="ribbon" role="toolbar" aria-label="Komutlar"></div>
+
+    <main id="view" class="view">
+      <div class="state"><div class="spinner"></div><p>Yükleniyor…</p></div>
+    </main>
+    <footer id="status" class="statusbar"><span>Hazır</span></footer>
+  </div>
+
+  <script src="schema.js"></script>
+  <script src="core.js"></script>
+  <script src="app.js"></script>
+  <script src="gantt.js"></script>
+  <script src="plan.js"></script>
+  <script src="portfoy.js"></script>
+  <script src="gorevler.js"></script>
+  <script src="bildirimler.js"></script>
+  <script src="kutuphane.js"></script>
+  <script src="gunluk.js"></script>
+</body>
+</html>
