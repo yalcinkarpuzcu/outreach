@@ -296,3 +296,5 @@ Tasarımdan sapmalar ve canlı testte bulunanlar:
 **Uçtan uca test (canlı, `akis_testi.py`):** proje oluşturma → 44 kayıt + hiyerarşi + 37 öncül bağı (proje dışına sızan bağ: 0) · öncülü açık görevi başlatma → geri alındı · tamamla → ardıllar Başlayabilir · onaylı görevi doğrudan tamamla → Onay Bekliyor · red (gerekçeli) → Revizyon · tekrar onay → Tamamlandı + Onay Geçmişi'nde 2 satır · baseline → 44 görevde baseline + 44 arşiv satırı · bitiş +30 gün → sapma +29.
 
 **Rol atamaları yapılmadı** — roller kullanıcısız oluşturuldu; demo kullanıcıları Workiom > Ayarlar > Ekipler'den atanmalı.
+
+**Vibe app yayını (16.10.2026):** `arge-proje-merkezi` v1 yayında → https://farmatek.workiom.com/vibe/arge-proje-merkezi/ (yalnızca oturum açmış tenant kullanıcıları). Paket, Workiom arayüzünün kullandığı `VibeApps/Create` + `Publish` uç noktalarıyla bayt bayt yüklendi; geri indirilen artifact'teki 12 dosyanın hash'i kaynakla aynı. Not: platform, yakında gelecek "write-proxy" için yazma izin listesi (`SetPermissions`) tanımlanmasını öneriyor; şu an etkisiz, o özellik açılmadan önce Projeler ve Görevler listeleri izin listesine eklenmeli.
