@@ -337,7 +337,6 @@
   "automations": {
     "DNM-00a \u00b7 T\u00fcr kodu (yeni d\u00f6nem)": 94,
     "DNM-00b \u00b7 T\u00fcr kodu (t\u00fcr de\u011fi\u015fti)": 95,
-    "DNM-01 \u00b7 Y\u0131l aktif \u2192 t\u00fcm aktif \u00e7al\u0131\u015fanlara karne a\u00e7": 96,
     "DNM-02 \u00b7 \u00c7eyrek kapan\u0131\u015f\u0131 \u2192 aktif OKR'lar kapan\u0131\u015fa": 97,
     "DNM-03 \u00b7 Y\u0131l kapan\u0131\u015f\u0131 \u2192 aktif karneler de\u011ferlendirmeye": 98,
     "DNM-04 \u00b7 \u00c7eyrek bitimine 7 g\u00fcn \u2192 OKR sahiplerine hat\u0131rlatma": 99,
@@ -355,11 +354,12 @@
     "OKR-04 \u00b7 OKR rengi (her gece)": 111,
     "OKR-05 \u00b7 Kapan\u0131\u015f \u2192 puan \u00f6nerisi, KR takibi biter": 112,
     "OKR-06 \u00b7 Kapand\u0131 \u2192 puan kontrol\u00fc": 113,
-    "KR-01 \u00b7 KR a\u00e7\u0131ld\u0131 \u2192 kilometre ta\u015f\u0131 de\u011ferleri, sahip, takip": 114,
     "KR-02 \u00b7 G\u00fcven \u2264 4 \u2192 risk bildirimi": 115,
     "KR-03 \u00b7 Haftal\u0131k check-in hat\u0131rlatmas\u0131 (pazartesi 09:00)": 116,
     "CHK-01 \u00b7 Check-in \u2192 KR g\u00fcncel de\u011fer, g\u00fcven, tarih": 117,
-    "CHK-02 \u00b7 Engel bildirildi \u2192 KR sahibi": 118
+    "CHK-02 \u00b7 Engel bildirildi \u2192 KR sahibi": 118,
+    "DNM-01 \u00b7 Y\u0131l aktif \u2192 t\u00fcm aktif \u00e7al\u0131\u015fanlara karne a\u00e7": 119,
+    "KR-01 \u00b7 KR a\u00e7\u0131ld\u0131 \u2192 kilometre ta\u015f\u0131 de\u011ferleri, sahip, takip": 120
   },
   "reports": {
     "Karne \u00b7 A\u00e7\u0131k karneler": 211052,

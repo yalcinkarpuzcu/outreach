@@ -112,7 +112,9 @@ DNM = [
                 cond("{{Fiili Görev Durumu}} = 'Aktif Çalışan'", [
                     {"type": "create_record", "list": K, "fields": {
                         "Karne": "formula:Concat({{Dönem Adı}}, ' – ', {{loop:İsim}})",
-                        "Çalışan": "loop:_id", "Dönem": "trigger:_id"}}])],
+                        "Çalışan": "loop:_id", "Dönem": "trigger:_id",
+                        # durum alanının varsayılanı otomasyonla açılan kayda uygulanmaz
+                        "Durum": "Hedef Belirleme"}}])],
                  mx=500, app_id=IK_APP)])]),
     A("DNM-02", "Çeyrek kapanışı → aktif OKR'lar kapanışa", updated(D, "Durum"), [
         cond("{{Durum}} = 'Kapanış' and {{Tür Kodu}} = 2", [
@@ -258,7 +260,9 @@ KRS = [
              [upd({"Başlangıç Değeri": 0, "Hedef Değer": 1, "Güncel Değer": 0})]),
         cond("isBlank({{Güncel Değer}})", [upd({"Güncel Değer": "trigger:Başlangıç Değeri"})]),
         cond("isBlank({{Sahip}})", [upd({"Sahip": "trigger:Objective Sahibi"})]),
-        upd({"Takipte": 1}),
+        # yalnızca Aktif objective'e eklenen KR takibe girer; diğerlerini OKR-03 aktifleşince açar
+        find(O, [w("Key Result'lar", "trigger:_id")], [
+            cond("{{Durum}} = 'Aktif'", [upd({"Takipte": 1}, target="trigger")])], mx=1),
     ]),
     A("KR-02", "Güven ≤ 4 → risk bildirimi", updated(KR, "Güven (1–10)"), [
         cond("{{Güven (1–10)}} <= 4", [

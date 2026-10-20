@@ -514,8 +514,9 @@ Demo verisinde bildirim yalnızca tenant sahibine gitsin diye tüm yönetici/sah
 
 ### Doğrulama
 - **Excel ile birebir:** 2025 karnelerinde Excel'in A / B / C örnekleri girildi → KPI Skoru **63,10 / 85,91 / 70,05** (OPS_Dummy 01, Hakan Bulut, Defne Arslan).
-- **Canlı test edilen otomasyonlar:** CHK-01 (check-in → KR değeri, güven, tarih, giren), CHK-02, KPI-02 (KPI gerçekleşeni → bağlı KR), KRN-01 (yönetici + form türü İK'dan), KRN-02 (ağırlık hatasında geri alma), KRN-04 (form türüne göre yetkinlik formları: Müdür için 7), KRN-06 (kalibre grup → final), OKR-01 (seviye kodu, başarı eşiği, kişisel OKR → 2026 karnesi). Test kayıtları silindi.
-- **Test edilmedi:** onay aksiyonlarının onay/red dalları (KRN-02, OKR-02), DNM-01 (2027 açılınca 37 karne oluşturur), zamanlanmış otomasyonlar (KRN-05, OKR-04, KR-03 ilk gece / pazartesi çalışacak), DNM-04/05 zaman tetikleyicileri.
+- **Canlı test edilen otomasyonlar:** CHK-01 (check-in → KR değeri, güven, tarih, giren), CHK-02, KPI-02 (KPI gerçekleşeni → bağlı KR), KRN-01 (yönetici + form türü İK'dan), KRN-02 (ağırlık hatasında geri alma), KRN-04 (form türüne göre yetkinlik formları: Müdür için 7), KRN-06 (kalibre grup → final), OKR-01 (seviye kodu, başarı eşiği, kişisel OKR → 2026 karnesi)., KRN-02 onay → Aktif + Onay Tarihi + KRN-03 hedef kilidi (otomasyonun yaptığı durum değişikliği diğer otomasyonları tetikliyor) / red (gerekçe zorunlu) → Hedef Belirleme, OKR-02 KR < 2 → Taslak / onay → Aktif / red → Taslak, KR-01 (yalnızca Aktif objective'e eklenen KR Takipte = 1), OKR-03 (Taslak → Aktif olunca KR'lar takibe girer), DNM-01 (2027 Aktif → 37 aktif çalışana 20 sn içinde "Hedef Belirleme" durumunda karne; KRN-01 37'sinde form türü ve yöneticiyi doldurdu). Test kayıtları silindi, 2027 Planlama'ya geri alındı.
+- **Testte düzeltilenler:** DNM-01 karneyi Durum boş açıyordu (durum alanının varsayılanı otomasyonla açılan kayda uygulanmıyor) → Durum açıkça yazılıyor. KR-01 Takipte'yi koşulsuz 1 yapıyordu → Objective ters bağlantıyla bulunup Durum = Aktif ise 1. Bildirim adımları kullanıcı alanı boşsa atlanıyor (Workiom hesabı olmayan çalışanda "Kullanıcı bulunamadı" hatası oluşmaz).
+- **Test edilmedi:** zamanlanmış otomasyonlar (KRN-05, OKR-04, KR-03 ilk gece / pazartesi çalışacak), DNM-04/05 zaman tetikleyicileri.
 
 ### Tasarımdan farklar
 | Konu | Tasarım | Kurulan | Neden |
