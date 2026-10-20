@@ -1,7 +1,7 @@
 # Performans Yönetimi (KPI Karnesi + OKR) · Workiom Tasarım Dokümanı
 
 **Yeni app adı:** `Performans Yönetimi` · **Bağlandığı app:** müşterinin merkezi İK uygulaması (`İK`)
-**Durum:** Taslak, onay bekliyor. Onay gelmeden build yapılmayacak.
+**Durum:** Taslak, onay bekliyor (K1 ve K6 onaylandı, 20.10.2026). Onay gelmeden build yapılmayacak.
 **Kaynaklar:** `Performans Kartı Hesaplama – Örnek.xlsx` (müşterinin mevcut KPI karnesi), "Performans Kartı Hesaplama Metodolojisi" analiz dokümanı, "KPI + OKR Performans Sistemi – Workiom Tasarım Önerisi", müşteri görüşmesi (20.10.2026: kalan %10 = yetkinlik, OKR takibi isteniyor, çalışanlar merkezi İK app'inde).
 
 ---
@@ -15,7 +15,7 @@ Excel'deki KPI karnesi Workiom'a **birebir** taşınır ve yıllık performans p
 KPI ile OKR üç noktada bağlanır:
 1. **Objective → İyileştirdiği KPI**: OKR'ın hangi KPI'ı iyileştirmek için açıldığı (Perdoo modeli).
 2. **Key Result → Kaynak KPI**: KR'ın güncel değeri KPI'ın gerçekleşen değerinden otomatik akar.
-3. **Kişisel Objective → Karne**: OKR kapanış puanları karnede **bilgi olarak** görünür, **puana girmez** (karar K1).
+3. **Kişisel Objective → Karne**: OKR kapanış puanları karnede **bilgi olarak** görünür, **puana girmez** (K1, onaylandı 20.10.2026).
 
 Kapsam: 1 yeni app, 3 klasör, **10 liste**, İK app'ine **2 uygulamalar arası bağlantı hedefi**, **27 otomasyon**, 4 rol, 2 pano.
 
@@ -44,7 +44,7 @@ Farmatek ve İleri Acoustic kurulumlarında canlı testle doğrulanan kısıtlar
 ## 2. Veri modeli
 
 ```
-🏢 İK (mevcut merkezi app — dokunulacak tek yer: Çalışanlar'a 1 alan, karar K6)
+🏢 İK (mevcut merkezi app — dokunulacak tek yer: Çalışanlar'a 1 alan, K6 onaylandı)
    Çalışanlar ── Departman ⇢ Departmanlar
                  Yönetici (kullanıcı), Workiom Kullanıcısı (kullanıcı)
                  [+ Performans Form Türü ⇢ Performans Yönetimi.Form Türleri]   (önerilen)
@@ -117,7 +117,7 @@ Farmatek ve İleri Acoustic kurulumlarında canlı testle doğrulanan kısıtlar
 | Departman | bağlantı → İK.Departmanlar | Lookup, rapor kırılımı | Var sayıldı |
 | Ünvan | metin / bağlantı | Lookup | Var sayıldı |
 | Aktif / Çalışma Durumu | onay kutusu / seçim | Toplu karne açmada filtre (find'da seçim desteklenmediği için sayı göstergesi gerekebilir) | Teyit |
-| **Performans Form Türü** | bağlantı → Performans Yönetimi.Form Türleri | Karne açılınca otomatik dolar | **Önerilen yeni alan (K6)** |
+| **Performans Form Türü** | bağlantı → Performans Yönetimi.Form Türleri | Karne açılınca otomatik dolar | **Eklenecek (K6 onaylandı)** |
 
 | İK.Departmanlar alanı | Tip | Kullanımı |
 |---|---|---|
@@ -461,7 +461,7 @@ Teknik karşılık: rol başına liste izinleri (erişim, ekleme, silme, toplu g
 
 ## 10. Build planı (onaydan sonra)
 
-1. İK app'inin listelerini ve alan ID'lerini okuma; eksik alanları müşteriyle netleştirme (Workiom Kullanıcısı, Yönetici tipi, Performans Form Türü).
+1. İK app'inin listelerini ve alan ID'lerini okuma; Workiom Kullanıcısı ve Yönetici alanlarının kullanıcı tipinde olduğunu doğrulama. Form Türleri listesi kurulduktan sonra **İK.Çalışanlar'a "Performans Form Türü" alanı eklenir** (uygulamalar arası bağlantı → Form Türleri) ve mevcut çalışanlara form türü atanır (müşterinin vereceği ünvan → form türü eşleşmesiyle toplu güncelleme).
 2. `python main.py build apps/performans_yonetimi.py`: app, 3 klasör, 10 liste, düz alanlar, uygulamalar arası bağlantılar, görünümler, formlar.
 3. `python apps/upgrade_performans_computed.py`: formüller → ters bağlantılar + rollup/sayım → lookup'lar.
 4. `python apps/performans_seed.py`: dönemler, form türleri, hedef türleri, yetkinlikler; Excel'deki 3 örnek çalışanın karnesi ve 27 hedefi.
@@ -477,14 +477,16 @@ Teknik karşılık: rol başına liste izinleri (erişim, ekleme, silme, toplu g
 
 | # | Karar | Önerim |
 |---|---|---|
-| **K1** | OKR performans puanına girsin mi? | **Girmesin**, karnede bilgi olarak görünsün; yetkinliklerde "OKR Davranışı" kalemi. (Alternatif: Form Türleri'ne OKR Oranı eklenir, Toplam Puan'a OKR Ortalaması × oran girer.) |
+| **K1** | OKR performans puanına girsin mi? | ✅ **Karar: Girmeyecek.** Karnede bilgi olarak görünür; yetkinliklerde "OKR Davranışı" kalemi. |
 | K2 | OKR seviyeleri | İlk yıl Şirket + Departman; Kişi opsiyonel |
 | K3 | KPI gerçekleşenini kim girer? | Çalışan girer, yönetici görür. (Alternatif: yalnızca yönetici / veri sahibi) |
 | K4 | Yetkinlik listesi ve ölçeği | Müşteriden; 1–5 varsayıldı |
 | K5 | Takvim ve check-in sıklığı | Takvim yılı, 4 çeyrek, haftalık check-in |
-| **K6** | İK.Çalışanlar'a "Performans Form Türü" alanı eklensin mi? | **Evet** (karne açılınca otomatik dolar). Hayırsa İK karne başına seçer. |
+| **K6** | İK.Çalışanlar'a "Performans Form Türü" alanı eklensin mi? | ✅ **Karar: Eklenecek.** Karne açılınca KRN-01 form türünü buradan otomatik doldurur. |
 | K7 | Karneler toplu mu açılsın (DNM-01) yoksa İK tek tek mi açsın? | Toplu (yıl Aktif olunca) |
 | K8 | Çalışan puanını / grubunu ne zaman görsün? | Karne Tamamlandı olduktan sonra (kalibrasyon bitince) |
 | K9 | Check-in düzeltme süresi | 24 saat, sonra salt okunur |
+
+**Müşteriden beklenen veri:** ünvan → form türü eşleşme listesi (İK.Çalışanlar'daki yeni alanı doldurmak için).
 
 **İlk analiz dokümanından açık kalanlar:** sıfır değerlerin puanlanması (soru 3), performans grubu sınırları (soru 7; artık Toplam Puan üzerinden). Kalan %10'un yetkinlik olduğu cevaplandı.
