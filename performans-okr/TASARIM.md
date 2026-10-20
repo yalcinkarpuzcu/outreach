@@ -542,3 +542,22 @@ Demo verisinde bildirim yalnızca tenant sahibine gitsin diye tüm yönetici/sah
 
 ### Kurulum dosyaları
 `performans-okr/builder/` — `apps/performans_yonetimi.py` (spec) → `performans_fix_primary.py` → `performans_computed.py` → `performans_seed.py` → `performans_automations.py` → `performans_roles.py` → `performans_reports.py`. Ayrıntı: `builder/README.md`.
+
+## 13. Geri Bildirim listesi ve vibe app (20.10.2026)
+
+**Geri Bildirim** (OKR klasörü, `apps/performans_feedback.py`): Tür (Takdir / Gelişim Önerisi / Geri Bildirim Talebi), Mesaj, Yanıt, Durum, Görünürlük (Herkese Açık / Özel), Tarih, Kimden / Kime → İK.Özlük Bilgileri, İlgili Objective, Yetkinlik (takdir rozeti); lookup'lar: Kimden Hesabı, Kime Hesabı, Kime Yöneticisi. 26 demo kaydı.
+
+| # | Tetikleyici | Aksiyon |
+|---|---|---|
+| **GB-01** | Geri bildirim oluşturuldu | Tarih boşsa bugün · Gönderen = oluşturan · Talep ise Durum = Yanıt Bekliyor, değilse Gönderildi · Kime Hesabı'na bildirim |
+| **GB-02** | Yanıt güncellendi (Talep) | Durum = Yanıtlandı · Kimden Hesabı'na bildirim |
+
+Canlı test edildi (talep → bildirim, yanıt → Yanıtlandı + bildirim).
+
+**Vibe app** `performans-okr` → https://faydasicok.workiom.com/vibe/performans-okr (kaynak: `vibe/performans-okr/`). Üstte persona seçici (Çalışan / Yönetici / İK) ve "kim olarak bakıyorum"; görünürlük demo içindir, gerçek erişimi Workiom rolleri belirler.
+- **Çalışan:** özet + yapılacaklar, karnem (ağırlık göstergeleri, gerçekleşen girişi, hedef ekle / onaya gönder), OKR'larım (bugün beklenen değer + sapma ile check-in, haftalık toplu güncelleme, yeni OKR), geri bildirim (takdir duvarı, rozetler, talep / yanıt).
+- **Yönetici:** ekip tablosu + benimseme kutucukları, karne / OKR onayı (AutomationApprovalRequest Approve / Reject), check-in akışı (takdir, yorum), takım OKR'ları (ekibe OKR atama, departman KR check-in'i), yetkinlik puanlama; "kendi hedeflerim" ile çalışan görünümü.
+- **İK:** dönem durumu yönetimi (otomasyon etkisi gösterilerek), faz çubuğu, departman × aşama ısı haritası, "kimde bekliyor" + hatırlatma, OKR çeyreği check-in uyumu, kalibrasyon (sürükle-bırak, hedef dağılım; kalibrasyon aşamasında değilse senaryo modu, kaydedilmez), şirket skoru, parametreler (form türü oranları, yetkinlik aktifliği).
+- Ekip = yöneticinin biriminin alt birimlerindeki çalışanlar (Organizasyon.Üst Birimi). Arayüz araştırması: Lattice, Perdoo, Tability, 15Five, Leapsome, Culture Amp, Profit.co, Quantive.
+- Yazma izin listesi 10 liste için tanımlı; API yalnızca oluşturma iznini açıyor (canUpdate = 0), yazma proxy'si devreye girince güncelleme izni Workiom tarafında açılmalı.
+- Demo için: Zeynep / İrem / Furkan 2026 karneleri Yönetici Onayında, Tolga / Pınar / Gizem Hedef Belirleme; Onayda bekleyen iki OKR yeniden gönderildi (gerçek onay isteği oluştu).
