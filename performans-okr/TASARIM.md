@@ -490,3 +490,54 @@ Teknik karşılık: rol başına liste izinleri (erişim, ekleme, silme, toplu g
 **Müşteriden beklenen veri:** ünvan → form türü eşleşme listesi (İK.Çalışanlar'daki yeni alanı doldurmak için).
 
 **İlk analiz dokümanından açık kalanlar:** sıfır değerlerin puanlanması (soru 3), performans grubu sınırları (soru 7; artık Toplam Puan üzerinden). Kalan %10'un yetkinlik olduğu cevaplandı.
+
+---
+
+## 12. Kurulum sonrası notlar (as-built, 20.10.2026)
+
+**Tenant:** `faydasicok` · **App:** [`Performans Yönetimi`](https://faydasicok.workiom.com/app/apps/11c4b539-f3f5-41e0-a4e5-82b5cd906840) · **İK app:** `İnsan Kaynakları`
+
+**Kurulu:** 3 klasör, 10 liste, 12 üst-alt ilişki (ters bağlantılı), 25 lookup, 18 formül, 16 rollup/sayım, 25 otomasyon, 4 rol, 15 pano widget'ı.
+**Demo verisi:** İK'ya 30 yeni çalışan (toplam 37 aktif) · 8 dönem · 3 form türü · 3 hedef türü · 8 yetkinlik · 52 karne (2025: 15 tamamlanmış, 2026: 37) · 340 KPI hedefi · 94 yetkinlik değerlendirmesi · 28 Objective (2026-Ç3 kapanmış, 2026-Ç4 aktif; şirket / departman / kişi) · 66 KR · 223 check-in.
+
+### İK eşlemesi (tasarımdaki genel adların karşılığı)
+| Tasarım | İK app'te |
+|---|---|
+| İK.Çalışanlar | **Özlük Bilgileri** (birincil: İsim) |
+| İK.Departmanlar | **Organizasyon** (pozisyon bazlı birim ağacı: CEO, CTO, Yazılım Müdürü …) |
+| Workiom Kullanıcısı | Özlük Bilgileri · **Workiom Hesabı** |
+| Yönetici | Özlük Bilgileri · **Birim Yöneticisi** (kullanıcı) |
+| Departman Yöneticisi | Organizasyon · **Birim Yöneticisi Hesabı** |
+| Performans Form Türü | Özlük Bilgileri'ne eklendi (K6) |
+
+Demo verisinde bildirim yalnızca tenant sahibine gitsin diye tüm yönetici/sahip alanları Yalçın'dır; "Benim karnem" demosu için Gülşen Yılmaz'ın Workiom Hesabı = Yalçın.
+
+### Doğrulama
+- **Excel ile birebir:** 2025 karnelerinde Excel'in A / B / C örnekleri girildi → KPI Skoru **63,10 / 85,91 / 70,05** (OPS_Dummy 01, Hakan Bulut, Defne Arslan).
+- **Canlı test edilen otomasyonlar:** CHK-01 (check-in → KR değeri, güven, tarih, giren), CHK-02, KPI-02 (KPI gerçekleşeni → bağlı KR), KRN-01 (yönetici + form türü İK'dan), KRN-02 (ağırlık hatasında geri alma), KRN-04 (form türüne göre yetkinlik formları: Müdür için 7), KRN-06 (kalibre grup → final), OKR-01 (seviye kodu, başarı eşiği, kişisel OKR → 2026 karnesi). Test kayıtları silindi.
+- **Test edilmedi:** onay aksiyonlarının onay/red dalları (KRN-02, OKR-02), DNM-01 (2027 açılınca 37 karne oluşturur), zamanlanmış otomasyonlar (KRN-05, OKR-04, KR-03 ilk gece / pazartesi çalışacak), DNM-04/05 zaman tetikleyicileri.
+
+### Tasarımdan farklar
+| Konu | Tasarım | Kurulan | Neden |
+|---|---|---|---|
+| Gerçekleşme | Gerçekleşme Oranı (0–1) | **Gerçekleşme (%)** + ölçekli formüller | Workiom formülünde **bölme sonucu 3 ondalığa yuvarlanıyor** (540/590 → 0,915). Oran 100.000 ile ölçeklendi, eşikler bu ölçekte yazıldı; Excel ile birebir. |
+| Yönelim | Yön Kodu (gizli sayı) + KPI-01 | Formül seçim alanını doğrudan okuyor (`{{Hedef Yönelimi=Azalan}}`) | Seçim karşılaştırması formülde çalışıyor; alan ve otomasyon gereksiz. |
+| OKR rengi | İlerleme ≥ 0,7 / ≥ 0,4 | Aktif: **İlerleme − Beklenen İlerleme** ≥ −0,05 yeşil, ≥ −0,15 sarı · Kapanmış: 0,7 / 0,4 | Çeyrek ortasında ham ilerleme her şeyi kırmızı gösteriyordu. Beklenen İlerleme = geçen gün / çeyrek günü (Objective'e 2 lookup + 2 formül eklendi). |
+| KRN-05, OKR-04 | Alan değişince | **Her gece** (01:00 / 01:10 UTC) | Formül/rollup değişimi kayıt güncelleme tetikleyicisi üretmiyor. |
+| KR-03 | pazartesi 09:00 | `0 6 * * 1` (UTC = 09:00 TR) | Sayı eşitliği filtresinde operatör 0 kullanılıyor. |
+| KRN-07 | Karne zaman tetikleyicisi | **DNM-05** (Dönemler · Hedef Giriş Son Tarihi − 3 gün) | Tarih, karnede değil dönemde. |
+| DNM-00 | Tek otomasyon | 00a (oluşturuldu) + 00b (Tür değişti) | |
+| KPI-03, YTK-01 | Otomasyon | Kurulmadı → yetki (Kilitli) ve form validasyonu ile | Kural yetkiyle zaten sağlanıyor. |
+| KRN-04 filtresi | "içerir" | Çoklu bağlantıda **"eşittir"** | `contains` sonuç döndürmüyor; `equals` çoklu bağlantıda üyelik kontrolü yapıyor. |
+| Yetki filtresi | Karne üzerinden | KPI Hedefleri ve Yetkinlik Değ.'de **Karne Sahibi / Karne Yöneticisi** lookup'ları | "Kendim" kayıt filtresi listenin kendi kullanıcı alanında çalışır. |
+| Red Notu | Onay redinde doldurulur | Alan var, otomatik dolmuyor | Ret gerekçesi onay kaydında kalıyor; alana yazılamıyor. |
+
+### Arayüzden tamamlanacaklar
+1. **Koşullu yetki grupları:** KPI Hedefleri'nde *Kilitli = 1* iken Hedef / Tür / Yönelim / Ağırlık / Hedeflenen salt okunur (Çalışan, Yönetici); Objective'de *Sahip = ben* → düzenler. API'de kurulmadı.
+2. **Rollere kullanıcı atama:** 4 rol kullanıcısız açıldı (Performans – İK / Üst Yönetim / Yönetici / Çalışan). Alan izin kodları (0 görmez, 1 salt okunur, 2 düzenler) tenant'taki mevcut rolden çıkarıldı; arayüzde bir kez kontrol edilmeli.
+3. **Formlar ve kayıt düzeni:** Karne formunda Hedefler / Yetkinlik / OKR / Kalibrasyon sekmeleri, Haftalık Check-in formu, Yeni OKR formu (KR alt tablosu).
+4. **Validasyonlar:** Hedef Ağırlığı 0–100, Güven 1–10, Yetkinlik Puanı 1–5, Seviye'ye göre zorunlu Departman / Sahip Çalışan.
+5. **OKR Ağacı** (Org Chart görünümü, Üst Objective) ve **Objective takvimi** (Timeline) görünümleri.
+
+### Kurulum dosyaları
+`performans-okr/builder/` — `apps/performans_yonetimi.py` (spec) → `performans_fix_primary.py` → `performans_computed.py` → `performans_seed.py` → `performans_automations.py` → `performans_roles.py` → `performans_reports.py`. Ayrıntı: `builder/README.md`.
