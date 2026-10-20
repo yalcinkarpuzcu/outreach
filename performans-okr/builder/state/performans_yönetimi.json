@@ -332,6 +332,36 @@
       "views": {},
       "forms": {},
       "layouts": {}
+    },
+    "Geri Bildirim": {
+      "id": "fdd846ae-03bd-4240-a9f4-32b8b52b1530",
+      "fields": {
+        "Son Aktivite Tarihi": 6038921,
+        "Son De\u011fi\u015ftirme Tarihi": 6038920,
+        "Son De\u011fi\u015ftiren": 6038919,
+        "Olu\u015fturulma Tarihi": 6038918,
+        "Olu\u015fturan": 6038917,
+        "Ad": 6038915,
+        "\u0130zleyiciler": 6038916,
+        "Geri Bildirim": 6038922,
+        "T\u00fcr": 6038923,
+        "Mesaj": 6038924,
+        "Yan\u0131t": 6038925,
+        "Durum": 6038926,
+        "G\u00f6r\u00fcn\u00fcrl\u00fck": 6038927,
+        "Tarih": 6038928,
+        "G\u00f6nderen (kullan\u0131c\u0131)": 6038929,
+        "Kimden": 6038930,
+        "Kime": 6038931,
+        "\u0130lgili Objective": 6038932,
+        "Yetkinlik": 6038933
+      },
+      "views": {
+        "T\u00fcm Geri Bildirimler": 881767,
+        "T\u00fcre G\u00f6re": 881768
+      },
+      "forms": {},
+      "layouts": {}
     }
   },
   "automations": {
@@ -359,7 +389,9 @@
     "CHK-01 \u00b7 Check-in \u2192 KR g\u00fcncel de\u011fer, g\u00fcven, tarih": 117,
     "CHK-02 \u00b7 Engel bildirildi \u2192 KR sahibi": 118,
     "DNM-01 \u00b7 Y\u0131l aktif \u2192 t\u00fcm aktif \u00e7al\u0131\u015fanlara karne a\u00e7": 119,
-    "KR-01 \u00b7 KR a\u00e7\u0131ld\u0131 \u2192 kilometre ta\u015f\u0131 de\u011ferleri, sahip, takip": 120
+    "KR-01 \u00b7 KR a\u00e7\u0131ld\u0131 \u2192 kilometre ta\u015f\u0131 de\u011ferleri, sahip, takip": 120,
+    "GB-01 \u00b7 Geri bildirim \u2192 tarih, g\u00f6nderen, al\u0131c\u0131ya bildirim": 121,
+    "GB-02 \u00b7 Talep yan\u0131tland\u0131 \u2192 durum, talep edene bildirim": 122
   },
   "reports": {
     "Karne \u00b7 A\u00e7\u0131k karneler": 211052,

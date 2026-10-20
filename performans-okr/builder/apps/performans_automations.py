@@ -291,7 +291,29 @@ CHK = [
     ]),
 ]
 
-ALL = DNM + KRN + KPI + OKR + KRS + CHK
+# ═══ Geri Bildirim ════════════════════════════════════════════════════════════
+G = "Geri Bildirim"
+GBL = [
+    A("GB-01", "Geri bildirim → tarih, gönderen, alıcıya bildirim", created(G), [
+        cond("isBlank({{Tarih}})", [upd({"Tarih": TODAY})]),
+        upd({"Gönderen (kullanıcı)": "trigger:Oluşturan"}),
+        cond("{{Tür}} = 'Geri Bildirim Talebi'", [
+            upd({"Durum": "Yanıt Bekliyor"}),
+            nf("Kime Hesabı", "{{Geri Bildirim}}: senden geri bildirim isteniyor. {{Mesaj}}"),
+        ], [
+            upd({"Durum": "Gönderildi"}),
+            nf("Kime Hesabı", "{{Geri Bildirim}}: {{Mesaj}}"),
+        ]),
+    ]),
+    A("GB-02", "Talep yanıtlandı → durum, talep edene bildirim", updated(G, "Yanıt"), [
+        cond("isNotBlank({{Yanıt}}) and {{Tür}} = 'Geri Bildirim Talebi'", [
+            upd({"Durum": "Yanıtlandı"}),
+            nf("Kimden Hesabı", "{{Geri Bildirim}}: geri bildirim talebin yanıtlandı. {{Yanıt}}"),
+        ]),
+    ]),
+]
+
+ALL = DNM + KRN + KPI + OKR + KRS + CHK + GBL
 
 if __name__ == "__main__":
     only = sys.argv[1:]
