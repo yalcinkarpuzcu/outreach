@@ -78,12 +78,13 @@ def w(field, value, op="equals"):
 
 
 def nf(field, msg):
-    return {"type": "notify", "to_field": field, "message": msg}
+    """Kullanıcı alanı boşsa bildirim atlanır (boş alana bildirim "Kullanıcı bulunamadı" hatası üretir)."""
+    return cond("isNotBlank({{%s}})" % field, [{"type": "notify", "to_field": field, "message": msg}])
 
 
 def nl(field, msg):
-    """Döngüdeki kaydın kullanıcı alanına bildirim."""
-    return {"type": "notify", "to_loop_field": field, "message": msg}
+    """Döngüdeki kaydın kullanıcı alanına bildirim (alan boşsa atlanır)."""
+    return cond("isNotBlank({{%s}})" % field, [{"type": "notify", "to_loop_field": field, "message": msg}])
 
 
 def A(code, name, trigger, actions):
