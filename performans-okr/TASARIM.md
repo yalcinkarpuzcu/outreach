@@ -561,3 +561,19 @@ Canlı test edildi (talep → bildirim, yanıt → Yanıtlandı + bildirim).
 - Ekip = yöneticinin biriminin alt birimlerindeki çalışanlar (Organizasyon.Üst Birimi). Arayüz araştırması: Lattice, Perdoo, Tability, 15Five, Leapsome, Culture Amp, Profit.co, Quantive.
 - Yazma izin listesi 10 liste için tanımlı; API yalnızca oluşturma iznini açıyor (canUpdate = 0), yazma proxy'si devreye girince güncelleme izni Workiom tarafında açılmalı.
 - Demo için: Zeynep / İrem / Furkan 2026 karneleri Yönetici Onayında, Tolga / Pınar / Gizem Hedef Belirleme; Onayda bekleyen iki OKR yeniden gönderildi (gerçek onay isteği oluştu).
+
+## 14. SuccessFactors görünümlü ikinci vibe app (`performans-sf`)
+
+- Adres: https://faydasicok.workiom.com/vibe/performans-sf (v1, yayında). Kaynak: `vibe/performans-sf/`.
+- Veri katmanı, otomasyonlar ve yazma izinleri `performans-okr` ile aynı. Yalnızca arayüz değişti.
+- SAP Horizon düzeni, Hasçelik logosu ve renkleri (lacivert #114285, kırmızı #cf112d):
+  - Kabuk çubuğu: logo, modül menüsü (Ana Sayfa ▾), eylem/kişi arama, görünüm seçici, bildirim zili, avatar.
+  - Sarı "Proxy" şeridi: hangi kişi olarak bakıldığını gösterir.
+- Her persona için bir ana sayfa var. Ana sayfada karşılama alanı, hızlı eylemler, "Sizin İçin Bugün" iş kartları ve sayılı kutucuklar bulunur.
+- Modüller, persona ve SF karşılıkları:
+
+  | Persona | Modüller (SF adlarıyla) |
+  |---|---|
+  | Çalışan | Performans Formu, Hedefler, Sürekli Performans |
+  | Yönetici | Ekibim, Onaylar, Check-in Akışı, Takım Hedefleri, Yetkinlik Değerlendirmesi |
+  | İK | Performans Döngüleri, Hedef Yönetimi, Kalibrasyon, Şirket Skoru, Yönetici Merkezi |

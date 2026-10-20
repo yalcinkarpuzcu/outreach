@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Performans ve Hedefler</title>
+<link rel="stylesheet" href="styles.css">
+<script src="app.js" defer></script>
+<script src="employee.js" defer></script>
+<script src="manager.js" defer></script>
+<script src="hr.js" defer></script>
+</head>
+<body>
+<header class="shell">
+  <div class="shell-left">
+    <img class="logo" src="logo.png" alt="Hasçelik" width="160" height="32">
+    <div class="modmenu">
+      <button id="modbtn" class="modbtn" aria-haspopup="menu" aria-expanded="false"><span id="modlabel">Ana Sayfa</span><span class="caret" aria-hidden="true"></span></button>
+      <div class="popover" id="modpop" role="menu" hidden></div>
+    </div>
+  </div>
+  <div class="shell-search" role="search">
+    <span class="ic-search" aria-hidden="true"></span>
+    <input id="search" type="search" placeholder="Eylem veya kişi arayın" aria-label="Eylem veya kişi arayın" autocomplete="off">
+    <div class="popover search-pop" id="searchpop" hidden></div>
+  </div>
+  <div class="shell-right">
+    <div class="persona" role="tablist" aria-label="Görünüm">
+      <button role="tab" data-persona="employee">Çalışan</button>
+      <button role="tab" data-persona="manager">Yönetici</button>
+      <button role="tab" data-persona="hr">İK Yöneticisi</button>
+    </div>
+    <button class="shell-btn" id="bell" aria-label="Yapılacaklar"><span class="ic-bell" aria-hidden="true"></span><span class="badge" id="bellcount" hidden></span></button>
+    <span id="meavatar"></span>
+  </div>
+</header>
+<div class="proxy">
+  <span class="proxy-ic" aria-hidden="true"></span>
+  <label for="who">Şu kişi olarak görüntüleniyor (Proxy):</label>
+  <select id="who"></select>
+</div>
+<main id="main" tabindex="-1">
+  <div class="loading"><span class="spinner"></span><span>Workiom verisi yükleniyor…</span></div>
+</main>
+<aside class="drawer" id="drawer" aria-hidden="true">
+  <div class="drawer-panel" role="dialog" aria-modal="true" aria-labelledby="drawer-title">
+    <header><h2 id="drawer-title"></h2><button class="icon-btn" id="drawer-close" aria-label="Kapat">✕</button></header>
+    <div class="drawer-body" id="drawer-body"></div>
+    <footer class="drawer-foot" id="drawer-foot"></footer>
+  </div>
+</aside>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+</body>
+</html>
