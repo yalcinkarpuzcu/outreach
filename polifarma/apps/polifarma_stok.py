@@ -412,7 +412,7 @@ SPEC = {
             "actions": [
                 {
                     "type": "condition",
-                    "if":   "isNotBlank({{Çıkış Miktarı}}) and {{Lot Durumu}} != 'Onaylı'",
+                    "if":   "{{Çıkış Miktarı}} > 0 and {{Lot Durumu}} != 'Onaylı' and isNotBlank({{Yapan Kişi}})",
                     "then": [
                         {"type": "notify", "to_field": "Yapan Kişi",
                          "message": "UYARI: {{Lot}} lotu onaylı değil ({{Lot Durumu}}). Çıkış hareketi #{{Hareket No}} geçersiz — stok sorumlusuyla görüşün."},
@@ -432,7 +432,7 @@ SPEC = {
                         {
                             "type": "approval",
                             "title":    "Malzeme / Numune Talebi",
-                            "subtitle": "{{Talep Eden}} — {{Malzeme}}{{Numune}} — {{İstenen Miktar}} — Proje: {{İlgili Proje}}",
+                            "subtitle": "Talep #{{Talep No}} ({{Talep Tipi}}) — {{Talep Eden}} — {{İstenen Miktar}} — Proje: {{İlgili Proje}}",
                             "approver": "field:Onaylayıcı (Stok Sorumlusu)",
                             "timeout_days": 2,
                             "require_rejection_message": True,
@@ -459,12 +459,12 @@ SPEC = {
                                     ],
                                 },
                                 {"type": "notify", "to_field": "Talep Eden",
-                                 "message": "Talebiniz onaylandı: {{Malzeme}}{{Numune}} — {{İstenen Miktar}}"},
+                                 "message": "Talebiniz onaylandı: Talep #{{Talep No}} ({{Talep Tipi}}) — {{İstenen Miktar}}"},
                             ],
                             "on_reject": [
                                 {"type": "update_record", "fields": {"Status": "Reddedildi"}},
                                 {"type": "notify", "to_field": "Talep Eden",
-                                 "message": "Talebiniz reddedildi: {{Malzeme}}{{Numune}} — {{İstenen Miktar}}"},
+                                 "message": "Talebiniz reddedildi: Talep #{{Talep No}} ({{Talep Tipi}}) — {{İstenen Miktar}}"},
                             ],
                         },
                     ],

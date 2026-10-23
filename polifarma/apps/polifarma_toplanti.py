@@ -302,7 +302,7 @@ SPEC = {
             "trigger": {"type": "record_created", "list": "Aksiyonlar"},
             "actions": [
                 {"type": "notify", "to_field": "Sorumlu",
-                 "message": "Size yeni aksiyon atandı: {{Aksiyon}} — Son tarih: {{Son Tarih}} — Toplantı: {{Toplantı}}"},
+                 "message": "Size yeni aksiyon atandı: {{Aksiyon}} — Son tarih: {{Son Tarih}}"},
             ],
         },
         # FR-3.4 — Son tarihe 2 gün kala
