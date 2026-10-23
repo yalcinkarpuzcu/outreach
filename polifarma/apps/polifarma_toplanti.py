@@ -186,6 +186,9 @@ SPEC = {
                          "filter": {"field": "Status", "value": ["Açık", "Devam Ediyor", "Gecikmede"]}},
                         {"name": "Geciken Aksiyonlar", "type": V.GRID,
                          "filter": {"field": "Status", "value": "Gecikmede"}},
+                        # Otomasyon döngüsü çoklu değerli filtrenin yalnızca ilk değerini uyguluyor → tek değerli "değil" filtresi
+                        {"name": "Tamamlanmamış Aksiyonlar", "type": V.GRID,
+                         "filter": {"field": "Status", "op": "not_in", "value": ["Tamamlandı"]}},
                         # FR-3.7 "Bana Atanan Açık Aksiyonlar" → UI'da "Sorumlu = Ben" filtresiyle (bkz. README)
                     ],
                     "layout": {
@@ -259,7 +262,7 @@ SPEC = {
                         {
                             "type":        "loop",
                             "list":        "Aksiyonlar",
-                            "view":        "Açık Aksiyonlar",
+                            "view":        "Tamamlanmamış Aksiyonlar",
                             "sort_by":     "Son Tarih ASC",
                             "max_records": 50,
                             "actions": [
