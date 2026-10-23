@@ -5,17 +5,25 @@ Kaynak: *Polifarma Workiom PoC — Proje ve İster Analizi* (23.10.2026). Bu kla
 
 ## Dosyalar ve kurulum sırası
 
+**Ön koşul — builder yaması:** `builder_patch/associated_link.diff` builder'a uygulanmalı (`patch -p1 < associated_link.diff`, builder kökünde). Workiom bir back-link'i mevcut LINK alanıyla eşleştirmez, her seferinde yeni bir ikiz alan açar; yama, spec'te `"back_link"` taşıyan LINK alanlarını back-link'i önce açıp ikizini o alan olarak kullanarak kurar. Yamasız kurulumda rollup/COUNT'lar boş kalır.
+
 | # | Komut | Ne yapar |
 |---|---|---|
 | 1 | `python main.py build apps/polifarma_arge_proje.py` | Uygulama 1 — Ar-Ge Proje Takibi (ortak bağlantı noktası, ilk kurulur) |
 | 2 | `python main.py build apps/polifarma_stok.py` | Uygulama 2 — Numune ve Hammadde Stok (Proje'ye cross-app link) |
 | 3 | `python main.py build apps/polifarma_toplanti.py` | Uygulama 3 — Toplantı Yönetimi (Proje'ye cross-app link) |
-| 4 | `python apps/upgrade_polifarma_computed.py` | Back-link, rollup, COUNT, formül, QR alanları (ID gerektirdiği için build sonrası) |
-| 5 | `python main.py build apps/polifarma_stok_faz2.py` | Kritik stok görünümü + günlük uyarı + stok raporları |
-| 6 | `python main.py build apps/polifarma_proje_faz2.py` | Bütçe / gerçekleşen maliyet raporları |
-| 7 | `python main.py seed apps/polifarma_toplanti.py` | Toplantı serileri (Haftalık Ar-Ge, PoC Geri Bildirim) |
+| 4 | `python apps/upgrade_polifarma_titles.py` | Zorunlu "Ad" alanlarını formüle çevirir (adım 2-3'teki 5 kayıt-oluşturan otomasyon bu yüzden ilk seferde uyarı verir) |
+| 5 | `python main.py build apps/polifarma_stok.py` ve `... polifarma_toplanti.py` | Tekrar build: eksik kalan 5 otomasyonu kurar |
+| 6 | `python apps/upgrade_polifarma_computed.py` | Rollup, COUNT, formül, QR alanları |
+| 7 | `python main.py build apps/polifarma_stok_faz2.py` | Kritik stok görünümü + günlük uyarı + stok raporları |
+| 8 | `python main.py build apps/polifarma_proje_faz2.py` | Bütçe / gerçekleşen maliyet raporları |
+| 9 | `python main.py seed apps/polifarma_toplanti.py` | Toplantı serileri (Haftalık Ar-Ge, PoC Geri Bildirim) |
 
 Dosyaları skill klasöründeki `apps/` altına kopyalayıp komutları oradan çalıştırın. API anahtarı `--api-key` ya da `API_KEY` ile verilir.
+
+**Plan uyumluluğu:** Spec'lerde `PLAN_SUPPORTS_PROCESS = False` iken süreç listeleri veri listesi olarak kurulur ve yerleşik Status yerine aynı seçeneklerle "Durum" alanı kullanılır (2024Business deneme planı süreç listesi ve klasör desteklemiyor; klasörleri builder kendisi atlar). Süreç listesi destekleyen planda `True` yapılır.
+
+**Polifarma tenant'ı (23.10.2026):** Yukarıdaki 9 adım hatasız tamamlandı. Test kayıtlarıyla doğrulandı: lot girişi → otomatik giriş hareketi, formül bileşeni → otomatik çıkış, Kalan Miktar / Toplam Stok / Kritik Seviye Altında ve proje Gerçekleşen Maliyet doğru hesaplanıyor (test kayıtları silindi).
 
 ---
 
