@@ -152,7 +152,7 @@ SPEC = {
                         {"name": "Onay Notu",                "type": F.TEXT, "multiline": True},
                         {"name": "Gecikmede",                "type": F.BOOLEAN},
                         {"name": "Ekler",                    "type": F.FILE},
-                        {"name": "Proje",                    "type": F.LINK, "target_list": "Ar-Ge Projeleri"},
+                        {"name": "Proje",                    "type": F.LINK, "target_list": "Ar-Ge Projeleri", "back_link": "Faz Kapıları"},
                         {"name": "Proje Kodu",               "type": F.LOOKUP, "via": "Proje", "lookup_field": "Proje Kodu"},
                         {"name": "Proje Lideri",             "type": F.LOOKUP, "via": "Proje", "lookup_field": "Proje Lideri"},
                         {"name": "Proje Ekibi",              "type": F.LOOKUP, "via": "Proje", "lookup_field": "Ekip"},
@@ -207,7 +207,7 @@ SPEC = {
                         {"name": "Kök Neden",     "type": F.TEXT, "multiline": True},
                         {"name": "Kapanış Notu",  "type": F.TEXT, "multiline": True},
                         {"name": "Ekler",         "type": F.FILE},
-                        {"name": "Proje",         "type": F.LINK, "target_list": "Ar-Ge Projeleri"},
+                        {"name": "Proje",         "type": F.LINK, "target_list": "Ar-Ge Projeleri", "back_link": "Görevler ve Sapmalar"},
                         {"name": "Proje Lideri",  "type": F.LOOKUP, "via": "Proje", "lookup_field": "Proje Lideri"},
                         {"name": "Ar-Ge Direktörü", "type": F.LOOKUP, "via": "Proje", "lookup_field": "Ar-Ge Direktörü"},
                     ],
@@ -264,7 +264,7 @@ SPEC = {
                         {"name": "Sorumlu",                "type": F.USER},
                         {"name": "Tarih",                  "type": F.DATE},
                         {"name": "Ekler",                  "type": F.FILE},
-                        {"name": "Proje",                  "type": F.LINK, "target_list": "Ar-Ge Projeleri"},
+                        {"name": "Proje",                  "type": F.LINK, "target_list": "Ar-Ge Projeleri", "back_link": "Denemeler"},
                     ],
                     "views": [
                         {"name": "Tüm Denemeler",      "type": V.GRID},
@@ -301,8 +301,8 @@ SPEC = {
                         {"name": "Sorumlu",             "type": F.USER},
                         {"name": "Tarih",               "type": F.DATE},
                         {"name": "Ekler",               "type": F.FILE},
-                        {"name": "Proje",               "type": F.LINK, "target_list": "Ar-Ge Projeleri"},
-                        {"name": "Deneme",              "type": F.LINK, "target_list": "Formülasyon Denemeleri"},
+                        {"name": "Proje",               "type": F.LINK, "target_list": "Ar-Ge Projeleri", "back_link": "Analitik Çalışmalar"},
+                        {"name": "Deneme",              "type": F.LINK, "target_list": "Formülasyon Denemeleri", "back_link": "Analitik Çalışmalar"},
                     ],
                     "views": [
                         {"name": "Tüm Analitik Çalışmalar", "type": V.GRID},
@@ -332,8 +332,8 @@ SPEC = {
                         {"name": "Sapma",                   "type": F.BOOLEAN},
                         {"name": "Sapma Açıklaması",        "type": F.TEXT, "multiline": True},
                         {"name": "Ekler",                   "type": F.FILE},
-                        {"name": "Proje",                   "type": F.LINK, "target_list": "Ar-Ge Projeleri"},
-                        {"name": "Batch (Deneme)",          "type": F.LINK, "target_list": "Formülasyon Denemeleri"},
+                        {"name": "Proje",                   "type": F.LINK, "target_list": "Ar-Ge Projeleri", "back_link": "Stabilite Çalışmaları"},
+                        {"name": "Batch (Deneme)",          "type": F.LINK, "target_list": "Formülasyon Denemeleri", "back_link": "Stabilite Çalışmaları"},
                     ],
                     "views": [
                         {"name": "Tüm Stabilite Çalışmaları", "type": V.GRID},
@@ -361,7 +361,7 @@ SPEC = {
                         {"name": "Bulgular",           "type": F.TEXT, "multiline": True},
                         {"name": "Sorumlu",            "type": F.USER},
                         {"name": "Ekler",              "type": F.FILE},
-                        {"name": "Stabilite Çalışması", "type": F.LINK, "target_list": "Stabilite Çalışmaları"},
+                        {"name": "Stabilite Çalışması", "type": F.LINK, "target_list": "Stabilite Çalışmaları", "back_link": "Ölçümler"},
                     ],
                     "views": [
                         {"name": "Tüm Stabilite Ölçümleri", "type": V.GRID},
@@ -538,3 +538,43 @@ SPEC = {
 
     "seed": {},
 }
+
+
+# ── Plan uyumluluğu ───────────────────────────────────────────────────────────
+# Polifarma deneme planı (2024Business) süreç listelerini desteklemiyor. False iken
+# süreç listeleri veri listesi olarak kurulur; yerleşik "Status" yerine aynı
+# seçeneklerle bir "Durum" SELECT alanı eklenir ve tüm referanslar ona çevrilir.
+PLAN_SUPPORTS_PROCESS = False
+
+
+def _process_to_data(spec):
+    def swap(o):
+        if isinstance(o, dict):
+            return {("Durum" if k == "Status" else k): swap(v) for k, v in o.items()}
+        if isinstance(o, list):
+            return [swap(x) for x in o]
+        if isinstance(o, str):
+            return "Durum" if o == "Status" else o.replace("{{Status}}", "{{Durum}}")
+        return o
+
+    lists = [l for f in spec.get("folders", []) for l in f["lists"]] + spec.get("lists", [])
+    for l in lists:
+        if "status_options" not in l:
+            continue
+        opts = l.pop("status_options")
+        l.pop("default_status", None)
+        l.pop("list_type", None)
+        durum = {"name": "Durum", "type": F.SELECT,
+                 "options": [o["label"] for o in opts], "colors": [o["color"] for o in opts]}
+        fields = l["fields"]
+        fields.insert(1 if fields and fields[0]["type"] == F.AUTONUMBER else 0, durum)
+        l["views"] = swap(l["views"])
+        for tab in l.get("layout", {}).get("tabs", [])[:1]:
+            tab["fields"].insert(0, "Durum")
+    spec["reports"] = swap(spec.get("reports", []))
+    spec["automations"] = swap(spec.get("automations", []))
+    return spec
+
+
+if not PLAN_SUPPORTS_PROCESS:
+    SPEC = _process_to_data(SPEC)

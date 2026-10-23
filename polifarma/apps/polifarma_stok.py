@@ -66,7 +66,7 @@ SPEC = {
                         {"name": "Kritik Stok Seviyesi",  "type": F.NUMBER},
                         {"name": "Stok Sorumlusu",        "type": F.USER},
                         {"name": "Notlar",                "type": F.TEXT,  "multiline": True},
-                        {"name": "Tedarikçi",             "type": F.LINK,  "target_list": "Tedarikçiler"},
+                        {"name": "Tedarikçi",             "type": F.LINK,  "target_list": "Tedarikçiler", "back_link": "Sağlanan Malzemeler"},
                         # "Lotlar", "Toplam Stok", "Kritik Seviye Altında" → upgrade script
                     ],
                     "views": [
@@ -106,7 +106,7 @@ SPEC = {
                          "colors":  ["#f5c044", "#5bd77e", "#ea346f", "#ff86c7"]},
                         {"name": "SKT Yaklaşıyor",       "type": F.BOOLEAN},
                         {"name": "Stok Sorumlusu",       "type": F.USER},
-                        {"name": "Malzeme",              "type": F.LINK,   "target_list": "Malzeme Kartları"},
+                        {"name": "Malzeme",              "type": F.LINK,   "target_list": "Malzeme Kartları", "back_link": "Lotlar"},
                         {"name": "Tedarikçi",            "type": F.LINK,   "target_list": "Tedarikçiler"},
                         {"name": "Birim",                "type": F.LOOKUP, "via": "Malzeme", "lookup_field": "Birim"},
                         # "Hareketler", "Kalan Miktar", "SKT'ye Kalan Gün", "QR Kod" → upgrade script
@@ -156,8 +156,8 @@ SPEC = {
                          "required_when": "{{Hareket Tipi}} = 'Çıkış' or {{Hareket Tipi}} = 'İmha' or {{Hareket Tipi}} = 'Sayım Eksiği'"},
                         {"name": "Yapan Kişi",      "type": F.USER},
                         {"name": "Açıklama",        "type": F.TEXT, "multiline": True},
-                        {"name": "Lot",             "type": F.LINK, "target_list": "Lotlar"},
-                        {"name": "İlgili Proje",    "type": F.LINK, "target_app": PROJE_APP, "target_list": "Ar-Ge Projeleri"},
+                        {"name": "Lot",             "type": F.LINK, "target_list": "Lotlar", "back_link": "Hareketler"},
+                        {"name": "İlgili Proje",    "type": F.LINK, "target_app": PROJE_APP, "target_list": "Ar-Ge Projeleri", "back_link": "Stok Tüketimi"},
                         {"name": "İlgili Deneme",   "type": F.LINK, "target_app": PROJE_APP, "target_list": "Formülasyon Denemeleri"},
                         {"name": "Malzeme",         "type": F.LOOKUP, "via": "Lot", "lookup_field": "Malzeme"},
                         {"name": "Lot Durumu",      "type": F.LOOKUP, "via": "Lot", "lookup_field": "Lot Durumu"},
@@ -197,7 +197,7 @@ SPEC = {
                         {"name": "Miktar",          "type": F.NUMBER, "required": True},
                         {"name": "Formüldeki Oran (%)", "type": F.NUMBER},
                         {"name": "Not",             "type": F.TEXT},
-                        {"name": "Deneme",          "type": F.LINK, "target_app": PROJE_APP, "target_list": "Formülasyon Denemeleri"},
+                        {"name": "Deneme",          "type": F.LINK, "target_app": PROJE_APP, "target_list": "Formülasyon Denemeleri", "back_link": "Formül Bileşenleri"},
                         {"name": "İlgili Proje",    "type": F.LINK, "target_app": PROJE_APP, "target_list": "Ar-Ge Projeleri"},
                         {"name": "Lot",             "type": F.LINK, "target_list": "Lotlar"},
                         {"name": "Malzeme",         "type": F.LOOKUP, "via": "Lot", "lookup_field": "Malzeme"},
@@ -234,8 +234,8 @@ SPEC = {
                         {"name": "Ekler",                "type": F.FILE},
                         {"name": "Tedarikçi",            "type": F.LINK, "target_list": "Tedarikçiler"},
                         {"name": "Malzeme",              "type": F.LINK, "target_list": "Malzeme Kartları"},
-                        {"name": "İlgili Proje",         "type": F.LINK, "target_app": PROJE_APP, "target_list": "Ar-Ge Projeleri"},
-                        {"name": "İlgili Deneme",        "type": F.LINK, "target_app": PROJE_APP, "target_list": "Formülasyon Denemeleri"},
+                        {"name": "İlgili Proje",         "type": F.LINK, "target_app": PROJE_APP, "target_list": "Ar-Ge Projeleri", "back_link": "Numuneler"},
+                        {"name": "İlgili Deneme",        "type": F.LINK, "target_app": PROJE_APP, "target_list": "Formülasyon Denemeleri", "back_link": "Üretilen Numuneler"},
                         # "QR Kod" → upgrade script
                     ],
                     "views": [
@@ -281,7 +281,7 @@ SPEC = {
                         {"name": "Teslim Tarihi",     "type": F.DATE},
                         {"name": "Onaylayıcı (Stok Sorumlusu)", "type": F.USER},
                         {"name": "Red Gerekçesi",     "type": F.TEXT,   "multiline": True},
-                        {"name": "İlgili Proje",      "type": F.LINK, "target_app": PROJE_APP, "target_list": "Ar-Ge Projeleri"},
+                        {"name": "İlgili Proje",      "type": F.LINK, "target_app": PROJE_APP, "target_list": "Ar-Ge Projeleri", "back_link": "Malzeme Talepleri"},
                         {"name": "İlgili Deneme",     "type": F.LINK, "target_app": PROJE_APP, "target_list": "Formülasyon Denemeleri"},
                         {"name": "Malzeme",           "type": F.LINK, "target_list": "Malzeme Kartları"},
                         {"name": "Lot",               "type": F.LINK, "target_list": "Lotlar"},
@@ -336,7 +336,7 @@ SPEC = {
                          "colors":  ["#ea346f", "#5bd77e", "#4e86f7"]},
                         {"name": "Yeni Saklama Bitiş Tarihi", "type": F.DATE},
                         {"name": "Not",               "type": F.TEXT, "multiline": True},
-                        {"name": "Numune",            "type": F.LINK, "target_list": "Numuneler"},
+                        {"name": "Numune",            "type": F.LINK, "target_list": "Numuneler", "back_link": "Depo Görevleri"},
                         {"name": "Lot",               "type": F.LINK, "target_list": "Lotlar"},
                     ],
                     "views": [
@@ -524,3 +524,43 @@ SPEC = {
 
     "seed": {},
 }
+
+
+# ── Plan uyumluluğu ───────────────────────────────────────────────────────────
+# Polifarma deneme planı (2024Business) süreç listelerini desteklemiyor. False iken
+# süreç listeleri veri listesi olarak kurulur; yerleşik "Status" yerine aynı
+# seçeneklerle bir "Durum" SELECT alanı eklenir ve tüm referanslar ona çevrilir.
+PLAN_SUPPORTS_PROCESS = False
+
+
+def _process_to_data(spec):
+    def swap(o):
+        if isinstance(o, dict):
+            return {("Durum" if k == "Status" else k): swap(v) for k, v in o.items()}
+        if isinstance(o, list):
+            return [swap(x) for x in o]
+        if isinstance(o, str):
+            return "Durum" if o == "Status" else o.replace("{{Status}}", "{{Durum}}")
+        return o
+
+    lists = [l for f in spec.get("folders", []) for l in f["lists"]] + spec.get("lists", [])
+    for l in lists:
+        if "status_options" not in l:
+            continue
+        opts = l.pop("status_options")
+        l.pop("default_status", None)
+        l.pop("list_type", None)
+        durum = {"name": "Durum", "type": F.SELECT,
+                 "options": [o["label"] for o in opts], "colors": [o["color"] for o in opts]}
+        fields = l["fields"]
+        fields.insert(1 if fields and fields[0]["type"] == F.AUTONUMBER else 0, durum)
+        l["views"] = swap(l["views"])
+        for tab in l.get("layout", {}).get("tabs", [])[:1]:
+            tab["fields"].insert(0, "Durum")
+    spec["reports"] = swap(spec.get("reports", []))
+    spec["automations"] = swap(spec.get("automations", []))
+    return spec
+
+
+if not PLAN_SUPPORTS_PROCESS:
+    SPEC = _process_to_data(SPEC)

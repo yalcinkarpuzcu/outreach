@@ -74,7 +74,7 @@ SPEC = {
                         {"name": "AI Özeti",             "type": F.TEXT, "multiline": True},
                         {"name": "Toplantı Serisi",      "type": F.LINK, "target_list": "Toplantı Serileri"},
                         {"name": "İlgili Projeler",      "type": F.LINK, "target_app": PROJE_APP,
-                         "target_list": "Ar-Ge Projeleri", "multiple": True},
+                         "target_list": "Ar-Ge Projeleri", "multiple": True, "back_link": "Toplantılar"},
                     ],
                     "views": [
                         {"name": "Tüm Toplantılar",      "type": V.GRID},
@@ -120,7 +120,7 @@ SPEC = {
                         {"name": "Kaynak",           "type": F.SELECT,
                          "options": ["Manuel", "Açık Aksiyon (otomatik)"],
                          "colors":  ["#8ed6ff", "#ffa979"]},
-                        {"name": "Toplantı",         "type": F.LINK, "target_list": "Toplantılar"},
+                        {"name": "Toplantı",         "type": F.LINK, "target_list": "Toplantılar", "back_link": "Gündem"},
                         {"name": "İlgili Aksiyon",   "type": F.LINK, "target_list": "Aksiyonlar"},
                         {"name": "İlgili Proje",     "type": F.LINK, "target_app": PROJE_APP, "target_list": "Ar-Ge Projeleri"},
                     ],
@@ -142,9 +142,9 @@ SPEC = {
                          "colors":  ["#8ed6ff", "#5bd77e", "#f5c044", "#ea346f", "#7942e3"]},
                         {"name": "Karar Veren",       "type": F.USER},
                         {"name": "Tarih",             "type": F.DATE},
-                        {"name": "Toplantı",          "type": F.LINK, "target_list": "Toplantılar"},
-                        {"name": "İlgili Proje",      "type": F.LINK, "target_app": PROJE_APP, "target_list": "Ar-Ge Projeleri"},
-                        {"name": "İlgili Faz Kapısı", "type": F.LINK, "target_app": PROJE_APP, "target_list": "Faz Kapıları"},
+                        {"name": "Toplantı",          "type": F.LINK, "target_list": "Toplantılar", "back_link": "Kararlar"},
+                        {"name": "İlgili Proje",      "type": F.LINK, "target_app": PROJE_APP, "target_list": "Ar-Ge Projeleri", "back_link": "Toplantı Kararları"},
+                        {"name": "İlgili Faz Kapısı", "type": F.LINK, "target_app": PROJE_APP, "target_list": "Faz Kapıları", "back_link": "Toplantı Kararları"},
                     ],
                     "views": [
                         {"name": "Tüm Kararlar",      "type": V.GRID},
@@ -174,9 +174,9 @@ SPEC = {
                          "options": ["Düşük", "Orta", "Yüksek", "Kritik"],
                          "colors":  ["#8ed6ff", "#f5c044", "#ffa979", "#ea346f"]},
                         {"name": "Kapanış Notu",   "type": F.TEXT, "multiline": True},
-                        {"name": "Toplantı",       "type": F.LINK, "target_list": "Toplantılar"},
-                        {"name": "Karar",          "type": F.LINK, "target_list": "Kararlar"},
-                        {"name": "İlgili Proje",   "type": F.LINK, "target_app": PROJE_APP, "target_list": "Ar-Ge Projeleri"},
+                        {"name": "Toplantı",       "type": F.LINK, "target_list": "Toplantılar", "back_link": "Aksiyonlar"},
+                        {"name": "Karar",          "type": F.LINK, "target_list": "Kararlar", "back_link": "Aksiyonlar"},
+                        {"name": "İlgili Proje",   "type": F.LINK, "target_app": PROJE_APP, "target_list": "Ar-Ge Projeleri", "back_link": "Toplantı Aksiyonları"},
                     ],
                     "views": [
                         {"name": "Tüm Aksiyonlar",   "type": V.GRID},
@@ -347,3 +347,43 @@ SPEC = {
         ],
     },
 }
+
+
+# ── Plan uyumluluğu ───────────────────────────────────────────────────────────
+# Polifarma deneme planı (2024Business) süreç listelerini desteklemiyor. False iken
+# süreç listeleri veri listesi olarak kurulur; yerleşik "Status" yerine aynı
+# seçeneklerle bir "Durum" SELECT alanı eklenir ve tüm referanslar ona çevrilir.
+PLAN_SUPPORTS_PROCESS = False
+
+
+def _process_to_data(spec):
+    def swap(o):
+        if isinstance(o, dict):
+            return {("Durum" if k == "Status" else k): swap(v) for k, v in o.items()}
+        if isinstance(o, list):
+            return [swap(x) for x in o]
+        if isinstance(o, str):
+            return "Durum" if o == "Status" else o.replace("{{Status}}", "{{Durum}}")
+        return o
+
+    lists = [l for f in spec.get("folders", []) for l in f["lists"]] + spec.get("lists", [])
+    for l in lists:
+        if "status_options" not in l:
+            continue
+        opts = l.pop("status_options")
+        l.pop("default_status", None)
+        l.pop("list_type", None)
+        durum = {"name": "Durum", "type": F.SELECT,
+                 "options": [o["label"] for o in opts], "colors": [o["color"] for o in opts]}
+        fields = l["fields"]
+        fields.insert(1 if fields and fields[0]["type"] == F.AUTONUMBER else 0, durum)
+        l["views"] = swap(l["views"])
+        for tab in l.get("layout", {}).get("tabs", [])[:1]:
+            tab["fields"].insert(0, "Durum")
+    spec["reports"] = swap(spec.get("reports", []))
+    spec["automations"] = swap(spec.get("automations", []))
+    return spec
+
+
+if not PLAN_SUPPORTS_PROCESS:
+    SPEC = _process_to_data(SPEC)

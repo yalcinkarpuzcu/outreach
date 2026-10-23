@@ -1,0 +1,92 @@
+--- a/workiom/builder.py
++++ b/workiom/builder.py
+@@ -429,6 +429,11 @@
+             self._log("field", name, "exists (state)")
+             return self.state.get_field_id(list_name, name)
+ 
++        # LINK with a back-link: create the association pair from the parent side and
++        # adopt the auto-created twin as this forward LINK (see _ensure_associated_link)
++        if field_spec.get("type") == F.LINK and field_spec.get("back_link"):
++            return self._ensure_associated_link(list_name, list_id, field_spec)
++
+         # Not found — create it
+         body = self._build_field_payload(field_spec, list_id, list_name)
+         if body is None:
+@@ -443,6 +448,77 @@
+             print(f"    ⚠️  Field '{name}' failed: {e.message}")
+             return None
+ 
++    def _ensure_associated_link(self, list_name: str, list_id: str,
++                                field_spec: dict) -> int | None:
++        """
++        Forward LINK + parent back-link as ONE association pair.
++
++        Workiom never pairs a back-link with an existing plain LINK: creating the
++        back-link always auto-creates a NEW twin LINK on the child, and rollups/COUNTs
++        on the parent only see records linked through that twin. So the back-link is
++        created first (on the target/parent list), and its twin is renamed to the
++        spec's field name and set to single/multiple as the spec says.
++
++        Spec: {"name": "Lot", "type": F.LINK, "target_list": "Lotlar",
++               "back_link": "Hareketler"}       # + target_app for cross-app
++        """
++        name = field_spec["name"]
++        back_name = field_spec["back_link"]
++        target_list = field_spec.get("target_list")
++        target_app = field_spec.get("target_app")
++        try:
++            if target_app:
++                parent_state = AppState(target_app)
++                parent_list_id = self.resolver.resolve_list(target_app, target_list)
++            else:
++                parent_state = self.state
++                parent_list_id = self.state.get_list_id(target_list)
++        except ResolutionError as e:
++            print(f"    ⚠️  Skipping LINK '{name}': {e}")
++            return None
++        if not parent_list_id:
++            print(f"    ⚠️  Skipping LINK '{name}': target list '{target_list}' not in state yet.")
++            return None
++
++        try:
++            parent_fields = self.client.get_all_fields(parent_list_id)
++            back = next((f for f in parent_fields if f.get("name") == back_name
++                         and f.get("linkedListId") == list_id), None)
++            if back:
++                back_id = back["id"]
++            else:
++                payload = {
++                    "name": back_name, "dataType": F.LINK,
++                    "linkedListId": list_id,
++                    "isAssociation": True, "hasAssociatedLinkedField": True,
++                    "allowMultiple": True, "isRequired": False, "isVisible": True,
++                }
++                if target_app:
++                    payload["linkedAppId"] = self.state.app_id
++                back_id = self.client.create_field(parent_list_id, payload)["id"]
++                self._log("field", f"{target_list}.{back_name}", "back-link created", str(back_id))
++            parent_state.set_field_id(target_list, back_name, back_id)
++            parent_state.save()
++
++            twin = next((f for f in self.client.get_all_fields(list_id)
++                         if f.get("dataType") == F.LINK and f.get("linkedFieldId") == back_id), None)
++            if not twin:
++                print(f"    ⚠️  LINK '{name}': twin of back-link {back_id} not found")
++                return None
++            body = dict(twin)
++            body.update({"name": name, "description": "",
++                         "allowMultiple": field_spec.get("multiple", False)})
++            self.client.update_field(list_id, twin["id"], body)
++        except WorkiomAPIError as e:
++            print(f"    ⚠️  LINK '{name}' (with back-link '{back_name}') failed: {e.message} {e.details}")
++            return None
++
++        self.state.set_field_id(list_name, name, twin["id"])
++        self._linked_list_id_cache[f"{list_name}::{name}"] = parent_list_id
++        self._field_type_cache[f"{list_name}::{name}"] = F.LINK
++        self._log("field", name, "created (paired)", str(twin["id"]))
++        return twin["id"]
++
+     def _build_lookup_payload(self, field_spec: dict,
+                               list_name: str | None) -> dict | None:
+         """
